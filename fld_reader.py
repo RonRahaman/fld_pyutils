@@ -1,12 +1,13 @@
-import struct
 import numpy as np
-from collections import namedtuple
 
 
 class FldData:
-    def __init__(self, filename):
+    def __init__(self, filename, ndim=3):
 
         self.filename = filename
+
+        # TODO: Check if this is consistent with nz ?
+        self.ndim = ndim
 
         with open(self.filename, 'rb') as f:
             header_str = f.read(132).decode(encoding='ascii')
@@ -49,12 +50,30 @@ class FldData:
             f.seek(self.glob_el_nums_offset)
             return np.fromfile(f, dtype=self.int_type, count=self.nelt)
 
+    def get_field(self):
+        with open(self.filename, 'rb') as f:
+            f.seek(self.field_offset)
+            count = self.ndim * self.nx * self.ny * self.nz * self.nelt
+            return np.fromfile(f, dtype=self.float_type, count=count).reshape([self.ndim, -1])
+
     def __repr__(self):
-        return str(self.__dict__)
+        return repr(self.__dict__)
 
 
 if __name__ == '__main__':
     fld = FldData('data/test0.f00001')
 
-    print(fld)
-    print(fld.get_glob_el_nums())
+    with open('header.txt', 'w') as f:
+        for k, v in fld.__dict__.items():
+            f.write('{:19} = {}\n'.format(k, v))
+
+    with open('glob_el_nums.txt', 'w') as f:
+        glob_el_array = fld.get_glob_el_nums()
+        glob_el_array.tofile(f, sep=' ', format='%3d')
+
+    with open('field.txt', 'w') as f:
+        fmt = '%.3e'
+        fld_array = fld.get_field()
+        for i in range(fld.ndim):
+            fld_array[i:].tofile(f, sep=' ', format=fmt)
+            f.write('\n')
