@@ -59,13 +59,19 @@ class FldData:
     def __repr__(self):
         return repr(self.__dict__)
 
+    def __str__(self):
+        width = max(len(key) for key in self.__dict__)
+        result = ''
+        for k, v in self.__dict__.items():
+            result += '{key:{width}} = {value}\n'.format(key=k, value=v, width=width)
+        return result
+
 
 if __name__ == '__main__':
     fld = FldData('data/test0.f00001')
 
     with open('header.txt', 'w') as f:
-        for k, v in fld.__dict__.items():
-            f.write('{:19} = {}\n'.format(k, v))
+        print(fld, file=f)
 
     with open('glob_el_nums.txt', 'w') as f:
         glob_el_array = fld.get_glob_el_nums()
