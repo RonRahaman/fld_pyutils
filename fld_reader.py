@@ -64,7 +64,7 @@ class FldData:
             self.if_press_mesh = False if 'F' in header_list[13] else True
 
             # Get endian test value (should be 6.54321 if endianness matches this system's)
-            endian_test_val = np.fromfile(f, dtype=np.float32, count=1)
+            endian_test_val = np.fromfile(f, dtype=np.float32, count=1)[0]
 
             # Set float size based on what the fld file says.  Only 32 and 64 bit types are supported.
             if self.float_size == 4:
@@ -75,7 +75,7 @@ class FldData:
                 raise ValueError('{} specified invalid float size {}'.format(self.filename, self.float_size))
 
             # If necessary, switch endianness of float type
-            if not np.all(np.isclose(endian_test_val, [6.54321], atol=1e-6, rtol=0.0)):
+            if np.abs(endian_test_val - 6.54321) > 1e-6:
                 self.float_type = self.float_type.newbyteorder('S')
 
             # Always set int size to int32
