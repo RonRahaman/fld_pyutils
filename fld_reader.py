@@ -121,7 +121,7 @@ class FldData:
                 self._coord_count = self.ndim * self.nx1 * self.ny1 * self.nz1 * self.nelt
                 self._coord_offset = current_offset
                 current_offset += self._coord_count * self.float_type.itemsize
-                self._notify("Located coorinate field X")
+                self._notify("Located coorinates X")
 
             # Velocity field
             elif code == 'U':
@@ -169,23 +169,34 @@ class FldData:
         Returns:
             np.array: An array of global element numbers.  Shape is [nelt,]
         """
-        with open(self.filename, 'rb') as f:
-            f.seek(self._glob_el_offset)
-            return np.fromfile(f, dtype=self.int_type, count=self.nelt)
+        return self._get_array(offset=self._glob_el_offset, count=self._glob_el_count, dtype=self.int_type)
 
-    def get_field(self):
-        """ Get the field data itself.
+    def get_coordinates(self):
+        """ Get the coordinates
 
         Returns:
-            np.array:  An array of field data.  Shape is [ndim, ndim*nx*ny*nz*nelt]
+            np.array:  An array of coordinates.  Shape is [ndim, ndim*nx*ny*nz*nelt]
         """
+        if self._coord_count:
+            return self._get_array(offset=self._coord_offset, count=self._coord_count, dtype=self.float_type,
+                                   reshape=[self.ndim, -1])
+        else:
+            self._error("No coordinate field was found.")
+
+    def _get_array(self, offset, dtype, count, reshape=None):
         with open(self.filename, 'rb') as f:
-            f.seek(self.field_offset)
-            count = self.ndim * self.nx1 * self.ny1 * self.nz1 * self.nelt
-            return np.fromfile(f, dtype=self.float_type, count=count).reshape([self.ndim, -1])
+            f.seek(offset)
+            array = np.fromfile(f, dtype=dtype, count=count)
+            if reshape:
+                return array.reshape(reshape)
+            else:
+                return array
 
     def _notify(self, msg):
         print("[{}] : {}".format(self.filename, msg))
+
+    def _error(self, error, msg):
+        raise error("[{}] : {}".format(self.filename, msg))
 
     def __repr__(self):
         return repr(self.__dict__)
@@ -211,9 +222,9 @@ if __name__ == '__main__':
         glob_el_array = fld.get_glob_el_nums()
         glob_el_array.tofile(f, sep=' ', format='%3d')
 
-    with open('field.txt', 'w') as f:
+    with open('coords.txt', 'w') as f:
         fmt = '%.3e'
-        fld_array = fld.get_field()
+        fld_array = fld.get_coordinates()
         for i in range(fld.ndim):
             fld_array[i:].tofile(f, sep=' ', format=fmt)
             f.write('\n')
