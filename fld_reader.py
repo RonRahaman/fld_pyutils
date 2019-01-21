@@ -1,4 +1,5 @@
 import numpy as np
+import re
 
 
 class FldData:
@@ -11,9 +12,9 @@ class FldData:
         filename (string): Path to fld file
         ndim (int, optional): Number of dimensions in corresponding model.  Default: 3
         float_size (int): Size of floats (in bytes) used in the fld file
-        nx (int):
-        ny (int):
-        nz (int):
+        nx1 (int):
+        ny1 (int):
+        nz1 (int):
         nelt (int):
         nelgt (int):
         time (float):
@@ -26,8 +27,6 @@ class FldData:
         float_type (np.dtype):  Set to float32 or float64, depending on float_size.
             Endianness is determined from fld file.
         int_type (np.dtype):  Always set to int32.  Endianness is determined from fld file.
-        glob_el_nums_offset (int):  Bytes at which the global element numbers begin, counting from beginning of file
-        field_offset (int):  Bytes at which the field data begin, counting from beginning of file
     """
 
     def __init__(self, filename, ndim=3):
@@ -50,9 +49,9 @@ class FldData:
             header_list = header_str.split()
 
             self.float_size = int(header_list[1])
-            self.nx = int(header_list[2])
-            self.ny = int(header_list[3])
-            self.nz = int(header_list[4])
+            self.nx1 = int(header_list[2])
+            self.ny1 = int(header_list[3])
+            self.nz1 = int(header_list[4])
             self.nelt = int(header_list[5])
             self.nelgt = int(header_list[6])
             self.time = float(header_list[7])
@@ -63,9 +62,9 @@ class FldData:
             self.p0th = float(header_list[12]),
 
             # Set if_press_mesh
-            if header_list[13] == 'F':
+            if header_list[13].casefold() == 'f':
                 self.if_press_mesh = False
-            elif header_list[13] == 'T':
+            elif header_list[13].casefold() == 't':
                 raise ValueError("{} specifies if_press_mesh='{}', but PnPn-2 is not supported for {}".format(
                     self.filename, header_list[13], self.__class__.__name__))
             else:
@@ -90,9 +89,79 @@ class FldData:
             # Always set int size to int32
             self.int_type = np.dtype(np.int32)
 
-        # Set offset locations of global element number and field data
-        self.glob_el_nums_offset = 136
-        self.field_offset = 136 + self.nelt
+        # Set offset locations of global element number (always present)
+        self._glob_el_offset = 136
+        self._glob_el_count = self.nelt
+
+        self._coord_offset = None
+        self._coord_count = None
+
+        self._velocity_offset = None
+        self._velocity_count = None
+
+        self._pressure_offset = None
+        self._pressure_count = None
+
+        self._temperature_offset = None
+        self._temperature_count = None
+
+        self._passive_scalar_offsets = dict()
+        self._passive_scalar_counts = dict()
+
+        current_offset = self._glob_el_offset + self._glob_el_count * self.int_type.itemsize
+
+        self._notify("Attempting to parse rdcode {}".format(self.rdcode))
+
+        # Parse something like "XUS01" into ['X', 'U', 'S01']
+        code_list = [s.upper() for s in re.split(r'(?!\d)', self.rdcode) if s]
+        for code in code_list:
+
+            # Coordinate data
+            if code == 'X':
+                self._coord_count = self.ndim * self.nx1 * self.ny1 * self.nz1 * self.nelt
+                self._coord_offset = current_offset
+                current_offset += self._coord_count * self.float_type.itemsize
+                self._notify("Located coorinate field X")
+
+            # Velocity field
+            elif code == 'U':
+                self._velocity_count = self.ndim * self.nx1 * self.ny1 * self.nz1 * self.nelt
+                self._velocity_offset = current_offset
+                current_offset += self._velocity_count * self.float_type.itemsize
+                self._notify("Located velocity field U")
+
+            # Pressure field
+            elif code == 'P':
+                self._pressure_count = self.nx1 * self.ny1 * self.nz1 * self.nelt
+                self._pressure_offset = current_offset
+                current_offset += self._pressure_count * self.float_type.itemsize
+                self._notify("Located pressure field P")
+
+            # Temperature field
+            elif code == 'T':
+                self._temperature_count = self.nx1 * self.ny1 * self.nz1 * self.nelt
+                self._temperature_offset = current_offset
+                current_offset += self._temperature_count * self.float_type.itemsize
+                self._notify("Located temperature field T")
+
+            # Passive scalars
+            # TODO: The passive scalars will be 0-based indexed once we parse them.  Maybe use dicts
+            elif code.startswith('S'):
+                try:
+                    num_scalars = int(code[1:])
+                except ValueError:
+                    self._notify(
+                        "Warning: Couldn't parse number of passive scalar fields (attempted to parse code {})".format(
+                            code))
+                else:
+                    for i in range(1, num_scalars + 1):
+                        self._passive_scalar_counts[i] = self.nx1 * self.ny1 * self.nz1 * self.nelt
+                        self._passive_scalar_offsets[i] = current_offset
+                        current_offset += self._passive_scalar_counts[i] * self.float_type.itemsize
+                    self._notify("Located {} passive scalar fields from {}".format(num_scalars, code))
+
+            else:
+                self._notify("Warning: Unsupported rdcode '{'".format(code))
 
     def get_glob_el_nums(self):
         """ Get the array of global element numbers.
@@ -101,7 +170,7 @@ class FldData:
             np.array: An array of global element numbers.  Shape is [nelt,]
         """
         with open(self.filename, 'rb') as f:
-            f.seek(self.glob_el_nums_offset)
+            f.seek(self._glob_el_offset)
             return np.fromfile(f, dtype=self.int_type, count=self.nelt)
 
     def get_field(self):
@@ -112,8 +181,11 @@ class FldData:
         """
         with open(self.filename, 'rb') as f:
             f.seek(self.field_offset)
-            count = self.ndim * self.nx * self.ny * self.nz * self.nelt
+            count = self.ndim * self.nx1 * self.ny1 * self.nz1 * self.nelt
             return np.fromfile(f, dtype=self.float_type, count=count).reshape([self.ndim, -1])
+
+    def _notify(self, msg):
+        print("[{}] : {}".format(self.filename, msg))
 
     def __repr__(self):
         return repr(self.__dict__)
