@@ -61,10 +61,17 @@ class FldData:
             self.nfileoo = int(header_list[10])
             self.rdcode = header_list[11]
             self.p0th = float(header_list[12]),
-            self.if_press_mesh = False if 'F' in header_list[13] else True
 
-            # Get endian test value (should be 6.54321 if endianness matches this system's)
-            endian_test_val = np.fromfile(f, dtype=np.float32, count=1)[0]
+            # Set if_press_mesh
+            if header_list[13] == 'F':
+                self.if_press_mesh = False
+            elif header_list[13] == 'T':
+                raise ValueError("{} specifies if_press_mesh='{}', but PnPn-2 is not supported for {}".format(
+                    self.filename, header_list[13], self.__class__.__name__))
+            else:
+                raise ValueError(
+                    "{} contains if_press_mesh={}', which is not supported (only 'T' or 'F' supported)".format(
+                        self.filename, header_list[13]))
 
             # Set float size based on what the fld file says.  Only 32 and 64 bit types are supported.
             if self.float_size == 4:
@@ -74,7 +81,9 @@ class FldData:
             else:
                 raise ValueError('{} specified invalid float size {}'.format(self.filename, self.float_size))
 
+            # Get endian test value (should be 6.54321 if endianness matches this system's)
             # If necessary, switch endianness of float type
+            endian_test_val = np.fromfile(f, dtype=np.float32, count=1)[0]
             if np.abs(endian_test_val - 6.54321) > 1e-6:
                 self.float_type = self.float_type.newbyteorder('S')
 
