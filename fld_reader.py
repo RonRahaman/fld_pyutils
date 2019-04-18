@@ -1,8 +1,10 @@
 import numpy as np
 import re
+from fld_header import FldHeader
+from typing import Tuple
 
 
-class FldData:
+class FldReader:
     """ Handles reading of Nek5000 fld file data.
 
     The header is always read and kept in memory.  The other the data (global element numbers and field data) are
@@ -38,60 +40,14 @@ class FldData:
         """
 
         self.filename = filename
+        self.ndim = int(ndim)  # TODO: Check if this is consistent with nz ?
 
-        # TODO: Check if this is consistent with nz ?
-        self.ndim = int(ndim)
-
-        with open(self.filename, 'rb') as f:
-
-            # Parse ASCII-formatted fields
-            header_str = f.read(132).decode(encoding='ascii')
-            header_list = header_str.split()
-
-            self.float_size = int(header_list[1])
-            self.nx1 = int(header_list[2])
-            self.ny1 = int(header_list[3])
-            self.nz1 = int(header_list[4])
-            self.nelt = int(header_list[5])
-            self.nelgt = int(header_list[6])
-            self.time = float(header_list[7])
-            self.iostep = int(header_list[8])
-            self.fid0 = int(header_list[9])
-            self.nfileoo = int(header_list[10])
-            self.rdcode = header_list[11]
-            self.p0th = float(header_list[12]),
-
-            # Set if_press_mesh
-            if header_list[13].casefold() == 'f':
-                self.if_press_mesh = False
-            elif header_list[13].casefold() == 't':
-                raise ValueError("{} specifies if_press_mesh='{}', but PnPn-2 is not supported for {}".format(
-                    self.filename, header_list[13], self.__class__.__name__))
-            else:
-                raise ValueError(
-                    "{} contains if_press_mesh={}', which is not supported (only 'T' or 'F' supported)".format(
-                        self.filename, header_list[13]))
-
-            # Set float size based on what the fld file says.  Only 32 and 64 bit types are supported.
-            if self.float_size == 4:
-                self.float_type = np.dtype(np.float32)
-            elif self.float_size == 8:
-                self.float_type = np.dtype(np.float64)
-            else:
-                raise ValueError('{} specified invalid float size {}'.format(self.filename, self.float_size))
-
-            # Get endian test value (should be 6.54321 if endianness matches this system's)
-            # If necessary, switch endianness of float type
-            endian_test_val = np.fromfile(f, dtype=np.float32, count=1)[0]
-            if np.abs(endian_test_val - 6.54321) > 1e-6:
-                self.float_type = self.float_type.newbyteorder('S')
-
-            # Always set int size to int32
-            self.int_type = np.dtype(np.int32)
+        # Get header
+        self.header = FldHeader.from_file(self.filename)
 
         # Set offset locations of global element number (always present)
         self._glob_el_offset = 136
-        self._glob_el_count = self.nelt
+        self._glob_el_count = self.header.nelt
 
         self._coord_offset = None
         self._coord_count = None
@@ -108,44 +64,45 @@ class FldData:
         self._passive_scalar_offsets = dict()
         self._passive_scalar_counts = dict()
 
-        current_offset = self._glob_el_offset + self._glob_el_count * self.int_type.itemsize
+        current_offset = self._glob_el_offset + self._glob_el_count * self.header.int_type.itemsize
 
-        self._notify("Attempting to parse rdcode {}".format(self.rdcode))
+        self._notify("Attempting to parse rdcode {}".format(self.header.rdcode))
+
+        n_xyze = self.header.nx1 * self.header.ny1 * self.header.nz1 * self.header.nelt
 
         # Parse something like "XUS01" into ['X', 'U', 'S01']
-        code_list = [s.upper() for s in re.split(r'(?!\d)', self.rdcode) if s]
+        code_list = [s.upper() for s in re.split(r'(\D\d*)', self.header.rdcode) if s]
         for code in code_list:
 
             # Coordinate data
             if code == 'X':
-                self._coord_count = self.ndim * self.nx1 * self.ny1 * self.nz1 * self.nelt
+                self._coord_count = self.ndim * n_xyze
                 self._coord_offset = current_offset
-                current_offset += self._coord_count * self.float_type.itemsize
+                current_offset += self._coord_count * self.header.float_type.itemsize
                 self._notify("Located coorinates X")
 
             # Velocity field
             elif code == 'U':
-                self._velocity_count = self.ndim * self.nx1 * self.ny1 * self.nz1 * self.nelt
+                self._velocity_count = self.ndim * n_xyze
                 self._velocity_offset = current_offset
-                current_offset += self._velocity_count * self.float_type.itemsize
+                current_offset += self._velocity_count * self.header.float_type.itemsize
                 self._notify("Located velocity field U")
 
             # Pressure field
             elif code == 'P':
-                self._pressure_count = self.nx1 * self.ny1 * self.nz1 * self.nelt
+                self._pressure_count = n_xyze
                 self._pressure_offset = current_offset
-                current_offset += self._pressure_count * self.float_type.itemsize
+                current_offset += self._pressure_count * self.header.float_type.itemsize
                 self._notify("Located pressure field P")
 
             # Temperature field
             elif code == 'T':
-                self._temperature_count = self.nx1 * self.ny1 * self.nz1 * self.nelt
+                self._temperature_count = n_xyze
                 self._temperature_offset = current_offset
-                current_offset += self._temperature_count * self.float_type.itemsize
+                current_offset += self._temperature_count * self.header.float_type.itemsize
                 self._notify("Located temperature field T")
 
             # Passive scalars
-            # TODO: The passive scalars will be 0-based indexed once we parse them.  Maybe use dicts
             elif code.startswith('S'):
                 try:
                     num_scalars = int(code[1:])
@@ -155,35 +112,55 @@ class FldData:
                             code))
                 else:
                     for i in range(1, num_scalars + 1):
-                        self._passive_scalar_counts[i] = self.nx1 * self.ny1 * self.nz1 * self.nelt
+                        self._passive_scalar_counts[i] = n_xyze
                         self._passive_scalar_offsets[i] = current_offset
-                        current_offset += self._passive_scalar_counts[i] * self.float_type.itemsize
+                        current_offset += self._passive_scalar_counts[i] * self.header.float_type.itemsize
                     self._notify("Located {} passive scalar fields from {}".format(num_scalars, code))
 
             else:
                 self._notify("Warning: Unsupported rdcode '{'".format(code))
 
-    def get_glob_el_nums(self):
+    def get_glob_el_nums(self) -> np.array:
         """ Get the array of global element numbers.
 
         Returns:
             np.array: An array of global element numbers.  Shape is [nelt,]
         """
-        return self._get_array(offset=self._glob_el_offset, count=self._glob_el_count, dtype=self.int_type)
+        return self._get_array(offset=self._glob_el_offset, count=self._glob_el_count, dtype=self.header.int_type)
 
-    def get_coordinates(self):
-        """ Get the coordinates
-
-        Returns:
-            np.array:  An array of coordinates.  Shape is [ndim, ndim*nx*ny*nz*nelt]
-        """
+    def get_coordinates(self) -> np.array:
         if self._coord_count:
-            return self._get_array(offset=self._coord_offset, count=self._coord_count, dtype=self.float_type,
-                                   reshape=[self.ndim, -1])
+            return self._get_array(offset=self._coord_offset, count=self._coord_count, dtype=self.header.float_type,
+                                   reshape=(self.ndim, -1))
         else:
             self._error("No coordinate field was found.")
 
-    def _get_array(self, offset, dtype, count, reshape=None):
+    def get_velocity(self) -> np.array:
+        if self._velocity_count:
+            return self._get_array(offset=self._velocity_offset, count=self._velocity_count, dtype=self.header.float_type,
+                                   reshape=(self.ndim, -1))
+        else:
+            self._error("No velocity field was found.")
+
+    def get_pressure(self) -> np.array:
+        if self._pressure_count:
+            return self._get_array(offset=self._pressure_offset, count=self._pressure_count, dtype=self.header.float_type)
+        else:
+            self._error("No pressure field was found.")
+
+    def get_temperature(self) -> np.array:
+        if self._temperature_count:
+            return self._get_array(offset=self._temperature_offset, count=self._temperature_count, dtype=self.header.float_type)
+        else:
+            self._error("No temperature field was found.")
+
+    def get_passive_scalar(self, n: int) -> np.array:
+        if n in self._passive_scalar_counts:
+            return self._get_array(offset=self._passive_scalar_offsets[n], count=self._passive_scalar_counts[n], dtype=self.header.float_type)
+        else:
+            self._error("Passive scalar {} was not found.".format(n))
+
+    def _get_array(self, offset: int, dtype: np.dtype, count: int, reshape: Tuple = None) -> np.array:
         with open(self.filename, 'rb') as f:
             f.seek(offset)
             array = np.fromfile(f, dtype=dtype, count=count)
@@ -192,11 +169,11 @@ class FldData:
             else:
                 return array
 
-    def _notify(self, msg):
+    def _notify(self, msg: str):
         print("[{}] : {}".format(self.filename, msg))
 
-    def _error(self, error, msg):
-        raise error("[{}] : {}".format(self.filename, msg))
+    def _error(self, msg: str):
+        raise Exception("[{}] : {}".format(self.filename, msg))
 
     def __repr__(self):
         return repr(self.__dict__)
@@ -213,18 +190,22 @@ if __name__ == '__main__':
 
     # Parses data from a test file, then prints data as plaintext files for inspection
 
-    fld = FldData('data/test0.f00001')
+    fld = FldReader('data/test0.f00001')
+
+    g = fld.get_glob_el_nums()
+    c = fld.get_coordinates()
+    v = fld.get_velocity()
+    p = fld.get_pressure()
+    t = fld.get_temperature()
 
     with open('header.txt', 'w') as f:
-        print(fld, file=f)
+        print(fld.header, file=f)
 
     with open('glob_el_nums.txt', 'w') as f:
-        glob_el_array = fld.get_glob_el_nums()
-        glob_el_array.tofile(f, sep=' ', format='%3d')
+        g.tofile(f, sep=' ', format='%3d')
 
     with open('coords.txt', 'w') as f:
         fmt = '%.3e'
-        fld_array = fld.get_coordinates()
         for i in range(fld.ndim):
-            fld_array[i:].tofile(f, sep=' ', format=fmt)
+            c[i:].tofile(f, sep=' ', format=fmt)
             f.write('\n')
