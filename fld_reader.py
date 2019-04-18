@@ -188,24 +188,35 @@ class FldReader:
 
 if __name__ == '__main__':
 
-    # Parses data from a test file, then prints data as plaintext files for inspection
+    ## Parses data from a test file, then prints data as plaintext files for inspection
+
+    #fld = FldReader('data/test0.f00001')
+
+    #g = fld.get_glob_el_nums()
+    #c = fld.get_coordinates()
+    #v = fld.get_velocity()
+    #p = fld.get_pressure()
+    #t = fld.get_temperature()
+
+    #with open('header.txt', 'w') as f:
+    #    print(fld.header, file=f)
+
+    #with open('glob_el_nums.txt', 'w') as f:
+    #    g.tofile(f, sep=' ', format='%3d')
+
+    #with open('coords.txt', 'w') as f:
+    #    fmt = '%.3e'
+    #    for i in range(fld.ndim):
+    #        c[i:].tofile(f, sep=' ', format=fmt)
+    #        f.write('\n')
 
     fld = FldReader('data/test0.f00001')
+    print(fld.header)
 
-    g = fld.get_glob_el_nums()
-    c = fld.get_coordinates()
-    v = fld.get_velocity()
-    p = fld.get_pressure()
-    t = fld.get_temperature()
+    test_outfile = 'fld_header_test.bin'
+    fld.header.to_file(test_outfile)
 
-    with open('header.txt', 'w') as f:
-        print(fld.header, file=f)
+    fld2 = FldReader(test_outfile)
+    print('***************')
+    print(fld2.header)
 
-    with open('glob_el_nums.txt', 'w') as f:
-        g.tofile(f, sep=' ', format='%3d')
-
-    with open('coords.txt', 'w') as f:
-        fmt = '%.3e'
-        for i in range(fld.ndim):
-            c[i:].tofile(f, sep=' ', format=fmt)
-            f.write('\n')

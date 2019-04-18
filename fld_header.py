@@ -1,8 +1,11 @@
 import numpy as np
+from typing import Tuple
 
 class FldHeader:
 
-    def __init__(self, nx1, ny1, nz1, nelt, nelgt, rdcode,
+    _endian_check_val = 6.54321
+
+    def __init__(self, nelgt, nx1, ny1, nz1, nelt=None, rdcode="",
                  time=0.0, iostep=0, fid0=0, nfileoo=1, p0th=0.0, if_press_mesh=False,
                  float_type=np.dtype(np.float32), int_type=np.dtype(np.int32)):
         self.nx1 = nx1
@@ -20,9 +23,8 @@ class FldHeader:
         self.float_type = float_type
         self.int_type = int_type
 
-
     @classmethod
-    def from_file(cls, filename):
+    def from_file(cls, filename: str):
 
         with open(filename, 'rb') as f:
 
@@ -65,15 +67,49 @@ class FldHeader:
             # Get endian test value (should be 6.54321 if endianness matches this system's)
             # If necessary, switch endianness of float type
             endian_test_val = np.fromfile(f, dtype=np.float32, count=1)[0]
-            if np.abs(endian_test_val - 6.54321) > 1e-6:
+            if np.abs(endian_test_val - cls._endian_check_val) > 1e-6:
                 float_type = float_type.newbyteorder('S')
 
             # Always set int size to int32
             int_type = np.dtype(np.int32)
 
-            return cls(nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, nelgt=nelgt, rdcode=rdcode,
-                       time=time, iostep=iostep, fid0=fid0, nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh,
-                       float_type=float_type, int_type=int_type)
+        return cls(nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, nelgt=nelgt, rdcode=rdcode,
+                   time=time, iostep=iostep, fid0=fid0, nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh,
+                   float_type=float_type, int_type=int_type)
+
+    @classmethod
+    def from_fields(cls, nelgt: int, nx1: int, ny1: int, nz1: int, nelt: int = None, time: float = 0.0,
+                    iostep: int = 0, fid0: int = 0, nfileoo: int = 1, p0th: float = 0.0, if_press_mesh: bool = False,
+                    float_type: np.dtype = np.dtype(np.float32), int_type: np.dtype = np.dtype(np.int32),
+                    coordinates: np.array = None, velocity: np.array = None, pressure: np.array = None,
+                    temperature: np.array = None, scalars: Tuple[np.array] = None):
+
+        rcode = ""
+        if coordinates:
+            rcode += "X"
+        if velocity:
+            rcode += "U"
+        if pressure:
+            rcode += "P"
+        if temperature:
+            rcode += "T"
+        if scalars:
+            rcode += "S{:2}".format(len(scalars))
+
+    def to_file(self, filename: str):
+
+        wdsize = self.float_type.itemsize
+        press_mesh = 't' if self.if_press_mesh else 'f'
+
+        fmt = '#std {wdsize:1d} {nx1:2d} {ny1:2d} {nz1:2d} {nelt:10d} {nelgt:10d} {time:20.13e} {iostep:9d} ' + \
+              '{fid0:6d} {nfileoo:6d} {rdcode:10} {p0th:15.7e} {press_mesh:1}'
+        header_text = fmt.format(**self.__dict__, **vars())
+
+        with open(filename, 'wb') as f:
+            f.write(header_text.encode('ascii'))
+            blanks = " " * (132 - f.tell())
+            f.write(blanks.encode('ascii'))
+            f.write(np.array([self.__class__._endian_check_val], dtype=self.float_type).tobytes())
 
     def __repr__(self):
         return str(self.__dict__)
@@ -84,4 +120,3 @@ class FldHeader:
         for k, v in self.__dict__.items():
             result += '{key:{width}} = {value}\n'.format(key=k, value=v, width=width)
         return result
-
