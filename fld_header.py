@@ -30,7 +30,7 @@ class FldHeader:
             self.glel = glel
 
     @classmethod
-    def from_file(cls, filename: str):
+    def fromfile(cls, filename: str):
 
         with open(filename, 'rb') as f:
 
@@ -106,7 +106,7 @@ class FldHeader:
         if scalars:
             rcode += "S{:2}".format(len(scalars))
 
-    def to_file(self, filename: str):
+    def tofile(self, filename: str):
 
         wdsize = self.float_type.itemsize
         press_mesh = 't' if self.if_press_mesh else 'f'

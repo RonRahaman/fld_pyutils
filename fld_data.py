@@ -4,7 +4,7 @@ from fld_header import FldHeader
 from typing import Tuple
 
 
-class FldReader:
+class FldData:
 
     def __init__(self, filename: str, ndim: int = 3):
 
@@ -12,8 +12,8 @@ class FldReader:
         self.ndim = int(ndim)  # TODO: Check if this is consistent with nz ?
         self.nscalars = 0
 
-        # Get header
-        self.header = FldHeader.from_file(self.filename)
+        # Get _header
+        self._header = FldHeader.fromfile(self.filename)
 
         # Fields will be empty until they are parsed below
         self.coords = np.array([])
@@ -24,7 +24,7 @@ class FldReader:
 
         self._notify("Attempting to parse rdcode {}".format(self.rdcode))
 
-        # Begin parsing fields after the header
+        # Begin parsing fields after the _header
         offset = 136 + self.nelt * self.int_type.itemsize
 
         # Parse rdcode into list (e.g., "XUS01" is parsed into ['X', 'U', 'S01']
@@ -77,11 +77,12 @@ class FldReader:
             else:
                 self._notify("Warning: Unsupported rdcode '{}'".format(code))
 
-    def from_file(self, filename: str, ndim: int = 3):
-        self.__init__(filename, ndim)
+    @classmethod
+    def fromfile(cls, filename: str, ndim: int = 3):
+        return cls(filename, ndim)
 
-    def to_file(self, filename):
-        self.header.to_file(filename)
+    def tofile(self, filename):
+        self._header.tofile(filename)
         with open(filename, 'ab') as f:
             f.write(self.coords.tobytes())
             f.write(self.u.tobytes())
@@ -109,73 +110,73 @@ class FldReader:
 
     def __str__(self):
         width = max(len(key) for key in self.__dict__)
-        result = str(self.header)
+        result = str(self._header)
         for k, v in self.__dict__.items():
-            if k != 'header':
+            if k != '_header':
                 result += '{key:{width}} = {value}\n'.format(key=k, value=v, width=width)
         return result
 
     @property
     def nx1(self) -> int:
-        return self.header.nx1
+        return self._header.nx1
 
     @property
     def ny1(self) -> int:
-        return self.header.ny1
+        return self._header.ny1
 
     @property
     def nz1(self) -> int:
-        return self.header.nz1
+        return self._header.nz1
 
     @property
     def nelt(self) -> int:
-        return self.header.nelt
+        return self._header.nelt
 
     @property
     def nelgt(self) -> int:
-        return self.header.nelgt
+        return self._header.nelgt
 
     @property
     def time(self) -> float:
-        return self.header.time
+        return self._header.time
 
     @property
     def iostep(self) -> int:
-        return self.header.iostep
+        return self._header.iostep
 
     @property
     def fid0(self) -> int:
-        return self.header.fid0
+        return self._header.fid0
 
     @property
     def nfileoo(self) -> int:
-        return self.header.nfileoo
+        return self._header.nfileoo
 
     @property
     def rdcode(self) -> str:
-        return self.header.rdcode
+        return self._header.rdcode
 
     @property
     def p0th(self) -> float:
-        return self.header.p0th
+        return self._header.p0th
 
     @property
     def if_press_mesh(self) -> bool:
-        return self.header.if_press_mesh
+        return self._header.if_press_mesh
 
     @property
     def float_type(self) -> np.dtype:
-        return self.header.float_type
+        return self._header.float_type
 
     @property
     def int_type(self) -> np.dtype:
-        return self.header.int_type
+        return self._header.int_type
 
 
 if __name__ == '__main__':
     ## Parses data from a test file, then prints data as plaintext files for inspection
 
-    # fld = FldReader('data/test0.f00001')
+    # fld = FldData('data/test0.f00001')
 
     # g = fld.get_glob_el_nums()
     # c = fld.get_coord()
@@ -183,8 +184,8 @@ if __name__ == '__main__':
     # p = fld.get_pressure()
     # t = fld.get_temperature()
 
-    # with open('header.txt', 'w') as f:
-    #    print(fld.header, file=f)
+    # with open('_header.txt', 'w') as f:
+    #    print(fld._header, file=f)
 
     # with open('glob_el_nums.txt', 'w') as f:
     #    g.tofile(f, sep=' ', format='%3d')
@@ -195,12 +196,12 @@ if __name__ == '__main__':
     #        c[i:].tofile(f, sep=' ', format=fmt)
     #        f.write('\n')
 
-    fld = FldReader('data/test0.f00001')
+    fld = FldData.fromfile('data/test0.f00001')
     print(fld)
 
     test_outfile = 'fld_header_test.bin'
-    fld.to_file(test_outfile)
+    fld.tofile(test_outfile)
 
-    fld2 = FldReader(test_outfile)
+    fld2 = FldData.fromfile(test_outfile)
     print('***************')
     print(fld2)
