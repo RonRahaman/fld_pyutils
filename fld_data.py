@@ -7,7 +7,6 @@ from typing import Tuple
 class FldData:
 
     def __init__(self,
-                 filename: str,
                  ndim: int,
                  nscalars: int,
                  header: FldHeader,
@@ -16,7 +15,6 @@ class FldData:
                  p: np.array,
                  t: np.array,
                  s: np.array):
-        self.filename = filename
         self.ndim = ndim
         self.nscalars = nscalars
         self._header = header
@@ -93,7 +91,7 @@ class FldData:
                 else:
                     error("Warning: Unsupported rdcode '{}'".format(code))
 
-        return cls(filename=filename, ndim=ndim, nscalars=nscalars, header=h, coords=coords, u=u, p=p, t=t, s=s)
+        return cls(ndim=ndim, nscalars=nscalars, header=h, coords=coords, u=u, p=p, t=t, s=s)
 
     @classmethod
     def fromvalues(cls,
@@ -102,6 +100,8 @@ class FldData:
                    ny1: int,
                    nz1: int,
                    nelt: int,
+                   ndim: int,
+                   nscalars: int = 0,
                    time: float = 0.0,
                    iostep: int = 0,
                    fid0: int = 0,
@@ -116,7 +116,49 @@ class FldData:
                    p: np.array = None,
                    t: np.array = None,
                    s: np.array = None):
-        pass
+
+        rdcode = ""
+
+        if coords is None:
+            coords = np.array([], dtype=float_type)
+        else:
+            if coords.shape != (ndim, nelt * nx1 * ny1 * nz1):
+                raise ValueError("Incorrect shape for coords: coords.shape must equal (ndim, nelt * nx1 * ny1 * nz1)")
+            rdcode += "X"
+
+        if u is None:
+            u = np.array([], dtype=float_type)
+        else:
+            if u.shape != (ndim, nelt * nx1 * ny1 * nz1):
+                raise ValueError("Incorrect shape for u: u.shape must equal (ndim, nelt * nx1 * ny1 * nz1)")
+            rdcode += "U"
+
+        if p is None:
+            p = np.array([], dtype=float_type)
+        else:
+            if p.shape != (nelt * nx1 * ny1 * nz1,):
+                raise ValueError("Incorrect shape for p: p.shape must equal (nelt * nx1 * ny1 * nz1,)")
+            rdcode += "P"
+
+        if t is None:
+            t = np.array([], dtype=float_type)
+        else:
+            if t.shape != (nelt * nx1 * ny1 * nz1,):
+                raise ValueError("Incorrect shape for t: t.shape must equal (nelt * nx1 * ny1 * nz1,)")
+            rdcode += "T"
+
+        if s is None:
+            s = np.array([], dtype=float_type)
+        else:
+            if s.shape != (nscalars, nelt * nx1 * ny1 * nz1):
+                raise ValueError("Incorrect shape for s: s.shape must equal (nscalars, nelt * nx1 * ny1 * nz1)")
+            rdcode += "S{:2}".format(nscalars)
+
+        h = FldHeader.fromvalues(nelgt=nelgt, nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, rdcode=rdcode, time=time,
+                                 iostep=iostep, fid0=fid0, nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh,
+                                 float_type=float_type, int_type=int_type, glel=glel)
+
+        return cls(ndim=ndim, nscalars=nscalars, header=h, coords=coords, u=u, p=p, t=t, s=s)
 
     def tofile(self, filename):
         self._header.tofile(filename)
@@ -200,34 +242,52 @@ class FldData:
 
 
 if __name__ == '__main__':
-    ## Parses data from a test file, then prints data as plaintext files for inspection
+    # # # Test 1:  Parses a file, writes it to a second file, then parses the second file
+    # # ===============================================================================
 
-    # fld = FldData('data/test0.f00001')
+    # fld = FldData.fromfile('data/test0.f00001')
+    # print(fld)
 
-    # g = fld.get_glob_el_nums()
-    # c = fld.get_coord()
-    # v = fld.get_velocity()
-    # p = fld.get_pressure()
-    # t = fld.get_temperature()
+    # print('***************')
 
-    # with open('_header.txt', 'w') as f:
-    #    print(fld._header, file=f)
+    # test_outfile = 'fld_header_test.bin'
+    # fld.tofile(test_outfile)
+    # fld2 = FldData.fromfile(test_outfile)
+    # print(fld2)
 
-    # with open('glob_el_nums.txt', 'w') as f:
-    #    g.tofile(f, sep=' ', format='%3d')
+    # Test 2: Creates a file from values, writes it to a file, then parses it again
+    # ===============================================================================
 
-    # with open('coords.txt', 'w') as f:
-    #    fmt = '%.3e'
-    #    for i in range(fld.ndim):
-    #        c[i:].tofile(f, sep=' ', format=fmt)
-    #        f.write('\n')
+    # Required
+    ndim = 3
+    nx1 = 7
+    ny1 = nx1
+    nz1 = nx1
+    nelgt = 512
+    nelt = nelgt
+    float_type = np.dtype(np.float32)
+    int_type = np.dtype(np.int32)
 
-    fld = FldData.fromfile('data/test0.f00001')
+    # Optional
+    glel = np.arange(1, nelt+1, dtype=int_type)
+    coords = np.vstack((np.full(nelt * nx1**3, fill_value=2, dtype=float_type),
+                        np.full(nelt * nx1**3, fill_value=3, dtype=float_type),
+                        np.full(nelt * nx1**3, fill_value=4, dtype=float_type)))
+    u = np.vstack((np.full(nelt * nx1**3, fill_value=5, dtype=float_type),
+                   np.full(nelt * nx1**3, fill_value=6, dtype=float_type),
+                   np.full(nelt * nx1**3, fill_value=7, dtype=float_type)))
+    p = np.full(nelt * nx1**3, fill_value=8, dtype=float_type)
+    t = np.full(nelt * nx1**3, fill_value=9, dtype=float_type)
+
+    fld = FldData.fromvalues(ndim=ndim, nx1=nx1, ny1=ny1, nz1=nz1, nelgt=nelgt, nelt=nelt,
+                             glel=glel, coords=coords, u=u, p=p, t=t, int_type=int_type, float_type=float_type)
     print(fld)
+
+    # print('***************')
 
     test_outfile = 'fld_header_test.bin'
     fld.tofile(test_outfile)
 
     fld2 = FldData.fromfile(test_outfile)
-    print('***************')
     print(fld2)
+
