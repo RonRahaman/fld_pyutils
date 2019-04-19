@@ -22,44 +22,43 @@ class FldReader:
         self.t = np.array([])
         self.s = np.array([])
 
-        self._notify("Attempting to parse rdcode {}".format(self.header.rdcode))
+        self._notify("Attempting to parse rdcode {}".format(self.rdcode))
 
         # Begin parsing fields after the header
-        offset = 136 + self.header.nelt * self.header.int_type.itemsize
+        offset = 136 + self.nelt * self.int_type.itemsize
 
         # Parse rdcode into list (e.g., "XUS01" is parsed into ['X', 'U', 'S01']
-        code_list = [s.upper() for s in re.split(r'(\D\d*)', self.header.rdcode) if s]
+        code_list = [s.upper() for s in re.split(r'(\D\d*)', self.rdcode) if s]
 
         for code in code_list:
 
             # Coordinate data
             if code == 'X':
-                count = self.ndim * self.header.nelt * self.header.nx1 * self.header.ny1 * self.header.nz1
-                self.coords = self._get_array(offset=offset, count=count, dtype=self.header.float_type,
+                count = self.ndim * self.nelt * self.nx1 * self.ny1 * self.nz1
+                self.coords = self._get_array(offset=offset, count=count, dtype=self.float_type,
                                               reshape=(self.ndim, -1))
-                offset += count * self.header.float_type.itemsize
+                offset += count * self.float_type.itemsize
                 self._notify("Located coordinates X")
 
             # Velocity field
             elif code == 'U':
-                count = self.ndim * self.header.nelt * self.header.nx1 * self.header.ny1 * self.header.nz1
-                self.u = self._get_array(offset=offset, count=count, dtype=self.header.float_type,
-                                         reshape=(self.ndim, -1))
-                offset += count * self.header.float_type.itemsize
+                count = self.ndim * self.nelt * self.nx1 * self.ny1 * self.nz1
+                self.u = self._get_array(offset=offset, count=count, dtype=self.float_type, reshape=(self.ndim, -1))
+                offset += count * self.float_type.itemsize
                 self._notify("Located velocity field U")
 
             # Pressure field
             elif code == 'P':
-                count = self.header.nelt * self.header.nx1 * self.header.ny1 * self.header.nz1
-                self.p = self._get_array(offset=offset, count=count, dtype=self.header.float_type)
-                offset += count * self.header.float_type.itemsize
+                count = self.nelt * self.nx1 * self.ny1 * self.nz1
+                self.p = self._get_array(offset=offset, count=count, dtype=self.float_type)
+                offset += count * self.float_type.itemsize
                 self._notify("Located pressure field P")
 
             # Temperature field
             elif code == 'T':
-                count = self.header.nelt * self.header.nx1 * self.header.ny1 * self.header.nz1
-                self.t = self._get_array(offset=offset, count=count, dtype=self.header.float_type)
-                offset += count * self.header.float_type.itemsize
+                count = self.nelt * self.nx1 * self.ny1 * self.nz1
+                self.t = self._get_array(offset=offset, count=count, dtype=self.float_type)
+                offset += count * self.float_type.itemsize
                 self._notify("Located temperature field T")
 
             # Passive scalars
@@ -70,10 +69,9 @@ class FldReader:
                     self._notify(
                         "Warning: Couldn't parse number of passive scalar fields (attempted to parse code {})".format(
                             code))
-                count = self.nscalars * self.header.nelt * self.header.nx1 * self.header.ny1 * self.header.nz1
-                self.s = self._get_array(offset=offset, count=count, dtype=self.header.float_type,
-                                         reshape=(self.nscalars, -1))
-                offset += count * self.header.float_type.itemsize
+                count = self.nscalars * self.nelt * self.nx1 * self.ny1 * self.nz1
+                self.s = self._get_array(offset=offset, count=count, dtype=self.float_type, reshape=(self.nscalars, -1))
+                offset += count * self.float_type.itemsize
                 self._notify("Located {} passive scalar fields".format(self.nscalars))
 
             else:
@@ -104,6 +102,62 @@ class FldReader:
             if k != 'header':
                 result += '{key:{width}} = {value}\n'.format(key=k, value=v, width=width)
         return result
+
+    @property
+    def nx1(self) -> int:
+        return self.header.nx1
+
+    @property
+    def ny1(self) -> int:
+        return self.header.ny1
+
+    @property
+    def nz1(self) -> int:
+        return self.header.nz1
+
+    @property
+    def nelt(self) -> int:
+        return self.header.nelt
+
+    @property
+    def nelgt(self) -> int:
+        return self.header.nelgt
+
+    @property
+    def time(self) -> float:
+        return self.header.time
+
+    @property
+    def iostep(self) -> int:
+        return self.header.iostep
+
+    @property
+    def fid0(self) -> int:
+        return self.header.fid0
+
+    @property
+    def nfileoo(self) -> int:
+        return self.header.nfileoo
+
+    @property
+    def rdcode(self) -> str:
+        return self.header.rdcode
+
+    @property
+    def p0th(self) -> float:
+        return self.header.p0th
+
+    @property
+    def if_press_mesh(self) -> bool:
+        return self.header.if_press_mesh
+
+    @property
+    def float_type(self) -> np.dtype:
+        return self.header.float_type
+
+    @property
+    def int_type(self) -> np.dtype:
+        return self.header.int_type
 
 
 if __name__ == '__main__':
