@@ -16,24 +16,20 @@ class FldReader:
         self.header = FldHeader.from_file(self.filename)
 
         # Fields will be empty until they are parsed below
-        self.glel = np.array([])
         self.coords = np.array([])
         self.u = np.array([])
         self.p = np.array([])
         self.t = np.array([])
         self.s = np.array([])
 
-        # Begin parsing fields after the header (136 bytes)
-        offset = 136
-
-        # Always get global element numbers
-        count = self.header.nelt
-        self.glel = self._get_array(offset=offset, count=count, dtype=self.header.int_type)
-        offset += count * self.header.int_type.itemsize
-
-        # Parse rdcode (e.g., "XUS01" is parsed into ['X', 'U', 'S01']
         self._notify("Attempting to parse rdcode {}".format(self.header.rdcode))
+
+        # Begin parsing fields after the header
+        offset = 136 + self.header.nelt * self.header.int_type.itemsize
+
+        # Parse rdcode into list (e.g., "XUS01" is parsed into ['X', 'U', 'S01']
         code_list = [s.upper() for s in re.split(r'(\D\d*)', self.header.rdcode) if s]
+
         for code in code_list:
 
             # Coordinate data
@@ -103,9 +99,10 @@ class FldReader:
 
     def __str__(self):
         width = max(len(key) for key in self.__dict__)
-        result = ''
+        result = str(self.header)
         for k, v in self.__dict__.items():
-            result += '{key:{width}} = {value}\n'.format(key=k, value=v, width=width)
+            if k != 'header':
+                result += '{key:{width}} = {value}\n'.format(key=k, value=v, width=width)
         return result
 
 
@@ -133,11 +130,11 @@ if __name__ == '__main__':
     #        f.write('\n')
 
     fld = FldReader('data/test0.f00001')
-    print(fld.header)
+    print(fld)
 
     test_outfile = 'fld_header_test.bin'
     fld.header.to_file(test_outfile)
 
     fld2 = FldReader(test_outfile)
     print('***************')
-    print(fld2.header)
+    print(fld2)

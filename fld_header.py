@@ -1,13 +1,14 @@
 import numpy as np
 from typing import Tuple
 
-class FldHeader:
 
+class FldHeader:
     _endian_check_val = 6.54321
 
-    def __init__(self, nelgt, nx1, ny1, nz1, nelt=None, rdcode="",
-                 time=0.0, iostep=0, fid0=0, nfileoo=1, p0th=0.0, if_press_mesh=False,
-                 float_type=np.dtype(np.float32), int_type=np.dtype(np.int32)):
+    def __init__(self, nelgt: int, nx1: int, ny1: int, nz1: int, nelt: int = None, rdcode: str = "", time: float = 0.0,
+                 iostep: int = 0, fid0: int = 0, nfileoo: int = 1, p0th: float = 0.0, if_press_mesh: bool = False,
+                 float_type: np.dtype = np.dtype(np.float32), int_type: np.dtype = np.dtype(np.int32),
+                 glel: np.array = None):
         self.nx1 = nx1
         self.ny1 = ny1
         self.nz1 = nz1
@@ -22,6 +23,11 @@ class FldHeader:
         self.if_press_mesh = if_press_mesh
         self.float_type = float_type
         self.int_type = int_type
+
+        if glel is None:
+            self.glel = np.arange(1, nelt + 1, dtype=int_type)
+        else:
+            self.glel = glel
 
     @classmethod
     def from_file(cls, filename: str):
@@ -73,9 +79,13 @@ class FldHeader:
             # Always set int size to int32
             int_type = np.dtype(np.int32)
 
+            # Get global element list
+            f.seek(136)
+            glel = np.fromfile(f, dtype=int_type, count=nelt)
+
         return cls(nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, nelgt=nelgt, rdcode=rdcode,
                    time=time, iostep=iostep, fid0=fid0, nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh,
-                   float_type=float_type, int_type=int_type)
+                   float_type=float_type, int_type=int_type, glel=glel)
 
     @classmethod
     def from_fields(cls, nelgt: int, nx1: int, ny1: int, nz1: int, nelt: int = None, time: float = 0.0,
@@ -110,6 +120,7 @@ class FldHeader:
             blanks = " " * (132 - f.tell())
             f.write(blanks.encode('ascii'))
             f.write(np.array([self.__class__._endian_check_val], dtype=self.float_type).tobytes())
+            f.write(self.glel.tobytes())
 
     def __repr__(self):
         return str(self.__dict__)
