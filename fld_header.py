@@ -5,9 +5,21 @@ from typing import Tuple
 class FldHeader:
     _endian_check_val = 6.54321
 
-    def __init__(self, nelgt: int, nx1: int, ny1: int, nz1: int, nelt: int = None, rdcode: str = "", time: float = 0.0,
-                 iostep: int = 0, fid0: int = 0, nfileoo: int = 1, p0th: float = 0.0, if_press_mesh: bool = False,
-                 float_type: np.dtype = np.dtype(np.float32), int_type: np.dtype = np.dtype(np.int32),
+    def __init__(self,
+                 nelgt: int,
+                 nx1: int,
+                 ny1: int,
+                 nz1: int,
+                 nelt: int = None,
+                 rdcode: str = "",
+                 time: float = 0.0,
+                 iostep: int = 0,
+                 fid0: int = 0,
+                 nfileoo: int = 1,
+                 p0th: float = 0.0,
+                 if_press_mesh: bool = False,
+                 float_type: np.dtype = np.dtype(np.float32),
+                 int_type: np.dtype = np.dtype(np.int32),
                  glel: np.array = None):
         self.nx1 = nx1
         self.ny1 = ny1
@@ -27,6 +39,8 @@ class FldHeader:
         if glel is None:
             self.glel = np.arange(1, nelt + 1, dtype=int_type)
         else:
+            if nelt != glel.size:
+                raise ValueError("Incorrect size of glel: nelt must be equal to glel.size")
             self.glel = glel
 
     @classmethod
@@ -83,28 +97,31 @@ class FldHeader:
             f.seek(136)
             glel = np.fromfile(f, dtype=int_type, count=nelt)
 
-        return cls(nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, nelgt=nelgt, rdcode=rdcode,
-                   time=time, iostep=iostep, fid0=fid0, nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh,
-                   float_type=float_type, int_type=int_type, glel=glel)
+        return cls(nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, nelgt=nelgt, rdcode=rdcode, time=time, iostep=iostep,
+                   fid0=fid0, nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh, float_type=float_type,
+                   int_type=int_type, glel=glel)
 
     @classmethod
-    def from_fields(cls, nelgt: int, nx1: int, ny1: int, nz1: int, nelt: int = None, time: float = 0.0,
-                    iostep: int = 0, fid0: int = 0, nfileoo: int = 1, p0th: float = 0.0, if_press_mesh: bool = False,
-                    float_type: np.dtype = np.dtype(np.float32), int_type: np.dtype = np.dtype(np.int32),
-                    coordinates: np.array = None, velocity: np.array = None, pressure: np.array = None,
-                    temperature: np.array = None, scalars: Tuple[np.array] = None):
+    def fromvalues(cls,
+                   nelgt: int,
+                   nx1: int,
+                   ny1: int,
+                   nz1: int,
+                   nelt: int = None,
+                   rdcode: str = "",
+                   time: float = 0.0,
+                   iostep: int = 0,
+                   fid0: int = 0,
+                   nfileoo: int = 1,
+                   p0th: float = 0.0,
+                   if_press_mesh: bool = False,
+                   float_type: np.dtype = np.dtype(np.float32),
+                   int_type: np.dtype = np.dtype(np.int32),
+                   glel: np.array = None):
 
-        rcode = ""
-        if coordinates:
-            rcode += "X"
-        if velocity:
-            rcode += "U"
-        if pressure:
-            rcode += "P"
-        if temperature:
-            rcode += "T"
-        if scalars:
-            rcode += "S{:2}".format(len(scalars))
+        return cls(nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, nelgt=nelgt, rdcode=rdcode, time=time, iostep=iostep,
+                   fid0=fid0, nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh, float_type=float_type,
+                   int_type=int_type, glel=glel)
 
     def tofile(self, filename: str):
 

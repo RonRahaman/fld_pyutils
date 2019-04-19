@@ -6,80 +6,123 @@ from typing import Tuple
 
 class FldData:
 
-    def __init__(self, filename: str, ndim: int = 3):
-
+    def __init__(self,
+                 filename: str,
+                 ndim: int,
+                 nscalars: int,
+                 header: FldHeader,
+                 coords: np.array,
+                 u: np.array,
+                 p: np.array,
+                 t: np.array,
+                 s: np.array):
         self.filename = filename
-        self.ndim = int(ndim)  # TODO: Check if this is consistent with nz ?
-        self.nscalars = 0
+        self.ndim = ndim
+        self.nscalars = nscalars
+        self._header = header
+        self.coords = coords
+        self.u = u
+        self.p = p
+        self.t = t
+        self.s = s
 
-        # Get _header
-        self._header = FldHeader.fromfile(self.filename)
+    @classmethod
+    def fromfile(cls, filename: str, ndim: int = 3):
 
-        # Fields will be empty until they are parsed below
-        self.coords = np.array([])
-        self.u = np.array([])
-        self.p = np.array([])
-        self.t = np.array([])
-        self.s = np.array([])
+        def notify(msg: str):
+            print("[{}] : {}".format(filename, msg))
 
-        self._notify("Attempting to parse rdcode {}".format(self.rdcode))
+        def error(msg: str):
+            raise Exception("[{}] : {}".format(filename, msg))
+
+        res = cls(filename=filename,
+                  ndim=ndim,
+                  nscalars=0,
+                  header=FldHeader.fromfile(filename),
+                  coords=np.array([]),
+                  u=np.array([]),
+                  p=np.array([]),
+                  t=np.array([]),
+                  s=np.array([]))
+
+        notify("Attempting to parse rdcode {}".format(res.rdcode))
 
         # Begin parsing fields after the _header
-        offset = 136 + self.nelt * self.int_type.itemsize
+        offset = 136 + res.nelt * res.int_type.itemsize
 
         # Parse rdcode into list (e.g., "XUS01" is parsed into ['X', 'U', 'S01']
-        code_list = [s.upper() for s in re.split(r'(\D\d*)', self.rdcode) if s]
+        code_list = [s.upper() for s in re.split(r'(\D\d*)', res.rdcode) if s]
 
         for code in code_list:
 
             # Coordinate data
             if code == 'X':
-                count = self.ndim * self.nelt * self.nx1 * self.ny1 * self.nz1
-                self.coords = self._get_array(offset=offset, count=count, dtype=self.float_type,
-                                              reshape=(self.ndim, -1))
-                offset += count * self.float_type.itemsize
-                self._notify("Located coordinates X")
+                count = res.ndim * res.nelt * res.nx1 * res.ny1 * res.nz1
+                res.coords = res._get_array(offset=offset, count=count, dtype=res.float_type, reshape=(res.ndim, -1))
+                offset += count * res.float_type.itemsize
+                notify("Located coordinates X")
 
             # Velocity field
             elif code == 'U':
-                count = self.ndim * self.nelt * self.nx1 * self.ny1 * self.nz1
-                self.u = self._get_array(offset=offset, count=count, dtype=self.float_type, reshape=(self.ndim, -1))
-                offset += count * self.float_type.itemsize
-                self._notify("Located velocity field U")
+                count = res.ndim * res.nelt * res.nx1 * res.ny1 * res.nz1
+                res.u = res._get_array(offset=offset, count=count, dtype=res.float_type, reshape=(res.ndim, -1))
+                offset += count * res.float_type.itemsize
+                notify("Located velocity field U")
 
             # Pressure field
             elif code == 'P':
-                count = self.nelt * self.nx1 * self.ny1 * self.nz1
-                self.p = self._get_array(offset=offset, count=count, dtype=self.float_type)
-                offset += count * self.float_type.itemsize
-                self._notify("Located pressure field P")
+                count = res.nelt * res.nx1 * res.ny1 * res.nz1
+                res.p = res._get_array(offset=offset, count=count, dtype=res.float_type)
+                offset += count * res.float_type.itemsize
+                notify("Located pressure field P")
 
             # Temperature field
             elif code == 'T':
-                count = self.nelt * self.nx1 * self.ny1 * self.nz1
-                self.t = self._get_array(offset=offset, count=count, dtype=self.float_type)
-                offset += count * self.float_type.itemsize
-                self._notify("Located temperature field T")
+                count = res.nelt * res.nx1 * res.ny1 * res.nz1
+                res.t = res._get_array(offset=offset, count=count, dtype=res.float_type)
+                offset += count * res.float_type.itemsize
+                notify("Located temperature field T")
 
             # Passive scalars
             elif code.startswith('S'):
                 try:
-                    self.nscalars = int(code[1:])
+                    res.nscalars = int(code[1:])
                 except ValueError:
-                    self._notify(
+                    notify(
                         "Warning: Couldn't parse number of passive scalar fields (attempted to parse code {})".format(
                             code))
-                count = self.nscalars * self.nelt * self.nx1 * self.ny1 * self.nz1
-                self.s = self._get_array(offset=offset, count=count, dtype=self.float_type, reshape=(self.nscalars, -1))
-                offset += count * self.float_type.itemsize
-                self._notify("Located {} passive scalar fields".format(self.nscalars))
+                count = res.nscalars * res.nelt * res.nx1 * res.ny1 * res.nz1
+                res.s = res._get_array(offset=offset, count=count, dtype=res.float_type, reshape=(res.nscalars, -1))
+                offset += count * res.float_type.itemsize
+                notify("Located {} passive scalar fields".format(res.nscalars))
 
             else:
-                self._notify("Warning: Unsupported rdcode '{}'".format(code))
+                error("Warning: Unsupported rdcode '{}'".format(code))
+
+        return res
 
     @classmethod
-    def fromfile(cls, filename: str, ndim: int = 3):
-        return cls(filename, ndim)
+    def fromvalues(cls,
+                   nelgt: int,
+                   nx1: int,
+                   ny1: int,
+                   nz1: int,
+                   nelt: int,
+                   time: float = 0.0,
+                   iostep: int = 0,
+                   fid0: int = 0,
+                   nfileoo: int = 1,
+                   p0th: float = 0.0,
+                   if_press_mesh: bool = False,
+                   float_type: np.dtype = np.dtype(np.float32),
+                   int_type: np.dtype = np.dtype(np.int32),
+                   glel: np.array = None,
+                   coords: np.array = None,
+                   u: np.array = None,
+                   p: np.array = None,
+                   t: np.array = None,
+                   s: np.array = None):
+        pass
 
     def tofile(self, filename):
         self._header.tofile(filename)
@@ -98,12 +141,6 @@ class FldData:
                 return array.reshape(reshape)
             else:
                 return array
-
-    def _notify(self, msg: str):
-        print("[{}] : {}".format(self.filename, msg))
-
-    def _error(self, msg: str):
-        raise Exception("[{}] : {}".format(self.filename, msg))
 
     def __repr__(self):
         return repr(self.__dict__)
@@ -171,6 +208,10 @@ class FldData:
     @property
     def int_type(self) -> np.dtype:
         return self._header.int_type
+
+    @property
+    def glel(self) -> np.array:
+        return self._header.glel
 
 
 if __name__ == '__main__':
