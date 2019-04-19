@@ -35,71 +35,65 @@ class FldData:
         def error(msg: str):
             raise Exception("[{}] : {}".format(filename, msg))
 
-        res = cls(filename=filename,
-                  ndim=ndim,
-                  nscalars=0,
-                  header=FldHeader.fromfile(filename),
-                  coords=np.array([]),
-                  u=np.array([]),
-                  p=np.array([]),
-                  t=np.array([]),
-                  s=np.array([]))
+        h = FldHeader.fromfile(filename)
 
-        notify("Attempting to parse rdcode {}".format(res.rdcode))
+        nscalars = 0
+        coords = np.array([])
+        u = np.array([])
+        p = np.array([])
+        t = np.array([])
+        s = np.array([])
 
-        # Begin parsing fields after the _header
-        offset = 136 + res.nelt * res.int_type.itemsize
+        notify("Attempting to fields from rdcode {}".format(h.rdcode))
 
-        # Parse rdcode into list (e.g., "XUS01" is parsed into ['X', 'U', 'S01']
-        code_list = [s.upper() for s in re.split(r'(\D\d*)', res.rdcode) if s]
+        with open(filename, 'rb') as f:
 
-        for code in code_list:
+            # Begin parsing fields after the _header
+            f.seek(136 + h.nelt * h.int_type.itemsize)
 
-            # Coordinate data
-            if code == 'X':
-                count = res.ndim * res.nelt * res.nx1 * res.ny1 * res.nz1
-                res.coords = res._get_array(offset=offset, count=count, dtype=res.float_type, reshape=(res.ndim, -1))
-                offset += count * res.float_type.itemsize
-                notify("Located coordinates X")
+            # Parse rdcode into list (e.g., "XUS01" is parsed into ['X', 'U', 'S01']
+            code_list = [s.upper() for s in re.split(r'(\D\d*)', h.rdcode) if s]
+            for code in code_list:
 
-            # Velocity field
-            elif code == 'U':
-                count = res.ndim * res.nelt * res.nx1 * res.ny1 * res.nz1
-                res.u = res._get_array(offset=offset, count=count, dtype=res.float_type, reshape=(res.ndim, -1))
-                offset += count * res.float_type.itemsize
-                notify("Located velocity field U")
+                # Coordinate data
+                if code == 'X':
+                    notify("Located coordinates X")
+                    size = ndim * h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
+                    coords = np.frombuffer(f.read(size), dtype=h.float_type).reshape(ndim, -1)
 
-            # Pressure field
-            elif code == 'P':
-                count = res.nelt * res.nx1 * res.ny1 * res.nz1
-                res.p = res._get_array(offset=offset, count=count, dtype=res.float_type)
-                offset += count * res.float_type.itemsize
-                notify("Located pressure field P")
+                # Velocity field
+                elif code == 'U':
+                    notify("Located velocity field U")
+                    size = ndim * h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
+                    u = np.frombuffer(f.read(size), dtype=h.float_type).reshape(ndim, -1)
 
-            # Temperature field
-            elif code == 'T':
-                count = res.nelt * res.nx1 * res.ny1 * res.nz1
-                res.t = res._get_array(offset=offset, count=count, dtype=res.float_type)
-                offset += count * res.float_type.itemsize
-                notify("Located temperature field T")
+                # Pressure field
+                elif code == 'P':
+                    notify("Located pressure field P")
+                    size = h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
+                    p = np.frombuffer(f.read(size), dtype=h.float_type)
 
-            # Passive scalars
-            elif code.startswith('S'):
-                try:
-                    res.nscalars = int(code[1:])
-                except ValueError:
-                    notify(
-                        "Warning: Couldn't parse number of passive scalar fields (attempted to parse code {})".format(
-                            code))
-                count = res.nscalars * res.nelt * res.nx1 * res.ny1 * res.nz1
-                res.s = res._get_array(offset=offset, count=count, dtype=res.float_type, reshape=(res.nscalars, -1))
-                offset += count * res.float_type.itemsize
-                notify("Located {} passive scalar fields".format(res.nscalars))
+                # Temperature field
+                elif code == 'T':
+                    notify("Located temperature field T")
+                    size = h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
+                    t = np.frombuffer(f.read(size), dtype=h.float_type)
 
-            else:
-                error("Warning: Unsupported rdcode '{}'".format(code))
+                # Passive scalars
+                elif code.startswith('S'):
+                    try:
+                        nscalars = int(code[1:])
+                    except ValueError:
+                        error("Couldn't parse number of passive scalar fields")
+                    else:
+                        notify("Located {} passive scalar fields".format(nscalars))
+                        size = nscalars * h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
+                        s = np.frombuffer(f.read(size), dtype=h.float_type).reshape(nscalars, -1)
 
-        return res
+                else:
+                    error("Warning: Unsupported rdcode '{}'".format(code))
+
+        return cls(filename=filename, ndim=ndim, nscalars=nscalars, header=h, coords=coords, u=u, p=p, t=t, s=s)
 
     @classmethod
     def fromvalues(cls,
@@ -132,15 +126,6 @@ class FldData:
             f.write(self.p.tobytes())
             f.write(self.t.tobytes())
             f.write(self.s.tobytes())
-
-    def _get_array(self, offset: int, dtype: np.dtype, count: int, reshape: Tuple = None) -> np.array:
-        with open(self.filename, 'rb') as f:
-            f.seek(offset)
-            array = np.fromfile(f, dtype=dtype, count=count)
-            if reshape:
-                return array.reshape(reshape)
-            else:
-                return array
 
     def __repr__(self):
         return repr(self.__dict__)
