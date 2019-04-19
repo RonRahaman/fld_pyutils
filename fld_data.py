@@ -124,6 +124,7 @@ class FldData:
         else:
             if coords.shape != (ndim, nelt * nx1 * ny1 * nz1):
                 raise ValueError("Incorrect shape for coords: coords.shape must equal (ndim, nelt * nx1 * ny1 * nz1)")
+            coords = np.array(coords, dtype=float_type)
             rdcode += "X"
 
         if u is None:
@@ -131,6 +132,7 @@ class FldData:
         else:
             if u.shape != (ndim, nelt * nx1 * ny1 * nz1):
                 raise ValueError("Incorrect shape for u: u.shape must equal (ndim, nelt * nx1 * ny1 * nz1)")
+            u = np.array(u, dtype=float_type)
             rdcode += "U"
 
         if p is None:
@@ -138,6 +140,7 @@ class FldData:
         else:
             if p.shape != (nelt * nx1 * ny1 * nz1,):
                 raise ValueError("Incorrect shape for p: p.shape must equal (nelt * nx1 * ny1 * nz1,)")
+            p = np.array(p, dtype=float_type)
             rdcode += "P"
 
         if t is None:
@@ -145,6 +148,7 @@ class FldData:
         else:
             if t.shape != (nelt * nx1 * ny1 * nz1,):
                 raise ValueError("Incorrect shape for t: t.shape must equal (nelt * nx1 * ny1 * nz1,)")
+            t = np.array(t, dtype=float_type)
             rdcode += "T"
 
         if s is None:
@@ -152,6 +156,7 @@ class FldData:
         else:
             if s.shape != (nscalars, nelt * nx1 * ny1 * nz1):
                 raise ValueError("Incorrect shape for s: s.shape must equal (nscalars, nelt * nx1 * ny1 * nz1)")
+            s = np.array(s, dtype=float_type)
             rdcode += "S{:2}".format(nscalars)
 
         h = FldHeader.fromvalues(nelgt=nelgt, nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, rdcode=rdcode, time=time,
@@ -269,18 +274,18 @@ if __name__ == '__main__':
     int_type = np.dtype(np.int32)
 
     # Optional
-    glel = np.arange(1, nelt+1, dtype=int_type)
-    coords = np.vstack((np.full(nelt * nx1**3, fill_value=2, dtype=float_type),
-                        np.full(nelt * nx1**3, fill_value=3, dtype=float_type),
-                        np.full(nelt * nx1**3, fill_value=4, dtype=float_type)))
-    u = np.vstack((np.full(nelt * nx1**3, fill_value=5, dtype=float_type),
-                   np.full(nelt * nx1**3, fill_value=6, dtype=float_type),
-                   np.full(nelt * nx1**3, fill_value=7, dtype=float_type)))
-    p = np.full(nelt * nx1**3, fill_value=8, dtype=float_type)
-    t = np.full(nelt * nx1**3, fill_value=9, dtype=float_type)
+    glel = np.arange(1, nelt+1)
+    coords = np.vstack((np.full(nelt * nx1**3, fill_value=2),
+                        np.full(nelt * nx1**3, fill_value=3),
+                        np.full(nelt * nx1**3, fill_value=4)))
+    u = np.vstack((np.full(nelt * nx1**3, fill_value=5),
+                   np.full(nelt * nx1**3, fill_value=6),
+                   np.full(nelt * nx1**3, fill_value=7)))
+    p = np.full(nelt * nx1**3, fill_value=8)
+    t = np.full(nelt * nx1**3, fill_value=9)
 
     fld = FldData.fromvalues(ndim=ndim, nx1=nx1, ny1=ny1, nz1=nz1, nelgt=nelgt, nelt=nelt,
-                             glel=glel, coords=coords, u=u, p=p, t=t, int_type=int_type, float_type=float_type)
+                             glel=glel, coords=coords, u=u, p=p, t=t)
     print(fld)
 
     # print('***************')

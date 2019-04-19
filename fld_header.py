@@ -41,7 +41,7 @@ class FldHeader:
         else:
             if nelt != glel.size:
                 raise ValueError("Incorrect size of glel: nelt must be equal to glel.size")
-            self.glel = glel
+            self.glel = np.array(glel, dtype=int_type)
 
     @classmethod
     def fromfile(cls, filename: str):
