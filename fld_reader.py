@@ -77,6 +77,18 @@ class FldReader:
             else:
                 self._notify("Warning: Unsupported rdcode '{}'".format(code))
 
+    def from_file(self, filename: str, ndim: int = 3):
+        self.__init__(filename, ndim)
+
+    def to_file(self, filename):
+        self.header.to_file(filename)
+        with open(filename, 'ab') as f:
+            f.write(self.coords.tobytes())
+            f.write(self.u.tobytes())
+            f.write(self.p.tobytes())
+            f.write(self.t.tobytes())
+            f.write(self.s.tobytes())
+
     def _get_array(self, offset: int, dtype: np.dtype, count: int, reshape: Tuple = None) -> np.array:
         with open(self.filename, 'rb') as f:
             f.seek(offset)
@@ -187,7 +199,7 @@ if __name__ == '__main__':
     print(fld)
 
     test_outfile = 'fld_header_test.bin'
-    fld.header.to_file(test_outfile)
+    fld.to_file(test_outfile)
 
     fld2 = FldReader(test_outfile)
     print('***************')
