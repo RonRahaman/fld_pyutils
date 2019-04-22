@@ -39,8 +39,8 @@ class FldHeader:
         if glel is None:
             self.glel = np.arange(1, nelt + 1, dtype=int_type)
         else:
-            if nelt != glel.size:
-                raise ValueError("Incorrect size of glel: nelt must be equal to glel.size")
+            if glel.shape != (self.nelt,):
+                raise ValueError("Incorrect shape for glel: glel.shape must equal (nelt,)")
             self.glel = np.array(glel, dtype=int_type)
 
     @classmethod
@@ -68,7 +68,7 @@ class FldHeader:
             # Set if_press_mesh               # default = F
             if header_list[13].casefold() == 'f':
                 if_press_mesh = False
-            elif header_list[13].casefold() == 't':
+            elif header_list[13].casefold() == '_t':
                 raise ValueError("{} specifies if_press_mesh='{}', but PnPn-2 is not supported for {}".format(
                     filename, header_list[13], cls.__name__))
             else:
@@ -84,7 +84,7 @@ class FldHeader:
             else:
                 raise ValueError('{} specified invalid float size {}'.format(filename, float_size))
 
-            # Get endian test value (should be 6.54321 if endianness matches this system's)
+            # Get endian test value (should be 6.54321 if endianness matches this system'_s)
             # If necessary, switch endianness of float type
             endian_test_val = np.fromfile(f, dtype=np.float32, count=1)[0]
             if np.abs(endian_test_val - cls._endian_check_val) > 1e-6:
@@ -126,7 +126,7 @@ class FldHeader:
     def tofile(self, filename: str):
 
         wdsize = self.float_type.itemsize
-        press_mesh = 't' if self.if_press_mesh else 'f'
+        press_mesh = '_t' if self.if_press_mesh else 'f'
 
         fmt = '#std {wdsize:1d} {nx1:2d} {ny1:2d} {nz1:2d} {nelt:10d} {nelgt:10d} {time:20.13e} {iostep:9d} ' + \
               '{fid0:6d} {nfileoo:6d} {rdcode:10} {p0th:15.7e} {press_mesh:1}'
@@ -148,3 +148,14 @@ class FldHeader:
         for k, v in self.__dict__.items():
             result += '{key:{width}} = {value}\n'.format(key=k, value=v, width=width)
         return result
+
+    @property
+    def glel(self) -> np.array:
+        return self.glel
+
+    @glel.setter
+    def glel(self, other: np.array):
+        if other.shape != (self.nelt,):
+            raise ValueError("Incorrect shape for glel: glel.shape must equal (nelt,)")
+        self.glel = other.astype(self.int_type)
+
