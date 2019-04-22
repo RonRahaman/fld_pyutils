@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Tuple
+from re import search
 
 
 class FldHeader:
@@ -37,11 +37,9 @@ class FldHeader:
         self.int_type = int_type
 
         if glel is None:
-            self.glel = np.arange(1, nelt + 1, dtype=int_type)
-        else:
-            if glel.shape != (self.nelt,):
-                raise ValueError("Incorrect shape for glel: glel.shape must equal (nelt,)")
-            self.glel = np.array(glel, dtype=int_type)
+            glel = np.arange(1, nelt + 1, dtype=int_type)
+
+        self.glel = glel
 
     @classmethod
     def fromfile(cls, filename: str):
@@ -53,17 +51,17 @@ class FldHeader:
             header_list = header_str.split()
 
             float_size = int(header_list[1])  # always 32-bit
-            nx1 = int(header_list[2])         # inferred from data
-            ny1 = int(header_list[3])         # necessarily == nx1
-            nz1 = int(header_list[4])         # inferred from data
-            nelt = int(header_list[5])        # default to nelgt
-            nelgt = int(header_list[6])       # inferred from data
-            time = float(header_list[7])      # default = 0
-            iostep = int(header_list[8])      # default = 0
-            fid0 = int(header_list[9])        # file id, default = 0
-            nfileoo = int(header_list[10])    # default = 1
-            rdcode = header_list[11]          # infer from data
-            p0th = float(header_list[12])     # default = 0
+            nx1 = int(header_list[2])  # inferred from data
+            ny1 = int(header_list[3])  # necessarily == nx1
+            nz1 = int(header_list[4])  # inferred from data
+            nelt = int(header_list[5])  # default to nelgt
+            nelgt = int(header_list[6])  # inferred from data
+            time = float(header_list[7])  # default = 0
+            iostep = int(header_list[8])  # default = 0
+            fid0 = int(header_list[9])  # file id, default = 0
+            nfileoo = int(header_list[10])  # default = 1
+            rdcode = header_list[11]  # infer from data
+            p0th = float(header_list[12])  # default = 0
 
             # Set if_press_mesh               # default = F
             if header_list[13].casefold() == 'f':
@@ -130,7 +128,7 @@ class FldHeader:
 
         fmt = '#std {wdsize:1d} {nx1:2d} {ny1:2d} {nz1:2d} {nelt:10d} {nelgt:10d} {time:20.13e} {iostep:9d} ' + \
               '{fid0:6d} {nfileoo:6d} {rdcode:10} {p0th:15.7e} {press_mesh:1}'
-        header_text = fmt.format(**self.__dict__, **vars())
+        header_text = fmt.format(**self.__dict__, wdsize=wdsize, press_mesh=press_mesh)
 
         with open(filename, 'wb') as f:
             f.write(header_text.encode('ascii'))
@@ -143,19 +141,36 @@ class FldHeader:
         return str(self.__dict__)
 
     def __str__(self):
-        width = max(len(key) for key in self.__dict__)
+        attr = self.__dict__.copy()
+        del attr['_glel']
+        attr['ndims'] = self.ndims
+        attr['nscalars'] = self.nscalars
+
+        width = max(len(key) for key in attr)
+
         result = ''
-        for k, v in self.__dict__.items():
+        for k, v in attr.items():
             result += '{key:{width}} = {value}\n'.format(key=k, value=v, width=width)
+
+        result += '{key} =\n{value}\n'.format(key='glel', value=self.glel)
+
         return result
 
     @property
     def glel(self) -> np.array:
-        return self.glel
+        return self._glel
 
     @glel.setter
     def glel(self, other: np.array):
         if other.shape != (self.nelt,):
             raise ValueError("Incorrect shape for glel: glel.shape must equal (nelt,)")
-        self.glel = other.astype(self.int_type)
+        self._glel = other.astype(self.int_type)
 
+    @property
+    def ndims(self):
+        return 2 if self.nz1 == 1 else 3
+
+    @property
+    def nscalars(self):
+        res = search(r'S(\d+)', self.rdcode)
+        return int(res.group(1)) if res else 0
