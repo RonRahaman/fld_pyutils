@@ -4,14 +4,26 @@ from fld_header import FldHeader
 
 
 class FldData:
+    """ A field data class
+
+    Parameters
+    ----------
+    header
+    coords
+    u
+    p
+    t
+    s
+
+    """
 
     def __init__(self,
                  header: FldHeader,
-                 coords: np.array = None,
-                 u: np.array = None,
-                 p: np.array = None,
-                 t: np.array = None,
-                 s: np.array = None):
+                 coords: np.ndarray = None,
+                 u: np.ndarray = None,
+                 p: np.ndarray = None,
+                 t: np.ndarray = None,
+                 s: np.ndarray = None):
 
         self._header = header
 
@@ -34,6 +46,19 @@ class FldData:
 
     @classmethod
     def fromfile(cls, filename: str):
+        """ Creates an :py:class:`FldData` object from the contents of a given file
+
+        Parameters
+        ----------
+        filename
+            foobar
+
+        Returns
+        -------
+        FldData
+            A new instance of an FldData
+
+        """
 
         def notify(msg: str):
             print("[{}] : {}".format(filename, msg))
@@ -115,12 +140,41 @@ class FldData:
                    if_press_mesh: bool = False,
                    float_type: np.dtype = np.dtype(np.float32),
                    int_type: np.dtype = np.dtype(np.int32),
-                   glel: np.array = None,
-                   coords: np.array = None,
-                   u: np.array = None,
-                   p: np.array = None,
-                   t: np.array = None,
-                   s: np.array = None):
+                   glel: np.ndarray = None,
+                   coords: np.ndarray = None,
+                   u: np.ndarray = None,
+                   p: np.ndarray = None,
+                   t: np.ndarray = None,
+                   s: np.ndarray = None):
+        """ Creates an FldData object from the given data values
+
+        Parameters
+        ----------
+        nelgt
+        nx1
+        ny1
+        nz1
+        nelt
+        time
+        iostep
+        fid0
+        nfileoo
+        p0th
+        if_press_mesh
+        float_type
+        int_type
+        glel
+        coords
+        u
+        p
+        t
+        s
+
+        Returns
+        -------
+        FldData
+
+        """
 
         header = FldHeader(nelgt=nelgt, nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, time=time, iostep=iostep, fid0=fid0,
                            nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh, float_type=float_type,
@@ -128,7 +182,14 @@ class FldData:
 
         return cls(header=header, coords=coords, u=u, p=p, t=t, s=s)
 
-    def tofile(self, filename):
+    def tofile(self, filename: str):
+        """
+
+        Parameters
+        ----------
+        filename
+
+        """
         self._header.tofile(filename)
         with open(filename, 'ab') as f:
             f.write(self._coords.tobytes())
@@ -163,127 +224,149 @@ class FldData:
 
     @property
     def nx1(self) -> int:
+        """ Number of GLL gridpoints along x-axis """
         return self._header.nx1
 
     @property
     def ny1(self) -> int:
+        """ Number of GLL gridpoints along y-axis """
         return self._header.ny1
 
     @property
     def nz1(self) -> int:
+        """ Number of gridpoints along z-axis """
         return self._header.nz1
 
     @property
     def nelt(self) -> int:
+        """ Number of local elements"""
         return self._header.nelt
 
     @property
     def nelgt(self) -> int:
+        """ Number of global elements"""
         return self._header.nelgt
 
     @property
     def time(self) -> float:
+        """ Absolute simulation time of this file's state """
         return self._header.time
 
     @property
     def iostep(self) -> int:
+        """ I/O timestep of this file's state """
         return self._header.iostep
 
     @property
     def fid0(self) -> int:
+        """ Index of this file, with respect to all files produced at this I/O step """
         return self._header.fid0
 
     @property
     def nfileoo(self) -> int:
+        """ Number of files produced at this I/O step """
         return self._header.nfileoo
 
     @property
     def rdcode(self) -> str:
+        """ String representing the fields contained in this file """
         return self._header.rdcode
 
     @property
     def p0th(self) -> float:
+        """ __ """
         return self._header.p0th
 
     @property
     def if_press_mesh(self) -> bool:
+        """ States whether pressure mesh is being used """
         return self._header.if_press_mesh
 
     @property
     def float_type(self) -> np.dtype:
+        """ Data type used for floating point numbers in this file """
         return self._header.float_type
 
     @property
     def int_type(self) -> np.dtype:
+        """ Data type used for integers in this file """
         return self._header.int_type
 
     @property
-    def glel(self) -> np.array:
+    def glel(self) -> np.ndarray:
+        """ Array of global element indices; shape is `(nelt,)` """
         return self._header.glel
 
     @glel.setter
-    def glel(self, other: np.array):
+    def glel(self, other: np.ndarray):
         # glel is a managed attribute of FldHeader, so no need to validate it here in FldData
         self._header.glel = other
 
     @property
     def ndims(self) -> int:
+        """ Number of physical dimensions in this simulation """
         return self._header.ndims
 
     @property
-    def nscalars(self):
+    def nscalars(self) -> int:
+        """ Number of passive scalars """
         return self._header.nscalars
 
     @property
-    def coords(self) -> np.array:
+    def coords(self) -> np.ndarray:
+        """ Array of element coordinates; shape is `(ndims, nelt * nx1 * ny1 * nz1)` """
         return self._coords
 
     @coords.setter
-    def coords(self, other: np.array):
+    def coords(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.ndims, self.nelt * self.nx1 * self.ny1 * self.nz1):
             raise ValueError("Incorrect shape for coords: coords.shape must equal (ndims, nelt * nx1 * ny1 * nz1)")
         self._coords = other.astype(self.float_type)
         self._set_rdcode()
 
     @property
-    def u(self) -> np.array:
+    def u(self) -> np.ndarray:
+        """ Array representing velocity field; shape is `(ndims, nelt * nx1 * ny1 * nz1)`"""
         return self._u
 
     @u.setter
-    def u(self, other: np.array):
+    def u(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.ndims, self.nelt * self.nx1 * self.ny1 * self.nz1):
             raise ValueError("Incorrect shape for u: u.shape must equal (ndims, nelt * nx1 * ny1 * nz1)")
         self._u = other.astype(self.float_type)
         self._set_rdcode()
 
     @property
-    def p(self) -> np.array:
+    def p(self) -> np.ndarray:
+        """ Array representing pressure field; shape is `(nelt * nx1 * ny1 * nz1,)`"""
         return self._p
 
     @p.setter
-    def p(self, other: np.array):
+    def p(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt * self.nx1 * self.ny1 * self.nz1,):
             raise ValueError("Incorrect shape for p: p.shape must equal (nelt * nx1 * ny1 * nz1,)")
         self._p = other.astype(self.float_type)
         self._set_rdcode()
 
     @property
-    def t(self) -> np.array:
+    def t(self) -> np.ndarray:
+        """ Array representing temperature field; shape is `(nelt * nx1 * ny1 * nz1,)`"""
         return self._t
 
     @t.setter
-    def t(self, other: np.array):
+    def t(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt * self.nx1 * self.ny1 * self.nz1,):
             raise ValueError("Incorrect shape for t: t.shape must equal (nelt * nx1 * ny1 * nz1,)")
         self._t = other.astype(self.float_type)
         self._set_rdcode()
 
     @property
-    def s(self):
+    def s(self) -> np.ndarray:
+        """ Array representing all passive scalar field; shape is `(nscalars * nelt * nx1 * ny1 * nz1,)`"""
         return self._s
 
     @s.setter
-    def s(self, other: np.array):
+    def s(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nscalars, self.nelt * self.nx1 * self.ny1 * self.nz1):
             raise ValueError("Incorrect shape for _s: _s.shape must equal (nscalars, nelt * nx1 * ny1 * nz1)")
         self._s = other.astype(self.float_type)
