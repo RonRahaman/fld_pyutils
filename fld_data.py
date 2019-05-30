@@ -46,15 +46,17 @@ class FldData:
 
     @classmethod
     def fromfile(cls, filename: str):
-        """
+        """ Creates an :py:class:`FldData` object from the contents of a given file
 
         Parameters
         ----------
         filename
+            foobar
 
         Returns
         -------
         FldData
+            A new instance of an FldData
 
         """
 
@@ -144,7 +146,7 @@ class FldData:
                    p: np.ndarray = None,
                    t: np.ndarray = None,
                    s: np.ndarray = None):
-        """
+        """ Creates an FldData object from the given data values
 
         Parameters
         ----------
@@ -180,7 +182,7 @@ class FldData:
 
         return cls(header=header, coords=coords, u=u, p=p, t=t, s=s)
 
-    def tofile(self, filename):
+    def tofile(self, filename: str):
         """
 
         Parameters
@@ -292,7 +294,7 @@ class FldData:
 
     @property
     def glel(self) -> np.ndarray:
-        """ Array of global element indices.  Shape is `(nelt,)` """
+        """ Array of global element indices; shape is `(nelt,)` """
         return self._header.glel
 
     @glel.setter
@@ -312,7 +314,7 @@ class FldData:
 
     @property
     def coords(self) -> np.ndarray:
-        """ Array of element coordinates.  Shape is `(ndims, nelt * nx1 * ny1 * nz1)` """
+        """ Array of element coordinates; shape is `(ndims, nelt * nx1 * ny1 * nz1)` """
         return self._coords
 
     @coords.setter
@@ -324,7 +326,7 @@ class FldData:
 
     @property
     def u(self) -> np.ndarray:
-        """ Array representing velocity field.  Shape is `(ndims, nelt * nx1 * ny1 * nz1)`"""
+        """ Array representing velocity field; shape is `(ndims, nelt * nx1 * ny1 * nz1)`"""
         return self._u
 
     @u.setter
@@ -336,7 +338,7 @@ class FldData:
 
     @property
     def p(self) -> np.ndarray:
-        """ Array representing pressure field.  Shape is `(nelt * nx1 * ny1 * nz1,)`"""
+        """ Array representing pressure field; shape is `(nelt * nx1 * ny1 * nz1,)`"""
         return self._p
 
     @p.setter
@@ -348,7 +350,7 @@ class FldData:
 
     @property
     def t(self) -> np.ndarray:
-        """ Array representing temperature field.  Shape is `(nelt * nx1 * ny1 * nz1,)`"""
+        """ Array representing temperature field; shape is `(nelt * nx1 * ny1 * nz1,)`"""
         return self._t
 
     @t.setter
@@ -360,7 +362,7 @@ class FldData:
 
     @property
     def s(self) -> np.ndarray:
-        """ Array representing all passive scalar field.  Shape is `(nscalars * nelt * nx1 * ny1 * nz1,)`"""
+        """ Array representing all passive scalar field; shape is `(nscalars * nelt * nx1 * ny1 * nz1,)`"""
         return self._s
 
     @s.setter
