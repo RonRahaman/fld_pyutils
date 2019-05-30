@@ -1,0 +1,556 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>API Reference &#8212; Fld Utils 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Updating Field Data" href="users/updating.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="users/updating.html" title="Updating Field Data"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Fld Utils 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="users/updating.html"
+                        title="previous chapter">Updating Field Data</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="flddata">
+<h2><cite>FldData</cite><a class="headerlink" href="#flddata" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fld_data.FldData">
+<em class="property">class </em><code class="descclassname">fld_data.</code><code class="descname">FldData</code><span class="sig-paren">(</span><em>header</em>, <em>coords=None</em>, <em>u=None</em>, <em>p=None</em>, <em>t=None</em>, <em>s=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fld_data.html#FldData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fld_data.FldData" title="Permalink to this definition">¶</a></dt>
+<dd><p>A field data class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>header</strong> (<a class="reference internal" href="#fld_header.FldHeader" title="fld_header.FldHeader"><code class="xref py py-class docutils literal notranslate"><span class="pre">FldHeader</span></code></a>) – </p></li>
+<li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>u</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.coords" title="fld_data.FldData.coords"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coords</span></code></a></p></td>
+<td><p>Array of element coordinates; shape is <cite>(ndims, nelt * nx1 * ny1 * nz1)</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.fid0" title="fld_data.FldData.fid0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fid0</span></code></a></p></td>
+<td><p>Index of this file, with respect to all files produced at this I/O step</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.float_type" title="fld_data.FldData.float_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">float_type</span></code></a></p></td>
+<td><p>Data type used for floating point numbers in this file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.glel" title="fld_data.FldData.glel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">glel</span></code></a></p></td>
+<td><p>Array of global element indices; shape is <cite>(nelt,)</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.if_press_mesh" title="fld_data.FldData.if_press_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">if_press_mesh</span></code></a></p></td>
+<td><p>States whether pressure mesh is being used</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.int_type" title="fld_data.FldData.int_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">int_type</span></code></a></p></td>
+<td><p>Data type used for integers in this file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.iostep" title="fld_data.FldData.iostep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iostep</span></code></a></p></td>
+<td><p>I/O timestep of this file’s state</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.ndims" title="fld_data.FldData.ndims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ndims</span></code></a></p></td>
+<td><p>Number of physical dimensions in this simulation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.nelgt" title="fld_data.FldData.nelgt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nelgt</span></code></a></p></td>
+<td><p>Number of global elements</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.nelt" title="fld_data.FldData.nelt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nelt</span></code></a></p></td>
+<td><p>Number of local elements</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.nfileoo" title="fld_data.FldData.nfileoo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nfileoo</span></code></a></p></td>
+<td><p>Number of files produced at this I/O step</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.nscalars" title="fld_data.FldData.nscalars"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nscalars</span></code></a></p></td>
+<td><p>Number of passive scalars</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.nx1" title="fld_data.FldData.nx1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nx1</span></code></a></p></td>
+<td><p>Number of GLL gridpoints along x-axis</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.ny1" title="fld_data.FldData.ny1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ny1</span></code></a></p></td>
+<td><p>Number of GLL gridpoints along y-axis</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.nz1" title="fld_data.FldData.nz1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nz1</span></code></a></p></td>
+<td><p>Number of gridpoints along z-axis</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.p" title="fld_data.FldData.p"><code class="xref py py-obj docutils literal notranslate"><span class="pre">p</span></code></a></p></td>
+<td><p>Array representing pressure field; shape is <cite>(nelt * nx1 * ny1 * nz1,)</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.p0th" title="fld_data.FldData.p0th"><code class="xref py py-obj docutils literal notranslate"><span class="pre">p0th</span></code></a></p></td>
+<td><p><span class="target" id="id1"></span></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.rdcode" title="fld_data.FldData.rdcode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rdcode</span></code></a></p></td>
+<td><p>String representing the fields contained in this file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.s" title="fld_data.FldData.s"><code class="xref py py-obj docutils literal notranslate"><span class="pre">s</span></code></a></p></td>
+<td><p>Array representing all passive scalar field; shape is <cite>(nscalars * nelt * nx1 * ny1 * nz1,)</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.t" title="fld_data.FldData.t"><code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code></a></p></td>
+<td><p>Array representing temperature field; shape is <cite>(nelt * nx1 * ny1 * nz1,)</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.time" title="fld_data.FldData.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></p></td>
+<td><p>Absolute simulation time of this file’s state</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.u" title="fld_data.FldData.u"><code class="xref py py-obj docutils literal notranslate"><span class="pre">u</span></code></a></p></td>
+<td><p>Array representing velocity field; shape is <cite>(ndims, nelt * nx1 * ny1 * nz1)</cite></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-center">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.fromfile" title="fld_data.FldData.fromfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromfile</span></code></a>(filename)</p></td>
+<td><p>Creates an <a class="reference internal" href="#fld_data.FldData" title="fld_data.FldData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FldData</span></code></a> object from the contents of a given file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fld_data.FldData.fromvalues" title="fld_data.FldData.fromvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fromvalues</span></code></a>(nelgt, nx1, ny1, nz1, nelt[, …])</p></td>
+<td><p>Creates an FldData object from the given data values</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fld_data.FldData.tofile" title="fld_data.FldData.tofile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tofile</span></code></a>(filename)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">type filename</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="fld_data.FldData.fromfile">
+<em class="property">classmethod </em><code class="descname">fromfile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fld_data.html#FldData.fromfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fld_data.FldData.fromfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an <a class="reference internal" href="#fld_data.FldData" title="fld_data.FldData"><code class="xref py py-class docutils literal notranslate"><span class="pre">FldData</span></code></a> object from the contents of a given file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – foobar</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A new instance of an FldData</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fld_data.FldData" title="fld_data.FldData">FldData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="fld_data.FldData.fromvalues">
+<em class="property">classmethod </em><code class="descname">fromvalues</code><span class="sig-paren">(</span><em>nelgt</em>, <em>nx1</em>, <em>ny1</em>, <em>nz1</em>, <em>nelt</em>, <em>time=0.0</em>, <em>iostep=0</em>, <em>fid0=0</em>, <em>nfileoo=1</em>, <em>p0th=0.0</em>, <em>if_press_mesh=False</em>, <em>float_type=dtype('float32')</em>, <em>int_type=dtype('int32')</em>, <em>glel=None</em>, <em>coords=None</em>, <em>u=None</em>, <em>p=None</em>, <em>t=None</em>, <em>s=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fld_data.html#FldData.fromvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fld_data.FldData.fromvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an FldData object from the given data values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nelgt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – </p></li>
+<li><p><strong>nx1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – </p></li>
+<li><p><strong>ny1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – </p></li>
+<li><p><strong>nz1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – </p></li>
+<li><p><strong>nelt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – </p></li>
+<li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – </p></li>
+<li><p><strong>iostep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – </p></li>
+<li><p><strong>fid0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – </p></li>
+<li><p><strong>nfileoo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – </p></li>
+<li><p><strong>p0th</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – </p></li>
+<li><p><strong>if_press_mesh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – </p></li>
+<li><p><strong>float_type</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>) – </p></li>
+<li><p><strong>int_type</strong> (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a>) – </p></li>
+<li><p><strong>glel</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>coords</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>u</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.7)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fld_data.FldData" title="fld_data.FldData">FldData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="fld_data.FldData.tofile">
+<code class="descname">tofile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fld_data.html#FldData.tofile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fld_data.FldData.tofile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.coords">
+<code class="descname">coords</code><a class="headerlink" href="#fld_data.FldData.coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of element coordinates; shape is <cite>(ndims, nelt * nx1 * ny1 * nz1)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.fid0">
+<code class="descname">fid0</code><a class="headerlink" href="#fld_data.FldData.fid0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index of this file, with respect to all files produced at this I/O step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.float_type">
+<code class="descname">float_type</code><a class="headerlink" href="#fld_data.FldData.float_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data type used for floating point numbers in this file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.glel">
+<code class="descname">glel</code><a class="headerlink" href="#fld_data.FldData.glel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array of global element indices; shape is <cite>(nelt,)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.if_press_mesh">
+<code class="descname">if_press_mesh</code><a class="headerlink" href="#fld_data.FldData.if_press_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>States whether pressure mesh is being used</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.int_type">
+<code class="descname">int_type</code><a class="headerlink" href="#fld_data.FldData.int_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data type used for integers in this file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dtype</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.iostep">
+<code class="descname">iostep</code><a class="headerlink" href="#fld_data.FldData.iostep" title="Permalink to this definition">¶</a></dt>
+<dd><p>I/O timestep of this file’s state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.ndims">
+<code class="descname">ndims</code><a class="headerlink" href="#fld_data.FldData.ndims" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of physical dimensions in this simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.nelgt">
+<code class="descname">nelgt</code><a class="headerlink" href="#fld_data.FldData.nelgt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of global elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.nelt">
+<code class="descname">nelt</code><a class="headerlink" href="#fld_data.FldData.nelt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of local elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.nfileoo">
+<code class="descname">nfileoo</code><a class="headerlink" href="#fld_data.FldData.nfileoo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of files produced at this I/O step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.nscalars">
+<code class="descname">nscalars</code><a class="headerlink" href="#fld_data.FldData.nscalars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of passive scalars</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.nx1">
+<code class="descname">nx1</code><a class="headerlink" href="#fld_data.FldData.nx1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of GLL gridpoints along x-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.ny1">
+<code class="descname">ny1</code><a class="headerlink" href="#fld_data.FldData.ny1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of GLL gridpoints along y-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.nz1">
+<code class="descname">nz1</code><a class="headerlink" href="#fld_data.FldData.nz1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of gridpoints along z-axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.p">
+<code class="descname">p</code><a class="headerlink" href="#fld_data.FldData.p" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array representing pressure field; shape is <cite>(nelt * nx1 * ny1 * nz1,)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.p0th">
+<code class="descname">p0th</code><a class="headerlink" href="#fld_data.FldData.p0th" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple" id="id2">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.rdcode">
+<code class="descname">rdcode</code><a class="headerlink" href="#fld_data.FldData.rdcode" title="Permalink to this definition">¶</a></dt>
+<dd><p>String representing the fields contained in this file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.s">
+<code class="descname">s</code><a class="headerlink" href="#fld_data.FldData.s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array representing all passive scalar field; shape is <cite>(nscalars * nelt * nx1 * ny1 * nz1,)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.t">
+<code class="descname">t</code><a class="headerlink" href="#fld_data.FldData.t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array representing temperature field; shape is <cite>(nelt * nx1 * ny1 * nz1,)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.time">
+<code class="descname">time</code><a class="headerlink" href="#fld_data.FldData.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute simulation time of this file’s state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fld_data.FldData.u">
+<code class="descname">u</code><a class="headerlink" href="#fld_data.FldData.u" title="Permalink to this definition">¶</a></dt>
+<dd><p>Array representing velocity field; shape is <cite>(ndims, nelt * nx1 * ny1 * nz1)</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fldheader">
+<h2><cite>FldHeader</cite><a class="headerlink" href="#fldheader" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fld_header.FldHeader">
+<em class="property">class </em><code class="descclassname">fld_header.</code><code class="descname">FldHeader</code><span class="sig-paren">(</span><em>nelgt</em>, <em>nx1</em>, <em>ny1</em>, <em>nz1</em>, <em>nelt=None</em>, <em>rdcode=''</em>, <em>time=0.0</em>, <em>iostep=0</em>, <em>fid0=0</em>, <em>nfileoo=1</em>, <em>p0th=0.0</em>, <em>if_press_mesh=False</em>, <em>float_type=dtype('float32')</em>, <em>int_type=dtype('int32')</em>, <em>glel=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fld_header.html#FldHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fld_header.FldHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Attributes</p>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 45%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>glel</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>ndims</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>nscalars</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 58%" />
+<col style="width: 42%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>fromfile</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>fromvalues</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>tofile</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="users/updating.html" title="Updating Field Data"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Fld Utils 0.0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ron Rahaman, Dillon Shaver.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>
