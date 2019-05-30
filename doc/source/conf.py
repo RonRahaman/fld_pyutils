@@ -39,7 +39,9 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.githubpages']
+    'sphinx.ext.githubpages',
+    'sphinx_autodoc_typehints',
+    'numpydoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
@@ -91,7 +93,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'nature'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -206,3 +208,11 @@ intersphinx_mapping = { 'numpy': ('https://docs.scipy.org/doc/numpy', (None, 'ob
 
 autosummary_generate = True
 
+
+# -- Options for autodoc ----------------------------------------------
+
+autoclass_content = "both"
+
+# -- Options for Autosummary ----------------------------------------------
+
+numpydoc_attributes_as_param_list = False
