@@ -7,11 +7,11 @@ class FldData:
 
     def __init__(self,
                  header: FldHeader,
-                 coords: np.array = None,
-                 u: np.array = None,
-                 p: np.array = None,
-                 t: np.array = None,
-                 s: np.array = None):
+                 coords: np.ndarray = None,
+                 u: np.ndarray = None,
+                 p: np.ndarray = None,
+                 t: np.ndarray = None,
+                 s: np.ndarray = None):
 
         self._header = header
 
@@ -34,6 +34,17 @@ class FldData:
 
     @classmethod
     def fromfile(cls, filename: str):
+        """
+
+        Parameters
+        ----------
+        filename : str
+
+        Returns
+        -------
+        FldData
+
+        """
 
         def notify(msg: str):
             print("[{}] : {}".format(filename, msg))
@@ -121,6 +132,35 @@ class FldData:
                    p: np.array = None,
                    t: np.array = None,
                    s: np.array = None):
+        """
+
+        Parameters
+        ----------
+        nelgt : int
+        nx1 : int
+        ny1 : int
+        nz1 : int
+        nelt : int
+        time : float, optional
+        iostep : int, optional
+        fid0 : int, optional
+        nfileoo : int, optional
+        p0th : float, optional
+        if_press_mesh : bool, optional
+        float_type : np.dtype, optional
+        int_type : np.dtype, optional
+        glel : np.array, optional
+        coords : np.array, optional
+        u : np.array, optional
+        p : np.array, optional
+        t : np.array, optional
+        s : np.array, optional
+
+        Returns
+        -------
+        FldData
+
+        """
 
         header = FldHeader(nelgt=nelgt, nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, time=time, iostep=iostep, fid0=fid0,
                            nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh, float_type=float_type,
@@ -129,6 +169,13 @@ class FldData:
         return cls(header=header, coords=coords, u=u, p=p, t=t, s=s)
 
     def tofile(self, filename):
+        """
+
+        Parameters
+        ----------
+        filename : str
+
+        """
         self._header.tofile(filename)
         with open(filename, 'ab') as f:
             f.write(self._coords.tobytes())
@@ -163,62 +210,155 @@ class FldData:
 
     @property
     def nx1(self) -> int:
+        """
+
+        Returns
+        -------
+        int
+
+        """
         return self._header.nx1
 
     @property
     def ny1(self) -> int:
+        """
+
+        Returns
+        -------
+        int
+
+        """
         return self._header.ny1
 
     @property
     def nz1(self) -> int:
+        """
+
+        Returns
+        -------
+        int
+
+        """
         return self._header.nz1
 
     @property
     def nelt(self) -> int:
+        """
+        Returns
+        -------
+        int
+
+        """
         return self._header.nelt
 
     @property
     def nelgt(self) -> int:
+        """
+        Returns
+        -------
+        int
+
+        """
         return self._header.nelgt
 
     @property
     def time(self) -> float:
+        """
+        Returns
+        -------
+        float
+
+        """
         return self._header.time
 
     @property
     def iostep(self) -> int:
+        """
+        Returns
+        -------
+        int
+
+        """
         return self._header.iostep
 
     @property
     def fid0(self) -> int:
+        """
+        Returns
+        -------
+        int
+
+        """
         return self._header.fid0
 
     @property
     def nfileoo(self) -> int:
+        """
+        Returns
+        -------
+        int
+
+        """
         return self._header.nfileoo
 
     @property
     def rdcode(self) -> str:
+        """
+        Returns
+        -------
+        str
+
+        """
         return self._header.rdcode
 
     @property
     def p0th(self) -> float:
+        """
+        Returns
+        -------
+        float
+
+        """
         return self._header.p0th
 
     @property
     def if_press_mesh(self) -> bool:
+        """
+        Returns
+        -------
+        bool
+
+        """
         return self._header.if_press_mesh
 
     @property
     def float_type(self) -> np.dtype:
+        """
+        Returns
+        -------
+        np.dtype
+
+        """
         return self._header.float_type
 
     @property
     def int_type(self) -> np.dtype:
+        """
+        Returns
+        -------
+        np.dtype
+
+        """
         return self._header.int_type
 
     @property
     def glel(self) -> np.array:
+        """
+        Returns
+        -------
+        np.array
+
+        """
         return self._header.glel
 
     @glel.setter
@@ -228,14 +368,32 @@ class FldData:
 
     @property
     def ndims(self) -> int:
+        """
+        Returns
+        -------
+        int
+
+        """
         return self._header.ndims
 
     @property
     def nscalars(self):
+        """
+        Returns
+        -------
+        int
+
+        """
         return self._header.nscalars
 
     @property
     def coords(self) -> np.array:
+        """
+        Returns
+        -------
+        np.ndarray
+
+        """
         return self._coords
 
     @coords.setter
@@ -247,6 +405,12 @@ class FldData:
 
     @property
     def u(self) -> np.array:
+        """
+        Returns
+        -------
+        np.array
+
+        """
         return self._u
 
     @u.setter
@@ -258,6 +422,12 @@ class FldData:
 
     @property
     def p(self) -> np.array:
+        """
+        Returns
+        -------
+        np.array
+
+        """
         return self._p
 
     @p.setter
@@ -269,6 +439,12 @@ class FldData:
 
     @property
     def t(self) -> np.array:
+        """
+        Returns
+        -------
+        np.array
+
+        """
         return self._t
 
     @t.setter
@@ -279,7 +455,13 @@ class FldData:
         self._set_rdcode()
 
     @property
-    def s(self):
+    def s(self) -> np.array:
+        """
+        Returns
+        -------
+        np.array
+
+        """
         return self._s
 
     @s.setter

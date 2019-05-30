@@ -18,3 +18,10 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Here's a ref: :class:`numpy.ndarray`
+
+.. currentmodule:: fld_data
+
+.. autoclass:: FldData
+    :members:
