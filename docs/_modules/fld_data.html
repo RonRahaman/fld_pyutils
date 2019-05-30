@@ -1,0 +1,503 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>fld_data &#8212; Fld Utils 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fld Utils 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fld_data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">fld_header</span> <span class="k">import</span> <span class="n">FldHeader</span>
+
+
+<div class="viewcode-block" id="FldData"><a class="viewcode-back" href="../index.html#fld_data.FldData">[docs]</a><span class="k">class</span> <span class="nc">FldData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; A field data class</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    header</span>
+<span class="sd">    coords</span>
+<span class="sd">    u</span>
+<span class="sd">    p</span>
+<span class="sd">    t</span>
+<span class="sd">    s</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">header</span><span class="p">:</span> <span class="n">FldHeader</span><span class="p">,</span>
+                 <span class="n">coords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">s</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">header</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="k">if</span> <span class="n">u</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span>
+
+<div class="viewcode-block" id="FldData.fromfile"><a class="viewcode-back" href="../index.html#fld_data.FldData.fromfile">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates an :py:class:`FldData` object from the contents of a given file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename</span>
+<span class="sd">            foobar</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        FldData</span>
+<span class="sd">            A new instance of an FldData</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">] : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">] : </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+
+        <span class="n">h</span> <span class="o">=</span> <span class="n">FldHeader</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+        <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Attempting to fields from rdcode </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">rdcode</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+
+            <span class="c1"># Begin parsing fields after the _header</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">136</span> <span class="o">+</span> <span class="n">h</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">int_type</span><span class="o">.</span><span class="n">itemsize</span><span class="p">)</span>
+
+            <span class="c1"># Parse rdcode into list (e.g., &quot;XUS01&quot; is parsed into [&#39;X&#39;, &#39;U&#39;, &#39;S01&#39;]</span>
+            <span class="n">code_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\D\d*)&#39;</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">rdcode</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">code_list</span><span class="p">:</span>
+
+                <span class="c1"># Coordinate data</span>
+                <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
+                    <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Located coordinates X&quot;</span><span class="p">)</span>
+                    <span class="n">size</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">ndims</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nz1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="o">.</span><span class="n">itemsize</span>
+                    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">ndims</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># Velocity field</span>
+                <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="s1">&#39;U&#39;</span><span class="p">:</span>
+                    <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Located velocity field U&quot;</span><span class="p">)</span>
+                    <span class="n">size</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">ndims</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nz1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="o">.</span><span class="n">itemsize</span>
+                    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">ndims</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># Pressure field</span>
+                <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
+                    <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Located pressure field P&quot;</span><span class="p">)</span>
+                    <span class="n">size</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nz1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="o">.</span><span class="n">itemsize</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+
+                <span class="c1"># Temperature field</span>
+                <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span>
+                    <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Located temperature field T&quot;</span><span class="p">)</span>
+                    <span class="n">size</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nz1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="o">.</span><span class="n">itemsize</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+
+                <span class="c1"># Passive scalars</span>
+                <span class="k">elif</span> <span class="n">code</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">nscalars</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;_t parse number of passive scalar fields&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Located </span><span class="si">{}</span><span class="s2"> passive scalar fields&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nscalars</span><span class="p">))</span>
+                        <span class="n">size</span> <span class="o">=</span> <span class="n">nscalars</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nz1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="o">.</span><span class="n">itemsize</span>
+                        <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nscalars</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">error</span><span class="p">(</span><span class="s2">&quot;Warning: Unsupported rdcode &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="n">u</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FldData.fromvalues"><a class="viewcode-back" href="../index.html#fld_data.FldData.fromvalues">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromvalues</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                   <span class="n">nelgt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                   <span class="n">nx1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                   <span class="n">ny1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                   <span class="n">nz1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                   <span class="n">nelt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                   <span class="n">time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                   <span class="n">iostep</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="n">fid0</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="n">nfileoo</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                   <span class="n">p0th</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                   <span class="n">if_press_mesh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                   <span class="n">float_type</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                   <span class="n">int_type</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+                   <span class="n">glel</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">coords</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">s</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates an FldData object from the given data values</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nelgt</span>
+<span class="sd">        nx1</span>
+<span class="sd">        ny1</span>
+<span class="sd">        nz1</span>
+<span class="sd">        nelt</span>
+<span class="sd">        time</span>
+<span class="sd">        iostep</span>
+<span class="sd">        fid0</span>
+<span class="sd">        nfileoo</span>
+<span class="sd">        p0th</span>
+<span class="sd">        if_press_mesh</span>
+<span class="sd">        float_type</span>
+<span class="sd">        int_type</span>
+<span class="sd">        glel</span>
+<span class="sd">        coords</span>
+<span class="sd">        u</span>
+<span class="sd">        p</span>
+<span class="sd">        t</span>
+<span class="sd">        s</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        FldData</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="n">FldHeader</span><span class="p">(</span><span class="n">nelgt</span><span class="o">=</span><span class="n">nelgt</span><span class="p">,</span> <span class="n">nx1</span><span class="o">=</span><span class="n">nx1</span><span class="p">,</span> <span class="n">ny1</span><span class="o">=</span><span class="n">ny1</span><span class="p">,</span> <span class="n">nz1</span><span class="o">=</span><span class="n">nz1</span><span class="p">,</span> <span class="n">nelt</span><span class="o">=</span><span class="n">nelt</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">iostep</span><span class="o">=</span><span class="n">iostep</span><span class="p">,</span> <span class="n">fid0</span><span class="o">=</span><span class="n">fid0</span><span class="p">,</span>
+                           <span class="n">nfileoo</span><span class="o">=</span><span class="n">nfileoo</span><span class="p">,</span> <span class="n">p0th</span><span class="o">=</span><span class="n">p0th</span><span class="p">,</span> <span class="n">if_press_mesh</span><span class="o">=</span><span class="n">if_press_mesh</span><span class="p">,</span> <span class="n">float_type</span><span class="o">=</span><span class="n">float_type</span><span class="p">,</span>
+                           <span class="n">int_type</span><span class="o">=</span><span class="n">int_type</span><span class="p">,</span> <span class="n">glel</span><span class="o">=</span><span class="n">glel</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="n">u</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FldData.tofile"><a class="viewcode-back" href="../index.html#fld_data.FldData.tofile">[docs]</a>    <span class="k">def</span> <span class="nf">tofile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;ab&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coords</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_u</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_t</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">attr</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{key}</span><span class="s1"> =</span><span class="se">\n</span><span class="si">{value}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">_set_rdcode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rdcode</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rdcode</span> <span class="o">+=</span> <span class="s2">&quot;X&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rdcode</span> <span class="o">+=</span> <span class="s2">&quot;U&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rdcode</span> <span class="o">+=</span> <span class="s2">&quot;P&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rdcode</span> <span class="o">+=</span> <span class="s2">&quot;T&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">rdcode</span> <span class="o">+=</span> <span class="s2">&quot;S</span><span class="si">{:2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nscalars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">rdcode</span> <span class="o">=</span> <span class="n">rdcode</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nx1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Number of GLL gridpoints along x-axis &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">nx1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ny1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Number of GLL gridpoints along y-axis &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">ny1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nz1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Number of gridpoints along z-axis &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">nz1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nelt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Number of local elements&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">nelt</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nelgt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Number of global elements&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">nelgt</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Absolute simulation time of this file&#39;s state &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">iostep</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; I/O timestep of this file&#39;s state &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">iostep</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fid0</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Index of this file, with respect to all files produced at this I/O step &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">fid0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nfileoo</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Number of files produced at this I/O step &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">nfileoo</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rdcode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; String representing the fields contained in this file &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">rdcode</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">p0th</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; __ &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">p0th</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">if_press_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; States whether pressure mesh is being used &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">if_press_mesh</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">float_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Data type used for floating point numbers in this file &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">float_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">int_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Data type used for integers in this file &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">int_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">glel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Array of global element indices; shape is `(nelt,)` &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">glel</span>
+
+    <span class="nd">@glel</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">glel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="c1"># glel is a managed attribute of FldHeader, so no need to validate it here in FldData</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">glel</span> <span class="o">=</span> <span class="n">other</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ndims</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Number of physical dimensions in this simulation &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">ndims</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nscalars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Number of passive scalars &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">nscalars</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Array of element coordinates; shape is `(ndims, nelt * nx1 * ny1 * nz1)` &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span>
+
+    <span class="nd">@coords</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for coords: coords.shape must equal (ndims, nelt * nx1 * ny1 * nz1)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">u</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Array representing velocity field; shape is `(ndims, nelt * nx1 * ny1 * nz1)`&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u</span>
+
+    <span class="nd">@u</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">u</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for u: u.shape must equal (ndims, nelt * nx1 * ny1 * nz1)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_u</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">p</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Array representing pressure field; shape is `(nelt * nx1 * ny1 * nz1,)`&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span>
+
+    <span class="nd">@p</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">p</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for p: p.shape must equal (nelt * nx1 * ny1 * nz1,)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Array representing temperature field; shape is `(nelt * nx1 * ny1 * nz1,)`&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span>
+
+    <span class="nd">@t</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for t: t.shape must equal (nelt * nx1 * ny1 * nz1,)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Array representing all passive scalar field; shape is `(nscalars * nelt * nx1 * ny1 * nz1,)`&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span>
+
+    <span class="nd">@s</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nscalars</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for _s: _s.shape must equal (nscalars, nelt * nx1 * ny1 * nz1)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nscalars</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># Test 1:  Parses a file, writes it to a second file, then parses the second file</span>
+    <span class="c1"># ===============================================================================</span>
+
+    <span class="n">fld</span> <span class="o">=</span> <span class="n">FldData</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="s1">&#39;data/test0.f00001&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fld</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;***************&#39;</span><span class="p">)</span>
+
+    <span class="n">test_outfile</span> <span class="o">=</span> <span class="s1">&#39;fld_header_test.bin&#39;</span>
+    <span class="n">fld</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">test_outfile</span><span class="p">)</span>
+    <span class="n">fld2</span> <span class="o">=</span> <span class="n">FldData</span><span class="o">.</span><span class="n">fromfile</span><span class="p">(</span><span class="n">test_outfile</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">fld2</span><span class="p">)</span>
+
+    <span class="c1"># Test 2: Creates a file from values, writes it to a file, then parses it again</span>
+    <span class="c1"># ===============================================================================</span>
+
+    <span class="c1"># # Required</span>
+    <span class="c1"># ndims = 3</span>
+    <span class="c1"># nx1 = 7</span>
+    <span class="c1"># ny1 = nx1</span>
+    <span class="c1"># nz1 = nx1</span>
+    <span class="c1"># nelgt = 512</span>
+    <span class="c1"># nelt = nelgt</span>
+    <span class="c1"># float_type = np.dtype(np.float32)</span>
+    <span class="c1"># int_type = np.dtype(np.int32)</span>
+
+    <span class="c1"># # Optional</span>
+    <span class="c1"># glel = np.arange(1, nelt + 1)</span>
+    <span class="c1"># coords = np.vstack((np.full(nelt * nx1 ** 3, fill_value=2),</span>
+    <span class="c1">#                     np.full(nelt * nx1 ** 3, fill_value=3),</span>
+    <span class="c1">#                     np.full(nelt * nx1 ** 3, fill_value=4)))</span>
+    <span class="c1"># u = np.vstack((np.full(nelt * nx1 ** 3, fill_value=5),</span>
+    <span class="c1">#                np.full(nelt * nx1 ** 3, fill_value=6),</span>
+    <span class="c1">#                np.full(nelt * nx1 ** 3, fill_value=7)))</span>
+    <span class="c1"># p = np.full(nelt * nx1 ** 3, fill_value=8)</span>
+    <span class="c1"># t = np.full(nelt * nx1 ** 3, fill_value=9)</span>
+
+    <span class="c1"># fld = FldData.fromvalues(nx1=nx1, ny1=ny1, nz1=nz1, nelgt=nelgt, nelt=nelt,</span>
+    <span class="c1">#                          glel=glel, coords=coords, u=u, p=p, t=t)</span>
+    <span class="c1"># print(fld)</span>
+
+    <span class="c1"># # print(&#39;***************&#39;)</span>
+
+    <span class="c1"># test_outfile = &#39;fld_header_test.bin&#39;</span>
+    <span class="c1"># fld.tofile(test_outfile)</span>
+
+    <span class="c1"># fld2 = FldData.fromfile(test_outfile)</span>
+    <span class="c1"># print(fld2)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fld Utils 0.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Ron Rahaman, Dillon Shaver.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>
