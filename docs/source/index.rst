@@ -6,7 +6,7 @@ Welcome to Fld Utils's documentation!
    :caption: Contents:
 
    users/index
-   api
+   api/index
 
 
 Indices and tables
