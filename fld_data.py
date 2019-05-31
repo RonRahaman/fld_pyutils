@@ -4,7 +4,7 @@ from fld_header import FldHeader
 
 
 class FldData:
-    """ Contains the data of a binary Nek5000 field file.
+    """ Contains the header and field data of a binary Nek5000 field file.
 
     The constructor is typically not used directly.  Most users will prefer to use :py:meth:`FldData.fromfile` or
     :py:meth:`FldData.fromvalues`.
@@ -66,7 +66,7 @@ class FldData:
 
     @classmethod
     def fromfile(cls, filename: str):
-        """ Creates an :py:class:`FldData` object from the contents of a given file
+        """ Creates an :py:class:`FldData` object from the contents of a given field file
 
         Parameters
         ----------

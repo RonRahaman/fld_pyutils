@@ -59,7 +59,7 @@
 
 
 <div class="viewcode-block" id="FldData"><a class="viewcode-back" href="../api/fld_data.html#fld_data.FldData">[docs]</a><span class="k">class</span> <span class="nc">FldData</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Contains the data of a binary Nek5000 field file.</span>
+    <span class="sd">&quot;&quot;&quot; Contains the header and field data of a binary Nek5000 field file.</span>
 
 <span class="sd">    The constructor is typically not used directly.  Most users will prefer to use :py:meth:`FldData.fromfile` or</span>
 <span class="sd">    :py:meth:`FldData.fromvalues`.</span>
@@ -121,7 +121,7 @@
 
 <div class="viewcode-block" id="FldData.fromfile"><a class="viewcode-back" href="../api/fld_data.html#fld_data.FldData.fromfile">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Creates an :py:class:`FldData` object from the contents of a given file</span>
+        <span class="sd">&quot;&quot;&quot; Creates an :py:class:`FldData` object from the contents of a given field file</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
