@@ -179,7 +179,7 @@ class FldData:
         nz1
             Number of GLL gridpoints along z-axis
         nelt
-            Number of local elements
+            Number of elements in this file
         time
             Absolute simulation time of this file's state
         iostep
@@ -207,7 +207,7 @@ class FldData:
         t
             Array representing temperature field; shape must be ``(nelt * nx1 * ny1 * nz1,)``
         s
-            Array representing all passive scalar field; shape must be ``(nscalars * nelt * nx1 * ny1 * nz1,)``
+            Array representing all passive scalar field; shape must be ``(nscalars, nelt * nx1 * ny1 * nz1)``
 
         Returns
         -------
@@ -282,7 +282,7 @@ class FldData:
 
     @property
     def nelt(self) -> int:
-        """ Number of local elements"""
+        """ Number of elements in this file """
         return self._header.nelt
 
     @property
@@ -399,13 +399,13 @@ class FldData:
     @t.setter
     def t(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt * self.nx1 * self.ny1 * self.nz1,):
-            raise ValueError("Incorrect shape for t: t.shape must equal (nelt * nx1 * ny1 * nz1,)")
+            raise ValueError("Incorrect shape for t: t.shape must equal ``(nelt * nx1 * ny1 * nz1,)``")
         self._t = other.astype(self.float_type)
         self._set_rdcode()
 
     @property
     def s(self) -> np.ndarray:
-        """ Array representing all passive scalar field; shape is ``(nscalars * nelt * nx1 * ny1 * nz1,)``"""
+        """ Array representing all passive scalar field; shape is ``(nscalars, nelt * nx1 * ny1 * nz1)``"""
         return self._s
 
     @s.setter

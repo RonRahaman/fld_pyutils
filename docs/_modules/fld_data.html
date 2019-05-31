@@ -234,7 +234,7 @@
 <span class="sd">        nz1</span>
 <span class="sd">            Number of GLL gridpoints along z-axis</span>
 <span class="sd">        nelt</span>
-<span class="sd">            Number of local elements</span>
+<span class="sd">            Number of elements in this file</span>
 <span class="sd">        time</span>
 <span class="sd">            Absolute simulation time of this file&#39;s state</span>
 <span class="sd">        iostep</span>
@@ -262,7 +262,7 @@
 <span class="sd">        t</span>
 <span class="sd">            Array representing temperature field; shape must be ``(nelt * nx1 * ny1 * nz1,)``</span>
 <span class="sd">        s</span>
-<span class="sd">            Array representing all passive scalar field; shape must be ``(nscalars * nelt * nx1 * ny1 * nz1,)``</span>
+<span class="sd">            Array representing all passive scalar field; shape must be ``(nscalars, nelt * nx1 * ny1 * nz1)``</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -337,7 +337,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nelt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Number of local elements&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Number of elements in this file &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">nelt</span>
 
     <span class="nd">@property</span>
@@ -454,13 +454,13 @@
     <span class="nd">@t</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">,):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for t: t.shape must equal (nelt * nx1 * ny1 * nz1,)&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for t: t.shape must equal ``(nelt * nx1 * ny1 * nz1,)``&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Array representing all passive scalar field; shape is ``(nscalars * nelt * nx1 * ny1 * nz1,)``&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Array representing all passive scalar field; shape is ``(nscalars, nelt * nx1 * ny1 * nz1)``&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span>
 
     <span class="nd">@s</span><span class="o">.</span><span class="n">setter</span>

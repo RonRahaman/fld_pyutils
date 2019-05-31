@@ -68,6 +68,65 @@
             
   <div class="section" id="data-representation">
 <h1>Data Representation<a class="headerlink" href="#data-representation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="header-data">
+<h2>Header Data<a class="headerlink" href="#header-data" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>The header of a field file includes metadata about:</dt><dd><ul class="simple">
+<li><p>The number of elements (<code class="docutils literal notranslate"><span class="pre">nelt</span></code>) in the given file</p></li>
+<li><p>The number of GLL gridpoints (<code class="docutils literal notranslate"><span class="pre">nx1</span></code>, <code class="docutils literal notranslate"><span class="pre">ny1</span></code>, and <code class="docutils literal notranslate"><span class="pre">nz1</span></code>)</p></li>
+<li><p>The number of physical dimensions in the simulation (<code class="docutils literal notranslate"><span class="pre">ndims</span></code>) <a class="footnote-reference brackets" href="#f1" id="id1">1</a></p></li>
+<li><p>The number of passive scalar fields (<code class="docutils literal notranslate"><span class="pre">nscalars</span></code>)</p></li>
+<li><p>The size of integer types (<code class="docutils literal notranslate"><span class="pre">int_type</span></code>).  In Fld Utils, this is represented
+as a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a></p></li>
+<li><p>The size and endianness of floating-point types (<code class="docutils literal notranslate"><span class="pre">float_type</span></code>).  In Fld Utils, this is represented
+as a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, which contains information about size and endianness.</p></li>
+<li><p>Other items, which are documented in <a class="reference internal" href="../api/fld_header.html#fld_header.FldHeader" title="fld_header.FldHeader"><code class="xref py py-class docutils literal notranslate"><span class="pre">fld_header.FldHeader</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="index-coordinate-and-field-data">
+<h2>Index, Coordinate, and Field Data<a class="headerlink" href="#index-coordinate-and-field-data" title="Permalink to this headline">¶</a></h2>
+<p>The main contents of the file include arrays of global element indices, element coordinates,
+and the fields themselves.  In Fld Utils, these are all represented as <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>.
+The data types of these arrays must be consistent with <code class="docutils literal notranslate"><span class="pre">int_type</span></code> or  <code class="docutils literal notranslate"><span class="pre">float_type</span></code>, as described
+by the header. The shapes of these arrays must be consistent with the sizes described by the header:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The global element IDs (<code class="docutils literal notranslate"><span class="pre">glel</span></code>) must have shape <code class="docutils literal notranslate"><span class="pre">(nelt,)</span></code></p></li>
+<li><p>The element coordinates (<code class="docutils literal notranslate"><span class="pre">coords</span></code>) must have shape <code class="docutils literal notranslate"><span class="pre">(ndims,</span> <span class="pre">nelt</span> <span class="pre">*</span> <span class="pre">nx1</span> <span class="pre">*</span> <span class="pre">ny1</span> <span class="pre">*</span> <span class="pre">nz1)</span></code></p></li>
+<li><p>The velocity field (<code class="docutils literal notranslate"><span class="pre">u</span></code>) must have shape <code class="docutils literal notranslate"><span class="pre">(ndims,</span> <span class="pre">nelt</span> <span class="pre">*</span> <span class="pre">nx1</span> <span class="pre">*</span> <span class="pre">ny1</span> <span class="pre">*</span> <span class="pre">nz1)</span></code></p></li>
+<li><p>The pressure field (<code class="docutils literal notranslate"><span class="pre">p</span></code>) must have shape <code class="docutils literal notranslate"><span class="pre">(nelt</span> <span class="pre">*</span> <span class="pre">nx1</span> <span class="pre">*</span> <span class="pre">ny1</span> <span class="pre">*</span> <span class="pre">nz1,)</span></code></p></li>
+<li><p>The temperature field (<code class="docutils literal notranslate"><span class="pre">t</span></code>) must have shape <code class="docutils literal notranslate"><span class="pre">(nelt</span> <span class="pre">*</span> <span class="pre">nx1</span> <span class="pre">*</span> <span class="pre">ny1</span> <span class="pre">*</span> <span class="pre">nz1,)</span></code></p></li>
+<li><p>The passive scalar fields (<code class="docutils literal notranslate"><span class="pre">s</span></code>) must have shape <code class="docutils literal notranslate"><span class="pre">(nscalars,</span> <span class="pre">nelt</span> <span class="pre">*</span> <span class="pre">nx1</span> <span class="pre">*</span> <span class="pre">ny1</span> <span class="pre">*</span> <span class="pre">nz1)</span></code>.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="ensuring-data-consistency">
+<h2>Ensuring Data Consistency<a class="headerlink" href="#ensuring-data-consistency" title="Permalink to this headline">¶</a></h2>
+<p>Data consistency is internally managed by the objects in Fld Utils.  Much of it (such as handling byte data)
+needn’t ever be managed directly by the user.  Furthermore, when the user attempts an inconsistent operation
+(such as attempting to set an incorrectly-sized field), the user is issued an error.  It is intended that the
+user can never – either knowlingly or unknowlingly – create an inconsistent field file.</p>
+<p>The following information describes internal data management and <strong>is not necessary knowledge for the user.</strong></p>
+<p>When reading from file, the index, coordinate, and field data are parsed using
+<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.frombuffer</span></code>.  This method takes a byte object, whose size is determined by the header data.
+This method also takes a parameter for <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>, which is inferred
+from <code class="docutils literal notranslate"><span class="pre">int_type</span></code> and <code class="docutils literal notranslate"><span class="pre">float_type</span></code> in the header of the field file; once the datatype is specified, the
+bytewise representation of the data can be internally managed by NumPy.</p>
+<p>When updating field the field data, the user must provide a <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> of the correct shape.
+Setting this data is handled by a managed attribute, which raises an error if the shape is incorrect.
+Conversion to the correct datatype is also handled automatically.</p>
+<p>When writing data, a byte object is constructed from <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.tobytes.html#numpy.ndarray.tobytes" title="(in NumPy v1.16)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">numpy.ndarray.tobytes()</span></code></a>.   The bytewise
+representation is handled automatically.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>The number of dimensions is inferred from the value of <code class="docutils literal notranslate"><span class="pre">nz1</span></code>.  If <code class="docutils literal notranslate"><span class="pre">nz1</span> <span class="pre">==</span> <span class="pre">1</span></code>,
+then the simulation is assumed to be 2D.  Otherwise, the simulation is 3D.</p>
+</dd>
+</dl>
+</div>
 </div>
 
 

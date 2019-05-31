@@ -20,7 +20,7 @@ class FldHeader:
     nz1
         Number of GLL gridpoints along z-axis
     nelt
-        Number of local elements
+        Number of elements in this file
     rdcode
         String representing the fields contained in this file
     time
@@ -182,7 +182,7 @@ class FldHeader:
         nz1
             Number of GLL gridpoints along z-axis
         nelt
-            Number of local elements
+            Number of elements in this file
         rdcode
             String representing the fields contained in this file
         time
