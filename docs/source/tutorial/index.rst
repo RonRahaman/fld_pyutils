@@ -1,11 +1,9 @@
-Users' Guide
-============
+Tutorial
+========
 
 .. toctree::
     :maxdepth: 1
 
-    about
-    data
     fromfile
     accessing
     editing

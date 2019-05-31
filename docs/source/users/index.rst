@@ -7,5 +7,7 @@ Users' Guide
     about
     data
     fromfile
-    fromdata
-    updating
+    accessing
+    editing
+    tofile
+    fromvalues

@@ -2,10 +2,11 @@ Welcome to Fld Utils's documentation!
 =====================================
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   users/index
-   api/index
+    users/index
+    tutorial/index
+    api/index
 
 
 Indices and tables
