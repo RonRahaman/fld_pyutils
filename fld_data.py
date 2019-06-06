@@ -4,16 +4,36 @@ from fld_header import FldHeader
 
 
 class FldData:
-    """ A field data class
+    """ Contains the header and field data of a binary Nek5000 field file.
+
+    The constructor is typically not used directly.  Most users will prefer to use :py:meth:`FldData.fromfile` or
+    :py:meth:`FldData.fromvalues`.
+
+    The parameters representing fields (``coords``, ``u``, ``p``, ``t``, and ``s``) must have sizes that are consistent with
+    ``header``.  For example, the scalar field ``p`` must have size equal to
+    ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``.  The constructor will raise a ``ValueError`` if the sizes are
+    inconsistent.
 
     Parameters
     ----------
     header
+        An instantiated :py:class:`fld_header.FldHeader` object.
     coords
+        Array of global element coordinates.
+        Must have shape = ``(header.ndims, header.nelt * header.nx1 * header.ny1 * header.nz1)``.  Default is ``None``.
     u
+        Array of velocities.  Must have shape = ``(header.ndims, header.nelt * header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.
     p
+        Array of pressures.  Must have shape = ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``. Default is ``None``.
     t
+        Array of temperatures.  Must have shape = ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``. Default is ``None``.
     s
+        Array of passive scalars.  Must have shape = ``(header.nscalars, header.nelt * header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.
+
+    Raises
+    ------
+    ValueError
+        If the size of any field is inconsistent with the header.
 
     """
 
@@ -46,17 +66,17 @@ class FldData:
 
     @classmethod
     def fromfile(cls, filename: str):
-        """ Creates an :py:class:`FldData` object from the contents of a given file
+        """ Creates an :py:class:`FldData` object from the contents of a given field file
 
         Parameters
         ----------
         filename
-            foobar
+            Path to a binary Nek5000 field file
 
         Returns
         -------
         FldData
-            A new instance of an FldData
+            A new instance of  :py:class:`FldData`
 
         """
 
@@ -146,33 +166,53 @@ class FldData:
                    p: np.ndarray = None,
                    t: np.ndarray = None,
                    s: np.ndarray = None):
-        """ Creates an FldData object from the given data values
+        """ Creates a :py:class:`FldData` object from the given data values.
 
         Parameters
         ----------
         nelgt
+            Number of global elements
         nx1
+            Number of GLL gridpoints along x-axis
         ny1
+            Number of GLL gridpoints along y-axis
         nz1
+            Number of GLL gridpoints along z-axis
         nelt
+            Number of elements in this file
         time
+            Absolute simulation time of this file's state
         iostep
+            I/O timestep of this file's state
         fid0
+            Index of this file, with respect to all files produced at this I/O step
         nfileoo
+            Number of files produced at this I/O step
         p0th
+            __
         if_press_mesh
+            States whether pressure mesh is being used
         float_type
+            Data type used for floating point numbers in this file
         int_type
+            Data type used for integers in this file
         glel
+            Array of global element indices; shape must be ``(nelt,)``
         coords
+            Array of element coordinates; shape must be ``(ndims, nelt * nx1 * ny1 * nz1)``
         u
+            Array representing velocity field; shape must be ``(ndims, nelt * nx1 * ny1 * nz1)``
         p
+            Array representing pressure field; shape must be ``(nelt * nx1 * ny1 * nz1,)``
         t
+            Array representing temperature field; shape must be ``(nelt * nx1 * ny1 * nz1,)``
         s
+            Array representing all passive scalar field; shape must be ``(nscalars, nelt * nx1 * ny1 * nz1)``
 
         Returns
         -------
         FldData
+            A new instance of :py:class:`FldData`
 
         """
 
@@ -183,11 +223,14 @@ class FldData:
         return cls(header=header, coords=coords, u=u, p=p, t=t, s=s)
 
     def tofile(self, filename: str):
-        """
+        """ Writes the data of this object to a binary Nek5000 field file.
+
+        If ``filename`` already exists, it is silently overwritten.
 
         Parameters
         ----------
         filename
+            The name of the desired field file
 
         """
         self._header.tofile(filename)
@@ -239,7 +282,7 @@ class FldData:
 
     @property
     def nelt(self) -> int:
-        """ Number of local elements"""
+        """ Number of elements in this file """
         return self._header.nelt
 
     @property
@@ -294,7 +337,7 @@ class FldData:
 
     @property
     def glel(self) -> np.ndarray:
-        """ Array of global element indices; shape is `(nelt,)` """
+        """ Array of global element indices; shape is ``(nelt,)`` """
         return self._header.glel
 
     @glel.setter
@@ -314,7 +357,7 @@ class FldData:
 
     @property
     def coords(self) -> np.ndarray:
-        """ Array of element coordinates; shape is `(ndims, nelt * nx1 * ny1 * nz1)` """
+        """ Array of element coordinates; shape is ``(ndims, nelt * nx1 * ny1 * nz1)`` """
         return self._coords
 
     @coords.setter
@@ -326,7 +369,7 @@ class FldData:
 
     @property
     def u(self) -> np.ndarray:
-        """ Array representing velocity field; shape is `(ndims, nelt * nx1 * ny1 * nz1)`"""
+        """ Array representing velocity field; shape is ``(ndims, nelt * nx1 * ny1 * nz1)``"""
         return self._u
 
     @u.setter
@@ -338,7 +381,7 @@ class FldData:
 
     @property
     def p(self) -> np.ndarray:
-        """ Array representing pressure field; shape is `(nelt * nx1 * ny1 * nz1,)`"""
+        """ Array representing pressure field; shape is ``(nelt * nx1 * ny1 * nz1,)``"""
         return self._p
 
     @p.setter
@@ -350,19 +393,19 @@ class FldData:
 
     @property
     def t(self) -> np.ndarray:
-        """ Array representing temperature field; shape is `(nelt * nx1 * ny1 * nz1,)`"""
+        """ Array representing temperature field; shape is ``(nelt * nx1 * ny1 * nz1,)``"""
         return self._t
 
     @t.setter
     def t(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt * self.nx1 * self.ny1 * self.nz1,):
-            raise ValueError("Incorrect shape for t: t.shape must equal (nelt * nx1 * ny1 * nz1,)")
+            raise ValueError("Incorrect shape for t: t.shape must equal ``(nelt * nx1 * ny1 * nz1,)``")
         self._t = other.astype(self.float_type)
         self._set_rdcode()
 
     @property
     def s(self) -> np.ndarray:
-        """ Array representing all passive scalar field; shape is `(nscalars * nelt * nx1 * ny1 * nz1,)`"""
+        """ Array representing all passive scalar field; shape is ``(nscalars, nelt * nx1 * ny1 * nz1)``"""
         return self._s
 
     @s.setter

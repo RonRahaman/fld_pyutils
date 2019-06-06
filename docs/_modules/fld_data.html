@@ -58,17 +58,37 @@
 <span class="kn">from</span> <span class="nn">fld_header</span> <span class="k">import</span> <span class="n">FldHeader</span>
 
 
-<div class="viewcode-block" id="FldData"><a class="viewcode-back" href="../index.html#fld_data.FldData">[docs]</a><span class="k">class</span> <span class="nc">FldData</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; A field data class</span>
+<div class="viewcode-block" id="FldData"><a class="viewcode-back" href="../api/fld_data.html#fld_data.FldData">[docs]</a><span class="k">class</span> <span class="nc">FldData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Contains the header and field data of a binary Nek5000 field file.</span>
+
+<span class="sd">    The constructor is typically not used directly.  Most users will prefer to use :py:meth:`FldData.fromfile` or</span>
+<span class="sd">    :py:meth:`FldData.fromvalues`.</span>
+
+<span class="sd">    The parameters representing fields (``coords``, ``u``, ``p``, ``t``, and ``s``) must have sizes that are consistent with</span>
+<span class="sd">    ``header``.  For example, the scalar field ``p`` must have size equal to</span>
+<span class="sd">    ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``.  The constructor will raise a ``ValueError`` if the sizes are</span>
+<span class="sd">    inconsistent.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    header</span>
+<span class="sd">        An instantiated :py:class:`fld_header.FldHeader` object.</span>
 <span class="sd">    coords</span>
+<span class="sd">        Array of global element coordinates.</span>
+<span class="sd">        Must have shape = ``(header.ndims, header.nelt * header.nx1 * header.ny1 * header.nz1)``.  Default is ``None``.</span>
 <span class="sd">    u</span>
+<span class="sd">        Array of velocities.  Must have shape = ``(header.ndims, header.nelt * header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.</span>
 <span class="sd">    p</span>
+<span class="sd">        Array of pressures.  Must have shape = ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``. Default is ``None``.</span>
 <span class="sd">    t</span>
+<span class="sd">        Array of temperatures.  Must have shape = ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``. Default is ``None``.</span>
 <span class="sd">    s</span>
+<span class="sd">        Array of passive scalars.  Must have shape = ``(header.nscalars, header.nelt * header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the size of any field is inconsistent with the header.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -99,19 +119,19 @@
         <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span>
 
-<div class="viewcode-block" id="FldData.fromfile"><a class="viewcode-back" href="../index.html#fld_data.FldData.fromfile">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FldData.fromfile"><a class="viewcode-back" href="../api/fld_data.html#fld_data.FldData.fromfile">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromfile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Creates an :py:class:`FldData` object from the contents of a given file</span>
+        <span class="sd">&quot;&quot;&quot; Creates an :py:class:`FldData` object from the contents of a given field file</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filename</span>
-<span class="sd">            foobar</span>
+<span class="sd">            Path to a binary Nek5000 field file</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        FldData</span>
-<span class="sd">            A new instance of an FldData</span>
+<span class="sd">            A new instance of  :py:class:`FldData`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -180,7 +200,7 @@
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="n">u</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FldData.fromvalues"><a class="viewcode-back" href="../index.html#fld_data.FldData.fromvalues">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FldData.fromvalues"><a class="viewcode-back" href="../api/fld_data.html#fld_data.FldData.fromvalues">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromvalues</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                    <span class="n">nelgt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
                    <span class="n">nx1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -201,33 +221,53 @@
                    <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                    <span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                    <span class="n">s</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Creates an FldData object from the given data values</span>
+        <span class="sd">&quot;&quot;&quot; Creates a :py:class:`FldData` object from the given data values.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        nelgt</span>
+<span class="sd">            Number of global elements</span>
 <span class="sd">        nx1</span>
+<span class="sd">            Number of GLL gridpoints along x-axis</span>
 <span class="sd">        ny1</span>
+<span class="sd">            Number of GLL gridpoints along y-axis</span>
 <span class="sd">        nz1</span>
+<span class="sd">            Number of GLL gridpoints along z-axis</span>
 <span class="sd">        nelt</span>
+<span class="sd">            Number of elements in this file</span>
 <span class="sd">        time</span>
+<span class="sd">            Absolute simulation time of this file&#39;s state</span>
 <span class="sd">        iostep</span>
+<span class="sd">            I/O timestep of this file&#39;s state</span>
 <span class="sd">        fid0</span>
+<span class="sd">            Index of this file, with respect to all files produced at this I/O step</span>
 <span class="sd">        nfileoo</span>
+<span class="sd">            Number of files produced at this I/O step</span>
 <span class="sd">        p0th</span>
+<span class="sd">            __</span>
 <span class="sd">        if_press_mesh</span>
+<span class="sd">            States whether pressure mesh is being used</span>
 <span class="sd">        float_type</span>
+<span class="sd">            Data type used for floating point numbers in this file</span>
 <span class="sd">        int_type</span>
+<span class="sd">            Data type used for integers in this file</span>
 <span class="sd">        glel</span>
+<span class="sd">            Array of global element indices; shape must be ``(nelt,)``</span>
 <span class="sd">        coords</span>
+<span class="sd">            Array of element coordinates; shape must be ``(ndims, nelt * nx1 * ny1 * nz1)``</span>
 <span class="sd">        u</span>
+<span class="sd">            Array representing velocity field; shape must be ``(ndims, nelt * nx1 * ny1 * nz1)``</span>
 <span class="sd">        p</span>
+<span class="sd">            Array representing pressure field; shape must be ``(nelt * nx1 * ny1 * nz1,)``</span>
 <span class="sd">        t</span>
+<span class="sd">            Array representing temperature field; shape must be ``(nelt * nx1 * ny1 * nz1,)``</span>
 <span class="sd">        s</span>
+<span class="sd">            Array representing all passive scalar field; shape must be ``(nscalars, nelt * nx1 * ny1 * nz1)``</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        FldData</span>
+<span class="sd">            A new instance of :py:class:`FldData`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -237,12 +277,15 @@
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="n">u</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FldData.tofile"><a class="viewcode-back" href="../index.html#fld_data.FldData.tofile">[docs]</a>    <span class="k">def</span> <span class="nf">tofile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FldData.tofile"><a class="viewcode-back" href="../api/fld_data.html#fld_data.FldData.tofile">[docs]</a>    <span class="k">def</span> <span class="nf">tofile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Writes the data of this object to a binary Nek5000 field file.</span>
+
+<span class="sd">        If ``filename`` already exists, it is silently overwritten.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filename</span>
+<span class="sd">            The name of the desired field file</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -294,7 +337,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nelt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Number of local elements&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Number of elements in this file &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">nelt</span>
 
     <span class="nd">@property</span>
@@ -349,7 +392,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">glel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Array of global element indices; shape is `(nelt,)` &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Array of global element indices; shape is ``(nelt,)`` &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">glel</span>
 
     <span class="nd">@glel</span><span class="o">.</span><span class="n">setter</span>
@@ -369,7 +412,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Array of element coordinates; shape is `(ndims, nelt * nx1 * ny1 * nz1)` &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Array of element coordinates; shape is ``(ndims, nelt * nx1 * ny1 * nz1)`` &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span>
 
     <span class="nd">@coords</span><span class="o">.</span><span class="n">setter</span>
@@ -381,7 +424,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">u</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Array representing velocity field; shape is `(ndims, nelt * nx1 * ny1 * nz1)`&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Array representing velocity field; shape is ``(ndims, nelt * nx1 * ny1 * nz1)``&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_u</span>
 
     <span class="nd">@u</span><span class="o">.</span><span class="n">setter</span>
@@ -393,7 +436,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">p</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Array representing pressure field; shape is `(nelt * nx1 * ny1 * nz1,)`&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Array representing pressure field; shape is ``(nelt * nx1 * ny1 * nz1,)``&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p</span>
 
     <span class="nd">@p</span><span class="o">.</span><span class="n">setter</span>
@@ -405,19 +448,19 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Array representing temperature field; shape is `(nelt * nx1 * ny1 * nz1,)`&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Array representing temperature field; shape is ``(nelt * nx1 * ny1 * nz1,)``&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t</span>
 
     <span class="nd">@t</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">t</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">,):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for t: t.shape must equal (nelt * nx1 * ny1 * nz1,)&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for t: t.shape must equal ``(nelt * nx1 * ny1 * nz1,)``&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_t</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot; Array representing all passive scalar field; shape is `(nscalars * nelt * nx1 * ny1 * nz1,)`&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Array representing all passive scalar field; shape is ``(nscalars, nelt * nx1 * ny1 * nz1)``&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_s</span>
 
     <span class="nd">@s</span><span class="o">.</span><span class="n">setter</span>

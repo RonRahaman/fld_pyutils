@@ -3,6 +3,46 @@ from re import search
 
 
 class FldHeader:
+    """ Contains the header of a binary Nek5000 field file
+
+    The constructor is typically not used directly.  Most users will prefer to use :py:meth:`FldHeader.fromfile` or
+    :py:meth:`FldHeader.fromvalues`.
+
+
+    Parameters
+    ----------
+    nelgt
+        Number of global elements
+    nx1
+        Number of GLL gridpoints along x-axis
+    ny1
+        Number of GLL gridpoints along y-axis
+    nz1
+        Number of GLL gridpoints along z-axis
+    nelt
+        Number of elements in this file
+    rdcode
+        String representing the fields contained in this file
+    time
+        Absolute simulation time of this file's state
+    iostep
+        I/O timestep of this file's state
+    fid0
+        Index of this file, with respect to all files produced at this I/O step
+    nfileoo
+        Number of files produced at this I/O step
+    p0th
+        __
+    if_press_mesh
+        States whether pressure mesh is being used
+    float_type
+        Data type used for floating point numbers in this file
+    int_type
+        Data type used for integers in this file
+    glel
+        Array of global element indices; shape must be ``(nelt,)``
+    """
+
     _endian_check_val = 6.54321
 
     def __init__(self,
@@ -20,7 +60,7 @@ class FldHeader:
                  if_press_mesh: bool = False,
                  float_type: np.dtype = np.dtype(np.float32),
                  int_type: np.dtype = np.dtype(np.int32),
-                 glel: np.array = None):
+                 glel: np.ndarray = None):
         self.nx1 = nx1
         self.ny1 = ny1
         self.nz1 = nz1
@@ -43,6 +83,19 @@ class FldHeader:
 
     @classmethod
     def fromfile(cls, filename: str):
+        """ Creates a :py:class:`FldHeader` object from the contents of a given field file
+
+        Parameters
+        ----------
+        filename
+            Path to a binary Nek5000 field file
+
+        Returns
+        -------
+        FldHeader
+            A new instance of  :py:class:`FldHeader`
+
+        """
 
         with open(filename, 'rb') as f:
 
@@ -116,6 +169,48 @@ class FldHeader:
                    float_type: np.dtype = np.dtype(np.float32),
                    int_type: np.dtype = np.dtype(np.int32),
                    glel: np.array = None):
+        """ Creates a :py:class:`FldHeader` object from the given data values
+
+        Parameters
+        ----------
+        nelgt
+            Number of global elements
+        nx1
+            Number of GLL gridpoints along x-axis
+        ny1
+            Number of GLL gridpoints along y-axis
+        nz1
+            Number of GLL gridpoints along z-axis
+        nelt
+            Number of elements in this file
+        rdcode
+            String representing the fields contained in this file
+        time
+            Absolute simulation time of this file's state
+        iostep
+            I/O timestep of this file's state
+        fid0
+            Index of this file, with respect to all files produced at this I/O step
+        nfileoo
+            Number of files produced at this I/O step
+        p0th
+            __
+        if_press_mesh
+            States whether pressure mesh is being used
+        float_type
+            Data type used for floating point numbers in this file
+        int_type
+            Data type used for integers in this file
+        glel
+            Array of global element indices; shape must be ``(nelt,)``
+
+        Returns
+        -------
+        FldHeader
+            A new instance of  :py:class:`FldHeader`
+
+        """
+
 
         return cls(nx1=nx1, ny1=ny1, nz1=nz1, nelt=nelt, nelgt=nelgt, rdcode=rdcode, time=time, iostep=iostep,
                    fid0=fid0, nfileoo=nfileoo, p0th=p0th, if_press_mesh=if_press_mesh, float_type=float_type,
@@ -157,20 +252,23 @@ class FldHeader:
         return result
 
     @property
-    def glel(self) -> np.array:
+    def glel(self) -> np.ndarray:
+        """ Array of global element indices; shape is ``(nelt,)`` """
         return self._glel
 
     @glel.setter
-    def glel(self, other: np.array):
+    def glel(self, other: np.ndarray):
         if other.shape != (self.nelt,):
             raise ValueError("Incorrect shape for glel: glel.shape must equal (nelt,)")
         self._glel = other.astype(self.int_type)
 
     @property
-    def ndims(self):
+    def ndims(self) -> int:
+        """ Number of physical dimensions in this simulation """
         return 2 if self.nz1 == 1 else 3
 
     @property
-    def nscalars(self):
+    def nscalars(self) -> int:
+        """ Number of passive scalars """
         res = search(r'S(\d+)', self.rdcode)
         return int(res.group(1)) if res else 0
