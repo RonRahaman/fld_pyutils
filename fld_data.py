@@ -262,7 +262,7 @@ class FldData:
         if self.t.size != 0:
             rdcode += "T"
         if self.s.size != 0:
-            rdcode += "S{:2}".format(self.nscalars)
+            rdcode += "S{:02}".format(self.s.shape[0])
         self._header.rdcode = rdcode
 
     @property
@@ -410,10 +410,10 @@ class FldData:
 
     @s.setter
     def s(self, other: np.ndarray):
-        if other.size != 0 and other.shape != (self.nscalars, self.nelt * self.nx1 * self.ny1 * self.nz1):
-            raise ValueError("Incorrect shape for _s: _s.shape must equal (nscalars, nelt * nx1 * ny1 * nz1)")
+        if other.size != 0 and len(other.shape) != 2 and other.shape[1] != self.nelt * self.nx1 * self.ny1 * self.nz1:
+            raise ValueError(
+                "Incorrect shape for s: s.shape must equal (x, nelt * nx1 * ny1 * nz1) for arbitrary number of scalars x")
         self._s = other.astype(self.float_type)
-        self._nscalars = other.shape[0]
         self._set_rdcode()
 
 
