@@ -14,7 +14,7 @@ glel = np.arange(1, nelt + 1)
 
 coords = np.vstack((np.full(nelt * nx1 ** 3, fill_value=2),
                     np.full(nelt * nx1 ** 3, fill_value=3),
-                    np.full(nelt * nx1 ** 3, fill_value=4)))
+                    np.full(nelt * nx1 ** 3, fill_value=4))).transpose()
 
 u = np.vstack((np.full(nelt * nx1 ** 3, fill_value=5),
                np.full(nelt * nx1 ** 3, fill_value=6),
