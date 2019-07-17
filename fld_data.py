@@ -20,9 +20,9 @@ class FldData:
         An instantiated :py:class:`fld_header.FldHeader` object.
     coords
         Array of global element coordinates.
-        Must have shape = ``(header.ndims, header.nelt * header.nx1 * header.ny1 * header.nz1)``.  Default is ``None``.
+        Must have shape = ``(header.nelt, header.nx1 * header.ny1 * header.nz1, header.ndims)``.  Default is ``None``.
     u
-        Array of velocities.  Must have shape = ``(header.ndims, header.nelt * header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.
+        Array of velocities.  Must have shape = ``(header.nelt, header.nx1 * header.ny1 * header.nz1, header.ndims)``. Default is ``None``.
     p
         Array of pressures.  Must have shape = ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``. Default is ``None``.
     t
@@ -93,6 +93,7 @@ class FldData:
         p = np.array([])
         t = np.array([])
         s = np.array([])
+        nxyz = h.nx1 * h.ny1 * h.nz1
 
         notify("Attempting to fields from rdcode {}".format(h.rdcode))
 
@@ -108,14 +109,14 @@ class FldData:
                 # Coordinate data
                 if code == 'X':
                     notify("Located coordinates X")
-                    size = h.ndims * h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
-                    coords = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.ndims, -1)
+                    size = h.ndims * h.nelt * nxyz * h.float_type.itemsize
+                    coords = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.nelt,h.ndims,nxyz)
 
                 # Velocity field
                 elif code == 'U':
                     notify("Located velocity field U")
                     size = h.ndims * h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
-                    u = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.ndims, -1)
+                    u = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.nelt,h.ndims,nxyz)
 
                 # Pressure field
                 elif code == 'P':
@@ -357,25 +358,25 @@ class FldData:
 
     @property
     def coords(self) -> np.ndarray:
-        """ Array of element coordinates; shape is ``(ndims, nelt * nx1 * ny1 * nz1)`` """
+        """ Array of element coordinates; shape is ``(nelt, ndims, nx1 * ny1 * nz1)`` """
         return self._coords
 
     @coords.setter
     def coords(self, other: np.ndarray):
-        if other.size != 0 and other.shape != (self.ndims, self.nelt * self.nx1 * self.ny1 * self.nz1):
-            raise ValueError("Incorrect shape for coords: coords.shape must equal (ndims, nelt * nx1 * ny1 * nz1)")
+        if other.size != 0 and other.shape != (self.nelt, self.ndims, self.nx1 * self.ny1 * self.nz1):
+            raise ValueError("Incorrect shape for coords: coords.shape must equal (nelt, ndims,  nx1 * ny1 * nz1)")
         self._coords = other.astype(self.float_type)
         self._set_rdcode()
 
     @property
     def u(self) -> np.ndarray:
-        """ Array representing velocity field; shape is ``(ndims, nelt * nx1 * ny1 * nz1)``"""
+        """ Array representing velocity field; shape is ``(nelt, ndims, nx1 * ny1 * nz1)``"""
         return self._u
 
     @u.setter
     def u(self, other: np.ndarray):
-        if other.size != 0 and other.shape != (self.ndims, self.nelt * self.nx1 * self.ny1 * self.nz1):
-            raise ValueError("Incorrect shape for u: u.shape must equal (ndims, nelt * nx1 * ny1 * nz1)")
+        if other.size != 0 and other.shape != (self.nelt, self.ndims, self.nx1 * self.ny1 * self.nz1):
+            raise ValueError("Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)")
         self._u = other.astype(self.float_type)
         self._set_rdcode()
 
