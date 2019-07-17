@@ -109,7 +109,7 @@ class FldData:
                 if code == 'X':
                     notify("Located coordinates X")
                     size = h.ndims * h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
-                    coords = np.frombuffer(f.read(size), dtype=h.float_type).reshape(-1, h.ndims)
+                    coords = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.ndims, -1)
 
                 # Velocity field
                 elif code == 'U':
@@ -362,8 +362,8 @@ class FldData:
 
     @coords.setter
     def coords(self, other: np.ndarray):
-        if other.size != 0 and other.shape != (self.nelt * self.nx1 * self.ny1 * self.nz1, self.ndims):
-            raise ValueError("Incorrect shape for coords: coords.shape must equal (nelt * nx1 * ny1 * nz1, ndims)")
+        if other.size != 0 and other.shape != (self.ndims, self.nelt * self.nx1 * self.ny1 * self.nz1):
+            raise ValueError("Incorrect shape for coords: coords.shape must equal (ndims, nelt * nx1 * ny1 * nz1)")
         self._coords = other.astype(self.float_type)
         self._set_rdcode()
 
