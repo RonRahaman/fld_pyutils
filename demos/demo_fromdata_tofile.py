@@ -27,7 +27,7 @@ t = np.full(nelt * nx1 ** 3, fill_value=9)
 data = FldData.fromvalues(nx1=nx1, ny1=ny1, nz1=nz1, nelgt=nelgt, nelt=nelt,
                          glel=glel, coords=coords, u=u, p=p, t=t)
 
-data.tofile('scratch.fld')
+data.tofile('fdtf0.f00001')
 
-data2 = FldData.fromfile('scratch.fld')
+data2 = FldData.fromfile('fdtf0.f00001')
 print(data2)
