@@ -411,7 +411,8 @@ class FldData:
 
     @s.setter
     def s(self, other: np.ndarray):
-        if other.size != 0 and len(other.shape) != 2 and other.shape[1] != self.nelt * self.nx1 * self.ny1 * self.nz1:
+        if other.size != 0 and (len(other.shape) != 2 or other.shape[
+            1] != self.nelt * self.nx1 * self.ny1 * self.nz1):
             raise ValueError(
                 "Incorrect shape for s: s.shape must equal (x, nelt * nx1 * ny1 * nz1) for arbitrary number of scalars x")
         self._s = other.astype(self.float_type)
