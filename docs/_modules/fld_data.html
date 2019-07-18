@@ -148,10 +148,12 @@
         <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
-        <span class="n">nxyz</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span
-            class="n">nx1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span
-            class="n">ny1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span
-            class="n">nz1</span>
+        <span class="n">nxyz</span> <span class="o">=</span> <span
+            class="n">h</span><span class="o">.</span><span class="n">nx1</span> <span
+            class="o">*</span> <span class="n">h</span><span
+            class="o">.</span><span class="n">ny1</span> <span
+            class="o">*</span> <span class="n">h</span><span
+            class="o">.</span><span class="n">nz1</span>
 
         <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Attempting to fields from rdcode </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">rdcode</span><span class="p">))</span>
 
@@ -167,32 +169,49 @@
                 <span class="c1"># Coordinate data</span>
                 <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
                     <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Located coordinates X&quot;</span><span class="p">)</span>
-                    <span class="n">size</span> <span class="o">=</span> <span class="n">h</span><span
-            class="o">.</span><span class="n">ndims</span> <span class="o">*</span> <span class="n">h</span><span
-            class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="n">nxyz</span> <span
-            class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span
-            class="o">.</span><span class="n">itemsize</span>
-                    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span
-            class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">f</span><span
-            class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span
-            class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">h</span><span
-            class="o">.</span><span class="n">float_type</span><span class="p">)</span><span class="o">.</span><span
-            class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span
-            class="n">nelt</span><span class="p">,</span><span class="n">h</span><span class="o">.</span><span
-            class="n">ndims</span><span class="p">,</span><span class="n">nxyz</span><span class="p">)</span>
+                    <span class="n">size</span> <span class="o">=</span> <span
+            class="n">h</span><span class="o">.</span><span
+            class="n">ndims</span> <span class="o">*</span> <span
+            class="n">h</span><span class="o">.</span><span
+            class="n">nelt</span> <span class="o">*</span> <span
+            class="n">nxyz</span> <span class="o">*</span> <span
+            class="n">h</span><span class="o">.</span><span
+            class="n">float_type</span><span class="o">.</span><span class="n">itemsize</span>
+                    <span class="n">coords</span> <span class="o">=</span> <span
+            class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span
+            class="p">(</span><span class="n">f</span><span
+            class="o">.</span><span class="n">read</span><span
+            class="p">(</span><span class="n">size</span><span
+            class="p">),</span> <span class="n">dtype</span><span
+            class="o">=</span><span class="n">h</span><span
+            class="o">.</span><span class="n">float_type</span><span
+            class="p">)</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span
+            class="n">h</span><span class="o">.</span><span
+            class="n">nelt</span><span class="p">,</span><span
+            class="n">h</span><span class="o">.</span><span
+            class="n">ndims</span><span class="p">,</span><span
+            class="n">nxyz</span><span class="p">)</span>
 
                 <span class="c1"># Velocity field</span>
                 <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="s1">&#39;U&#39;</span><span class="p">:</span>
                     <span class="n">notify</span><span class="p">(</span><span class="s2">&quot;Located velocity field U&quot;</span><span class="p">)</span>
                     <span class="n">size</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">ndims</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">nz1</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">float_type</span><span class="o">.</span><span class="n">itemsize</span>
-                    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span
-            class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">f</span><span
-            class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span
-            class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">h</span><span
-            class="o">.</span><span class="n">float_type</span><span class="p">)</span><span class="o">.</span><span
-            class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span
-            class="n">nelt</span><span class="p">,</span><span class="n">h</span><span class="o">.</span><span
-            class="n">ndims</span><span class="p">,</span><span class="n">nxyz</span><span class="p">)</span>
+                    <span class="n">u</span> <span class="o">=</span> <span
+            class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span
+            class="p">(</span><span class="n">f</span><span
+            class="o">.</span><span class="n">read</span><span
+            class="p">(</span><span class="n">size</span><span
+            class="p">),</span> <span class="n">dtype</span><span
+            class="o">=</span><span class="n">h</span><span
+            class="o">.</span><span class="n">float_type</span><span
+            class="p">)</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span
+            class="n">h</span><span class="o">.</span><span
+            class="n">nelt</span><span class="p">,</span><span
+            class="n">h</span><span class="o">.</span><span
+            class="n">ndims</span><span class="p">,</span><span
+            class="n">nxyz</span><span class="p">)</span>
 
                 <span class="c1"># Pressure field</span>
                 <span class="k">elif</span> <span class="n">code</span> <span class="o">==</span> <span class="s1">&#39;P&#39;</span><span class="p">:</span>
@@ -339,10 +358,13 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">rdcode</span> <span class="o">+=</span> <span class="s2">&quot;T&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">rdcode</span> <span class="o">+=</span> <span class="s2">&quot;S</span><span class="si">{:02}</span><span
-            class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span
-            class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span
-            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">rdcode</span> <span class="o">+=</span> <span
+            class="s2">&quot;S</span><span class="si">{:02}</span><span
+            class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span
+            class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">s</span><span
+            class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="o">.</span><span class="n">rdcode</span> <span class="o">=</span> <span class="n">rdcode</span>
 
     <span class="nd">@property</span>
@@ -442,15 +464,24 @@
 
     <span class="nd">@coords</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span
-            class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span
-            class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span
-            class="bp">self</span><span class="o">.</span><span class="n">nelt</span><span class="p">,</span> <span
-            class="bp">self</span><span class="o">.</span><span class="n">ndims</span><span class="p">,</span> <span
-            class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span
-            class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span
-            class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for coords: coords.shape must equal (nelt, ndims,  nx1 * ny1 * nz1)&quot;</span><span
+        <span class="k">if</span> <span class="n">other</span><span
+            class="o">.</span><span class="n">size</span> <span
+            class="o">!=</span> <span class="mi">0</span> <span
+            class="ow">and</span> <span class="n">other</span><span
+            class="o">.</span><span class="n">shape</span> <span
+            class="o">!=</span> <span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">nelt</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">ndims</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">nx1</span> <span class="o">*</span> <span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">ny1</span> <span class="o">*</span> <span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">nz1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span
+            class="p">(</span><span class="s2">&quot;Incorrect shape for coords: coords.shape must equal (nelt, ndims,  nx1 * ny1 * nz1)&quot;</span><span
             class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_coords</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span>
@@ -462,15 +493,24 @@
 
     <span class="nd">@u</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">u</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span
-            class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">other</span><span
-            class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span
-            class="bp">self</span><span class="o">.</span><span class="n">nelt</span><span class="p">,</span> <span
-            class="bp">self</span><span class="o">.</span><span class="n">ndims</span><span class="p">,</span> <span
-            class="bp">self</span><span class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span
-            class="bp">self</span><span class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span
-            class="bp">self</span><span class="o">.</span><span class="n">nz1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)&quot;</span><span
+        <span class="k">if</span> <span class="n">other</span><span
+            class="o">.</span><span class="n">size</span> <span
+            class="o">!=</span> <span class="mi">0</span> <span
+            class="ow">and</span> <span class="n">other</span><span
+            class="o">.</span><span class="n">shape</span> <span
+            class="o">!=</span> <span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">nelt</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">ndims</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">nx1</span> <span class="o">*</span> <span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">ny1</span> <span class="o">*</span> <span
+            class="bp">self</span><span class="o">.</span><span
+            class="n">nz1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span
+            class="p">(</span><span class="s2">&quot;Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)&quot;</span><span
             class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_u</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_rdcode</span><span class="p">()</span>
@@ -506,15 +546,23 @@
 
     <span class="nd">@s</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span
-            class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span
-            class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">shape</span><span
-            class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">and</span> <span
-            class="n">other</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
-            class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span
-            class="o">.</span><span class="n">nelt</span> <span class="o">*</span> <span class="bp">self</span><span
-            class="o">.</span><span class="n">nx1</span> <span class="o">*</span> <span class="bp">self</span><span
-            class="o">.</span><span class="n">ny1</span> <span class="o">*</span> <span class="bp">self</span><span
+        <span class="k">if</span> <span class="n">other</span><span
+            class="o">.</span><span class="n">size</span> <span
+            class="o">!=</span> <span class="mi">0</span> <span
+            class="ow">and</span> <span class="nb">len</span><span
+            class="p">(</span><span class="n">other</span><span
+            class="o">.</span><span class="n">shape</span><span
+            class="p">)</span> <span class="o">!=</span> <span
+            class="mi">2</span> <span class="ow">and</span> <span class="n">other</span><span
+            class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]</span> <span
+            class="o">!=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">nelt</span> <span
+            class="o">*</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">nx1</span> <span
+            class="o">*</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">ny1</span> <span
+            class="o">*</span> <span class="bp">self</span><span
             class="o">.</span><span class="n">nz1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Incorrect shape for s: s.shape must equal (x, nelt * nx1 * ny1 * nz1) for arbitrary number of scalars x&quot;</span><span
