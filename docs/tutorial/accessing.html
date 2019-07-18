@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"/>
-    <title>Accessing Data &#8212; Fld Utils 0.0.1 documentation</title>
+    <title>Working With Data &#8212; Fld Utils 0.0.1 documentation</title>
     <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css"/>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css"/>
 
@@ -17,7 +17,7 @@
     <script type="text/javascript" src="../_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="../genindex.html"/>
     <link rel="search" title="Search" href="../search.html"/>
-    <link rel="next" title="Editing Data" href="editing.html"/>
+    <link rel="next" title="Writing Data To File" href="tofile.html"/>
     <link rel="prev" title="Reading Data From File" href="fromfile.html"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
@@ -32,7 +32,7 @@
             <a href="../genindex.html" title="General Index"
                accesskey="I">index</a></li>
         <li class="right">
-            <a href="editing.html" title="Editing Data"
+            <a href="tofile.html" title="Writing Data To File"
                accesskey="N">next</a> |
         </li>
         <li class="right">
@@ -54,8 +54,8 @@
                               title="previous chapter">Reading Data From
             File</a></p>
         <h4>Next topic</h4>
-        <p class="topless"><a href="editing.html"
-                              title="next chapter">Editing Data</a></p>
+        <p class="topless"><a href="tofile.html"
+                              title="next chapter">Writing Data To File</a></p>
         <div id="searchbox" style="display: none" role="search">
             <h3>Quick search</h3>
             <div class="searchformwrapper">
@@ -74,11 +74,11 @@
         <div class="bodywrapper">
             <div class="body" role="main">
 
-                <div class="section" id="accessing-data">
-                    <span id="id1"></span>
-                    <h1>Accessing Data<a class="headerlink"
-                                         href="#accessing-data"
-                                         title="Permalink to this headline">¶</a>
+                <div class="section" id="working-with-data">
+                    <span id="accessing-data"></span>
+                    <h1>Working With Data<a class="headerlink"
+                                            href="#working-with-data"
+                                            title="Permalink to this headline">¶</a>
                     </h1>
                     <div class="section" id="header-metadata">
                         <h2>Header Metadata<a class="headerlink"
@@ -162,9 +162,27 @@
                         <div class="highlight-pycon notranslate">
                             <div class="highlight"><pre><span></span><span
                                     class="gp">&gt;&gt;&gt; </span><span
-                                    class="n">f</span><span
-                                    class="o">.</span><span class="n">p</span>                   <span
-                                    class="c1"># Pressure field</span>
+                                    class="kn">from</span> <span class="nn">fld_data</span> <span
+                                    class="kn">import</span> <span class="n">FldData</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span
+                                        class="nn">numpy</span> <span
+                                        class="kn">as</span> <span
+                                        class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span
+                                        class="o">=</span> <span class="n">FldData</span><span
+                                        class="o">.</span><span class="n">fromfile</span><span
+                                        class="p">(</span><span class="s1">&#39;demos/data/test0.f00001&#39;</span><span
+                                        class="p">)</span>
+<span class="go">[scratch.f00001] : Attempting to fields from rdcode XUPTS02</span>
+<span class="go">[scratch.f00001] : Located coordinates X</span>
+<span class="go">[scratch.f00001] : Located velocity field U</span>
+<span class="go">[scratch.f00001] : Located pressure field P</span>
+<span class="go">[scratch.f00001] : Located temperature field T</span>
+<span class="go">[scratch.f00001] : Located 2 passive scalar fields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">p</span>                   <span
+                                        class="c1"># Pressure field</span>
 <span class="go">array([-8.543964e-09, -7.483058e-09, -7.243701e-09, ..., -7.243678e-09,</span>
 <span class="go">       -7.483029e-09, -8.543934e-09], dtype=float32)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span
@@ -215,13 +233,15 @@
                             consistently-shaped
                             arrays. Hence, when re-assinging arrays, the shape
                             of the new array must
-                            match the metadata. <a class="reference internal"
-                                                   href="../api/fld_data.html#fld_data.FldData"
-                                                   title="fld_data.FldData"><code
+                            match the existing shape of the metadata (with the
+                            exception of deleting
+                            fields and changing the number of passive scalars,
+                            see below). <code
                                     class="xref py py-class docutils literal notranslate"><span
-                                    class="pre">fld_data.FldData</span></code></a>
-                            will raise a <cite>ValueError</cite> if
-                            the shape of the new array does not match.</p>
+                                    class="pre">fld_data</span>
+                                <span class="pre">.FldData</span></code> will
+                            raise a <cite>ValueError</cite> if the shape of the
+                            new array does not match.</p>
                         <div class="highlight-pycon notranslate">
                             <div class="highlight"><pre><span></span><span
                                     class="gp">&gt;&gt;&gt; </span><span
@@ -269,6 +289,34 @@
                                         class="mf">2.0</span><span
                                         class="p">)</span>  <span class="c1"># Oops!</span>
 <span class="go">ValueError: Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)</span>
+</pre>
+                            </div>
+                        </div>
+                        <p>To delete a field, assign it to an empty array:</p>
+                        <div class="highlight-default notranslate">
+                            <div class="highlight"><pre><span></span><span
+                                    class="gp">&gt;&gt;&gt; </span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">u</span> <span class="o">=</span> <span
+                                    class="n">np</span><span
+                                    class="o">.</span><span
+                                    class="n">array</span><span
+                                    class="p">([])</span>
+</pre>
+                            </div>
+                        </div>
+                        <p>You may freely change the number of passive scalars,
+                            so long as each scalar
+                            field has the correct size:</p>
+                        <div class="highlight-pycon notranslate">
+                            <div class="highlight"><pre><span></span><span
+                                    class="gp">&gt;&gt;&gt; </span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">nscalars</span>   <span
+                                    class="c1"># There are two passive scalars</span>
+<span class="go">2</span>
 </pre>
                             </div>
                         </div>
@@ -321,7 +369,7 @@
             <a href="../genindex.html" title="General Index"
             >index</a></li>
         <li class="right">
-            <a href="editing.html" title="Editing Data"
+            <a href="tofile.html" title="Writing Data To File"
             >next</a> |
         </li>
         <li class="right">

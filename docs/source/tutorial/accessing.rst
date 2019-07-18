@@ -1,7 +1,7 @@
 .. _accessing-data:
 
-Accessing Data
-==============
+Working With Data
+=================
 
 Header Metadata
 ---------------
@@ -40,6 +40,15 @@ Reading the data is straightforward.  It can be used like like any NumPy array.
 
 .. code-block:: pycon
 
+    >>> from fld_data import FldData
+    >>> import numpy as np
+    >>> f = FldData.fromfile('demos/data/test0.f00001')
+    [scratch.f00001] : Attempting to fields from rdcode XUPTS02
+    [scratch.f00001] : Located coordinates X
+    [scratch.f00001] : Located velocity field U
+    [scratch.f00001] : Located pressure field P
+    [scratch.f00001] : Located temperature field T
+    [scratch.f00001] : Located 2 passive scalar fields
     >>> f.p                   # Pressure field
     array([-8.543964e-09, -7.483058e-09, -7.243701e-09, ..., -7.243678e-09,
            -7.483029e-09, -8.543934e-09], dtype=float32)
@@ -55,14 +64,27 @@ Modifying elements in-place is also straightforward:
 
 Re-assigning arrays is internally managed to maintain consistently-shaped
 arrays.  Hence, when re-assinging arrays, the shape of the new array must
-match the metadata.  :py:class:`fld_data.FldData` will raise a `ValueError` if
-the shape of the new array does not match.
+match the existing shape of the metadata (with the exception of deleting
+fields and changing the number of passive scalars, see below).  :py:class:`fld_data
+.FldData` will raise a `ValueError` if the shape of the new array does not match.
 
 .. code-block:: pycon
 
     >>> f.u = np.full_like(f.u, fill_value=1.0)                             # OK
     >>> f.u = np.full(shape=(f.nelt * f.nx1**3 * f.ndims), fill_value=2.0)  # Oops!
     ValueError: Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)
+
+To delete a field, assign it to an empty array:
+
+    >>> f.u = np.array([])
+
+You may freely change the number of passive scalars, so long as each scalar
+field has the correct size:
+
+.. code-block:: pycon
+
+    >>> f.nscalars   # There are two passive scalars
+    2
 
 .. warning::
 

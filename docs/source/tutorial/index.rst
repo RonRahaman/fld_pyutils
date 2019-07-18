@@ -6,6 +6,5 @@ Tutorial
 
     fromfile
     accessing
-    editing
     tofile
     fromvalues
