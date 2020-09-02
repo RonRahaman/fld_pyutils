@@ -1,0 +1,391 @@
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>Working With Data &#8212; Fld Utils 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css"/>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css"/>
+
+    <script type="text/javascript" id="documentation_options"
+            data-url_root="../"
+            src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="next" title="Writing Data To File" href="tofile.html"/>
+    <link rel="prev" title="Reading Data From File" href="fromfile.html"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="related" role="navigation" aria-label="related navigation">
+    <h3>Navigation</h3>
+    <ul>
+        <li class="right" style="margin-right: 10px">
+            <a href="../genindex.html" title="General Index"
+               accesskey="I">index</a></li>
+        <li class="right">
+            <a href="tofile.html" title="Writing Data To File"
+               accesskey="N">next</a> |
+        </li>
+        <li class="right">
+            <a href="fromfile.html" title="Reading Data From File"
+               accesskey="P">previous</a> |
+        </li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fld Utils 0.0.1
+            documentation</a> &#187;
+        </li>
+        <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Tutorial</a>
+            &#187;
+        </li>
+    </ul>
+</div>
+<div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+    <div class="sphinxsidebarwrapper">
+        <h4>Previous topic</h4>
+        <p class="topless"><a href="fromfile.html"
+                              title="previous chapter">Reading Data From
+            File</a></p>
+        <h4>Next topic</h4>
+        <p class="topless"><a href="tofile.html"
+                              title="next chapter">Writing Data To File</a></p>
+        <div id="searchbox" style="display: none" role="search">
+            <h3>Quick search</h3>
+            <div class="searchformwrapper">
+                <form class="search" action="../search.html" method="get">
+                    <input type="text" name="q"/>
+                    <input type="submit" value="Go"/>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">$('#searchbox').show(0);</script>
+    </div>
+</div>
+
+<div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+
+                <div class="section" id="working-with-data">
+                    <span id="accessing-data"></span>
+                    <h1>Working With Data<a class="headerlink"
+                                            href="#working-with-data"
+                                            title="Permalink to this headline">¶</a>
+                    </h1>
+                    <div class="section" id="header-metadata">
+                        <h2>Header Metadata<a class="headerlink"
+                                              href="#header-metadata"
+                                              title="Permalink to this headline">¶</a>
+                        </h2>
+                        <p>Metadata from the header can be accessed via
+                            attributes of the
+                            <a class="reference internal"
+                               href="../api/fld_data.html#fld_data.FldData"
+                               title="fld_data.FldData"><code
+                                    class="xref py py-class docutils literal notranslate"><span
+                                    class="pre">fld_data.FldData</span></code></a>
+                            object. The header metadata includes number of
+                            dimensions, number of elements, the I/O timestep,
+                            etc. (see the documentation of <a
+                                    class="reference internal"
+                                    href="../api/fld_data.html#fld_data.FldData"
+                                    title="fld_data.FldData"><code
+                                    class="xref py py-class docutils literal notranslate"><span
+                                    class="pre">fld_data.FldData</span></code></a>
+                            for a full list).
+                            The header data are typically
+                            <strong>read-only</strong> attributes that are
+                            managed
+                            internally; this is to maintain consistency of the
+                            overall data format when
+                            other fields are changed.</p>
+                        <div class="highlight-pycon notranslate">
+                            <div class="highlight"><pre><span></span><span
+                                    class="gp">&gt;&gt;&gt; </span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">ndims</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                        class="o">.</span><span class="n">nscalars</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                        class="o">.</span><span class="n">float_type</span>
+<span class="go">dtype(&#39;float32&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                        class="o">.</span><span class="n">nscalars</span> <span
+                                        class="o">=</span> <span
+                                        class="mi">3</span>
+<span class="go">AttributeError: can&#39;t set attribute</span>
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section"
+                         id="elements-ids-coordinates-and-fields">
+                        <h2>Elements IDs, Coordinates, and Fields<a
+                                class="headerlink"
+                                href="#elements-ids-coordinates-and-fields"
+                                title="Permalink to this headline">¶</a></h2>
+                        <p>An <a class="reference internal"
+                                 href="../api/fld_data.html#fld_data.FldData"
+                                 title="fld_data.FldData"><code
+                                class="xref py py-class docutils literal notranslate"><span
+                                class="pre">fld_data.FldData</span></code></a>
+                            object contains NumPy arrays for global
+                            element IDs, coordinates, velocity, pressure,
+                            temperatures, and (if present)
+                            passive scalars. The shape of each array depends on
+                            the kind of
+                            data that it represents. For example, the pressure
+                            array is 1D with shape =
+                            <cite>(nelt * nx1 * ny1 * nz1)</cite> whereas the
+                            velocity array is 3D with shape
+                            <cite>(nelt, nx1 * ny1 * nz1, ndims)</cite>. See the
+                            documentation of
+                            <a class="reference internal"
+                               href="../api/fld_data.html#fld_data.FldData"
+                               title="fld_data.FldData"><code
+                                    class="xref py py-class docutils literal notranslate"><span
+                                    class="pre">fld_data.FldData</span></code></a>
+                            for a full list)</p>
+                        <p>Reading the data is straightforward. It can be used
+                            like like any NumPy array.</p>
+                        <div class="highlight-pycon notranslate">
+                            <div class="highlight"><pre><span></span><span
+                                    class="gp">&gt;&gt;&gt; </span><span
+                                    class="kn">from</span> <span class="nn">fld_data</span> <span
+                                    class="kn">import</span> <span class="n">FldData</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span
+                                        class="nn">numpy</span> <span
+                                        class="kn">as</span> <span
+                                        class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span
+                                        class="o">=</span> <span class="n">FldData</span><span
+                                        class="o">.</span><span class="n">fromfile</span><span
+                                        class="p">(</span><span class="s1">&#39;demos/data/test0.f00001&#39;</span><span
+                                        class="p">)</span>
+<span class="go">[scratch.f00001] : Attempting to fields from rdcode XUPTS02</span>
+<span class="go">[scratch.f00001] : Located coordinates X</span>
+<span class="go">[scratch.f00001] : Located velocity field U</span>
+<span class="go">[scratch.f00001] : Located pressure field P</span>
+<span class="go">[scratch.f00001] : Located temperature field T</span>
+<span class="go">[scratch.f00001] : Located 2 passive scalar fields</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">p</span>                   <span
+                                        class="c1"># Pressure field</span>
+<span class="go">array([-8.543964e-09, -7.483058e-09, -7.243701e-09, ..., -7.243678e-09,</span>
+<span class="go">       -7.483029e-09, -8.543934e-09], dtype=float32)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span
+                                        class="o">.</span><span
+                                        class="n">max</span><span
+                                        class="p">(</span><span
+                                        class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">p</span><span
+                                        class="p">)</span>           <span
+                                        class="c1"># Maximum pressure value</span>
+<span class="go">2.293219e-08</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">u</span><span
+                                        class="p">[</span><span
+                                        class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">glel</span> <span
+                                        class="o">==</span> <span
+                                        class="mi">2</span><span
+                                        class="p">,:,:]</span>  <span
+                                        class="c1"># Velocity components for global element ID 2</span>
+</pre>
+                            </div>
+                        </div>
+                        <p>Modifying elements in-place is also
+                            straightforward:</p>
+                        <div class="highlight-pycon notranslate">
+                            <div class="highlight"><pre><span></span><span
+                                    class="gp">&gt;&gt;&gt; </span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">u</span><span
+                                    class="p">[</span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">glel</span> <span
+                                    class="o">==</span> <span
+                                    class="mi">2</span><span
+                                    class="p">,:,:]</span> <span
+                                    class="o">=</span> <span class="mi">0</span>  <span
+                                    class="c1"># Set all velocity compenents for element 2</span>
+</pre>
+                            </div>
+                        </div>
+                        <p>Re-assigning arrays is internally managed to maintain
+                            consistently-shaped
+                            arrays. Hence, when re-assinging arrays, the shape
+                            of the new array must
+                            match the existing shape of the metadata (with the
+                            exception of deleting
+                            fields and changing the number of passive scalars,
+                            see below). <code
+                                    class="xref py py-class docutils literal notranslate"><span
+                                    class="pre">fld_data</span>
+                                <span class="pre">.FldData</span></code> will
+                            raise a <cite>ValueError</cite> if the shape of the
+                            new array does not match.</p>
+                        <div class="highlight-pycon notranslate">
+                            <div class="highlight"><pre><span></span><span
+                                    class="gp">&gt;&gt;&gt; </span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">u</span> <span class="o">=</span> <span
+                                    class="n">np</span><span
+                                    class="o">.</span><span
+                                    class="n">full_like</span><span
+                                    class="p">(</span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">u</span><span
+                                    class="p">,</span> <span class="n">fill_value</span><span
+                                    class="o">=</span><span
+                                    class="mf">1.0</span><span
+                                    class="p">)</span>                             <span
+                                    class="c1"># OK</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">u</span> <span
+                                        class="o">=</span> <span
+                                        class="n">np</span><span
+                                        class="o">.</span><span
+                                        class="n">full</span><span
+                                        class="p">(</span><span
+                                        class="n">shape</span><span
+                                        class="o">=</span><span
+                                        class="p">(</span><span
+                                        class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">nelt</span> <span
+                                        class="o">*</span> <span
+                                        class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">nx1</span><span
+                                        class="o">**</span><span
+                                        class="mi">3</span> <span
+                                        class="o">*</span> <span
+                                        class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">ndims</span><span
+                                        class="p">),</span> <span class="n">fill_value</span><span
+                                        class="o">=</span><span
+                                        class="mf">2.0</span><span
+                                        class="p">)</span>  <span class="c1"># Oops!</span>
+<span class="go">ValueError: Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)</span>
+</pre>
+                            </div>
+                        </div>
+                        <p>To delete a field, assign it to an empty array:</p>
+                        <div class="highlight-default notranslate">
+                            <div class="highlight"><pre><span></span><span
+                                    class="gp">&gt;&gt;&gt; </span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">u</span> <span class="o">=</span> <span
+                                    class="n">np</span><span
+                                    class="o">.</span><span
+                                    class="n">array</span><span
+                                    class="p">([])</span>
+</pre>
+                            </div>
+                        </div>
+                        <p>You may freely change the number of passive scalars,
+                            so long as each scalar
+                            field has the correct size:</p>
+                        <div class="highlight-pycon notranslate">
+                            <div class="highlight"><pre><span></span><span
+                                    class="gp">&gt;&gt;&gt; </span><span
+                                    class="n">f</span><span
+                                    class="o">.</span><span
+                                    class="n">nscalars</span>   <span
+                                    class="c1"># There are two passive scalars</span>
+<span class="go">2</span>
+</pre>
+                            </div>
+                        </div>
+                        <div class="admonition warning">
+                            <p class="admonition-title">Warning</p>
+                            <p>The managed assignments are intended to prevent
+                                accidents.
+                                Be aware that <code
+                                        class="xref py py-class docutils literal notranslate"><span
+                                        class="pre">fld_data</span> <span
+                                        class="pre">.FldData</span></code> still
+                                allows some more
+                                explicit NumPy operations that may create
+                                inconsistencies. For example:</p>
+                            <div class="highlight-pycon notranslate">
+                                <div class="highlight"><pre><span></span><span
+                                        class="gp">&gt;&gt;&gt; </span><span
+                                        class="n">f</span><span
+                                        class="o">.</span><span
+                                        class="n">u</span><span
+                                        class="o">.</span><span
+                                        class="n">resize</span><span
+                                        class="p">(</span><span
+                                        class="mi">100</span><span
+                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                            class="o">.</span><span
+                                            class="n">u</span><span
+                                            class="o">.</span><span class="n">shape</span>
+<span class="go">(100,)</span>
+</pre>
+                                </div>
+                            </div>
+                            <p>Hopefully, these operations fall outside normal
+                                usage!</p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="clearer"></div>
+</div>
+<div class="related" role="navigation" aria-label="related navigation">
+    <h3>Navigation</h3>
+    <ul>
+        <li class="right" style="margin-right: 10px">
+            <a href="../genindex.html" title="General Index"
+            >index</a></li>
+        <li class="right">
+            <a href="tofile.html" title="Writing Data To File"
+            >next</a> |
+        </li>
+        <li class="right">
+            <a href="fromfile.html" title="Reading Data From File"
+            >previous</a> |
+        </li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fld Utils 0.0.1
+            documentation</a> &#187;
+        </li>
+        <li class="nav-item nav-item-1"><a href="index.html">Tutorial</a> &#187;
+        </li>
+    </ul>
+</div>
+<div class="footer" role="contentinfo">
+    &#169; Copyright 2019, Ron Rahaman, Dillon Shaver.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+</div>
+</body>
+</html>

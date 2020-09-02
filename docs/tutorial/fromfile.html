@@ -1,0 +1,333 @@
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <title>Reading Data From File &#8212; Fld Utils 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css"/>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css"/>
+
+    <script type="text/javascript" id="documentation_options"
+            data-url_root="../"
+            src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="next" title="Working With Data" href="accessing.html"/>
+    <link rel="prev" title="Tutorial" href="index.html"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="related" role="navigation" aria-label="related navigation">
+    <h3>Navigation</h3>
+    <ul>
+        <li class="right" style="margin-right: 10px">
+            <a href="../genindex.html" title="General Index"
+               accesskey="I">index</a></li>
+        <li class="right">
+            <a href="accessing.html" title="Working With Data"
+               accesskey="N">next</a> |
+        </li>
+        <li class="right">
+            <a href="index.html" title="Tutorial"
+               accesskey="P">previous</a> |
+        </li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fld Utils 0.0.1
+            documentation</a> &#187;
+        </li>
+        <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Tutorial</a>
+            &#187;
+        </li>
+    </ul>
+</div>
+<div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+    <div class="sphinxsidebarwrapper">
+        <h4>Previous topic</h4>
+        <p class="topless"><a href="index.html"
+                              title="previous chapter">Tutorial</a></p>
+        <h4>Next topic</h4>
+        <p class="topless"><a href="accessing.html"
+                              title="next chapter">Working With Data</a></p>
+        <div id="searchbox" style="display: none" role="search">
+            <h3>Quick search</h3>
+            <div class="searchformwrapper">
+                <form class="search" action="../search.html" method="get">
+                    <input type="text" name="q"/>
+                    <input type="submit" value="Go"/>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">$('#searchbox').show(0);</script>
+    </div>
+</div>
+
+<div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+
+                <div class="section" id="reading-data-from-file">
+                    <span id="reading-data"></span>
+                    <h1>Reading Data From File<a class="headerlink"
+                                                 href="#reading-data-from-file"
+                                                 title="Permalink to this headline">¶</a>
+                    </h1>
+                    <p>This tutorial assumes you have opened a Python
+                        interactive session from the top-level directory of the
+                        repo.
+                        It uses the demo file at
+                        <cite>demos/data/test0.f00001</cite>. You can run any of
+                        these commands from a separate script,
+                        and you can use any valid field file you choose.</p>
+                    <p>All functionality is handled through the <a
+                            class="reference internal"
+                            href="../api/fld_data.html#fld_data.FldData"
+                            title="fld_data.FldData"><code
+                            class="xref py py-class docutils literal notranslate"><span
+                            class="pre">fld_data.FldData</span></code></a>
+                        class. First, import this class:</p>
+                    <div class="highlight-default notranslate">
+                        <div class="highlight"><pre><span></span><span
+                                class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                class="nn">fld_data</span> <span class="k">import</span> <span
+                                class="n">FldData</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>To read data from a file and create a new <code
+                            class="docutils literal notranslate"><span
+                            class="pre">FldData</span></code> object, use the <a
+                            class="reference internal"
+                            href="../api/fld_data.html#fld_data.FldData.fromfile"
+                            title="fld_data.FldData.fromfile"><code
+                            class="xref py py-meth docutils literal notranslate"><span
+                            class="pre">fld_data.FldData.fromfile()</span></code></a>
+                        method.
+                        The code below creates a new <code
+                                class="docutils literal notranslate"><span
+                                class="pre">FldData</span></code> object and
+                        assigns it to the variable <code
+                                class="docutils literal notranslate"><span
+                                class="pre">f</span></code>. Running this
+                        command also
+                        shows messages about which fields were successfully
+                        parsed from the file.</p>
+                    <div class="highlight-default notranslate">
+                        <div class="highlight"><pre><span></span><span
+                                class="gp">&gt;&gt;&gt; </span><span
+                                class="n">f</span> <span
+                                class="o">=</span> <span
+                                class="n">FldData</span><span class="o">.</span><span
+                                class="n">fromfile</span><span
+                                class="p">(</span><span class="s1">&#39;demos/data/test0.f00001&#39;</span><span
+                                class="p">)</span>
+<span class="go">[demos/data/test0.f00001] : Attempting to fields from rdcode XUPTS02</span>
+<span class="go">[demos/data/test0.f00001] : Located coordinates X</span>
+<span class="go">[demos/data/test0.f00001] : Located velocity field U</span>
+<span class="go">[demos/data/test0.f00001] : Located pressure field P</span>
+<span class="go">[demos/data/test0.f00001] : Located temperature field T</span>
+<span class="go">[demos/data/test0.f00001] : Located 2 passive scalar fields</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>Now that you’ve created an object, you can access the
+                        field data in many ways. To show a quick summary, simply
+                        print
+                        the data (below). To access the field data itself, see
+                        the next section, <a class="reference internal"
+                                             href="accessing.html#accessing-data"><span
+                                class="std std-ref">Working With Data</span></a>.
+                    </p>
+                    <div class="highlight-pycon notranslate">
+                        <div class="highlight"><pre><span></span><span
+                                class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span
+                                class="p">(</span><span class="n">f</span><span
+                                class="p">)</span>
+<span class="go">nx1           = 6</span>
+<span class="go">ny1           = 6</span>
+<span class="go">nz1           = 6</span>
+<span class="go">nelt          = 512</span>
+<span class="go">nelgt         = 512</span>
+<span class="go">time          = 0.1</span>
+<span class="go">iostep        = 0</span>
+<span class="go">fid0          = 0</span>
+<span class="go">nfileoo       = 1</span>
+<span class="go">rdcode        = XUPTS02</span>
+<span class="go">p0th          = 0.0</span>
+<span class="go">if_press_mesh = False</span>
+<span class="go">float_type    = float32</span>
+<span class="go">int_type      = int32</span>
+<span class="go">ndims         = 3</span>
+<span class="go">nscalars      = 2</span>
+<span class="go">glel =</span>
+<span class="go">[385 386 387 388 389 390 391 392 393 394 395 396 397 398 399 400 401 402</span>
+<span class="go"> 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 418 419 420</span>
+<span class="go"> 421 422 423 424 425 426 427 428 429 430 431 432 433 434 435 436 437 438</span>
+<span class="go"> 439 440 441 442 443 444 445 446 447 448 449 450 451 452 453 454 455 456</span>
+<span class="go"> 457 458 459 460 461 462 463 464 465 466 467 468 469 470 471 472 473 474</span>
+<span class="go"> 475 476 477 478 479 480 481 482 483 484 485 486 487 488 489 490 491 492</span>
+<span class="go"> 493 494 495 496 497 498 499 500 501 502 503 504 505 506 507 508 509 510</span>
+<span class="go"> 511 512 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272</span>
+<span class="go"> 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290</span>
+<span class="go"> 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308</span>
+<span class="go"> 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326</span>
+<span class="go"> 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344</span>
+<span class="go"> 345 346 347 348 349 350 351 352 353 354 355 356 357 358 359 360 361 362</span>
+<span class="go"> 363 364 365 366 367 368 369 370 371 372 373 374 375 376 377 378 379 380</span>
+<span class="go"> 381 382 383 384 129 130 131 132 133 134 135 136 137 138 139 140 141 142</span>
+<span class="go"> 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160</span>
+<span class="go"> 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178</span>
+<span class="go"> 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196</span>
+<span class="go"> 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214</span>
+<span class="go"> 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232</span>
+<span class="go"> 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250</span>
+<span class="go"> 251 252 253 254 255 256   1   2   3   4   5   6   7   8   9  10  11  12</span>
+<span class="go">  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30</span>
+<span class="go">  31  32  33  34  35  36  37  38  39  40  41  42  43  44  45  46  47  48</span>
+<span class="go">  49  50  51  52  53  54  55  56  57  58  59  60  61  62  63  64  65  66</span>
+<span class="go">  67  68  69  70  71  72  73  74  75  76  77  78  79  80  81  82  83  84</span>
+<span class="go">  85  86  87  88  89  90  91  92  93  94  95  96  97  98  99 100 101 102</span>
+<span class="go"> 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120</span>
+<span class="go"> 121 122 123 124 125 126 127 128]</span>
+<span class="go">coords =</span>
+<span class="go">[[[-0.5        -0.4706319  -0.4106539  ... -0.3393461  -0.2793681</span>
+<span class="go">   -0.25      ]</span>
+<span class="go">  [-0.5        -0.5        -0.5        ... -0.25       -0.25</span>
+<span class="go">   -0.25      ]</span>
+<span class="go">  [12.         12.         12.         ... 12.5        12.5</span>
+<span class="go">   12.5       ]]</span>
+
+<span class="go"> [[-0.25       -0.2206319  -0.1606539  ... -0.08934606 -0.02936808</span>
+<span class="go">    0.        ]</span>
+<span class="go">  [-0.5        -0.5        -0.5        ... -0.25       -0.25</span>
+<span class="go">   -0.25      ]</span>
+<span class="go">  [12.         12.         12.         ... 12.5        12.5</span>
+<span class="go">   12.5       ]]</span>
+
+<span class="go"> [[ 0.          0.02936808  0.08934606 ...  0.1606539   0.2206319</span>
+<span class="go">    0.25      ]</span>
+<span class="go">  [-0.5        -0.5        -0.5        ... -0.25       -0.25</span>
+<span class="go">   -0.25      ]</span>
+<span class="go">  [12.         12.         12.         ... 12.5        12.5</span>
+<span class="go">   12.5       ]]</span>
+
+<span class="go"> ...</span>
+
+<span class="go"> [[-0.25       -0.2206319  -0.1606539  ... -0.08934606 -0.02936808</span>
+<span class="go">    0.        ]</span>
+<span class="go">  [ 0.25        0.25        0.25       ...  0.5         0.5</span>
+<span class="go">    0.5       ]</span>
+<span class="go">  [ 3.5         3.5         3.5        ...  4.          4.</span>
+<span class="go">    4.        ]]</span>
+
+<span class="go"> [[ 0.          0.02936808  0.08934606 ...  0.1606539   0.2206319</span>
+<span class="go">    0.25      ]</span>
+<span class="go">  [ 0.25        0.25        0.25       ...  0.5         0.5</span>
+<span class="go">    0.5       ]</span>
+<span class="go">  [ 3.5         3.5         3.5        ...  4.          4.</span>
+<span class="go">    4.        ]]</span>
+
+<span class="go"> [[ 0.25        0.2793681   0.3393461  ...  0.4106539   0.4706319</span>
+<span class="go">    0.5       ]</span>
+<span class="go">  [ 0.25        0.25        0.25       ...  0.5         0.5</span>
+<span class="go">    0.5       ]</span>
+<span class="go">  [ 3.5         3.5         3.5        ...  4.          4.</span>
+<span class="go">    4.        ]]]</span>
+<span class="go">u =</span>
+<span class="go">[[[ 0.000000e+00  0.000000e+00  0.000000e+00 ... -2.809322e-09</span>
+<span class="go">   -7.336542e-09  7.894312e-11]</span>
+<span class="go">  [ 0.000000e+00  0.000000e+00  0.000000e+00 ... -2.242141e-11</span>
+<span class="go">    4.981548e-10  7.894312e-11]</span>
+<span class="go">  [ 0.000000e+00  0.000000e+00  0.000000e+00 ...  1.153631e+00</span>
+<span class="go">    1.153219e+00  1.154157e+00]]</span>
+
+<span class="go"> [[ 0.000000e+00  0.000000e+00  0.000000e+00 ... -8.384476e-09</span>
+<span class="go">   -7.620197e-09 -9.798484e-17]</span>
+<span class="go">  [ 0.000000e+00  0.000000e+00  0.000000e+00 ...  2.323609e-10</span>
+<span class="go">    4.436172e-10 -9.429510e-11]</span>
+<span class="go">  [ 0.000000e+00  0.000000e+00  0.000000e+00 ...  1.153618e+00</span>
+<span class="go">    1.153614e+00  1.153616e+00]]</span>
+
+<span class="go"> [[ 0.000000e+00  0.000000e+00  0.000000e+00 ... -8.583987e-09</span>
+<span class="go">   -7.170476e-09 -7.894264e-11]</span>
+<span class="go">  [ 0.000000e+00  0.000000e+00  0.000000e+00 ...  2.701780e-10</span>
+<span class="go">    5.468154e-10  7.894294e-11]</span>
+<span class="go">  [ 0.000000e+00  0.000000e+00  0.000000e+00 ...  1.153590e+00</span>
+<span class="go">    1.153693e+00  1.154157e+00]]</span>
+
+<span class="go"> ...</span>
+
+<span class="go"> [[ 7.894294e-11  7.170476e-09  8.583988e-09 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]</span>
+<span class="go">  [-7.894285e-11 -5.468150e-10 -2.701783e-10 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]</span>
+<span class="go">  [ 1.154157e+00  1.153693e+00  1.153590e+00 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]]</span>
+
+<span class="go"> [[-1.440888e-16  7.620197e-09  8.384475e-09 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]</span>
+<span class="go">  [ 9.429513e-11 -4.436173e-10 -2.323614e-10 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]</span>
+<span class="go">  [ 1.153616e+00  1.153614e+00  1.153618e+00 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]]</span>
+
+<span class="go"> [[-7.894271e-11  7.336542e-09  2.809322e-09 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]</span>
+<span class="go">  [-7.894272e-11 -4.981544e-10  2.242174e-11 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]</span>
+<span class="go">  [ 1.154157e+00  1.153219e+00  1.153631e+00 ...  0.000000e+00</span>
+<span class="go">    0.000000e+00  0.000000e+00]]]</span>
+<span class="go">p =</span>
+<span class="go">[-8.543964e-09 -7.483058e-09 -7.243701e-09 ... -7.243678e-09 -7.483029e-09</span>
+<span class="go"> -8.543934e-09]</span>
+<span class="go">t =</span>
+<span class="go">[ 0.00150895  0.00150848  0.00150903 ... -0.00151602 -0.00151574</span>
+<span class="go"> -0.00151491]</span>
+<span class="go">s =</span>
+<span class="go">[[0.008372   0.00837195 0.00837172 ... 0.00277838 0.00277885 0.00277894]</span>
+<span class="go"> [0.01321292 0.01321275 0.01321177 ... 0.00436501 0.00436609 0.00436628]]</span>
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="clearer"></div>
+</div>
+<div class="related" role="navigation" aria-label="related navigation">
+    <h3>Navigation</h3>
+    <ul>
+        <li class="right" style="margin-right: 10px">
+            <a href="../genindex.html" title="General Index"
+            >index</a></li>
+        <li class="right">
+            <a href="accessing.html" title="Working With Data"
+            >next</a> |
+        </li>
+        <li class="right">
+            <a href="index.html" title="Tutorial"
+            >previous</a> |
+        </li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fld Utils 0.0.1
+            documentation</a> &#187;
+        </li>
+        <li class="nav-item nav-item-1"><a href="index.html">Tutorial</a> &#187;
+        </li>
+    </ul>
+</div>
+<div class="footer" role="contentinfo">
+    &#169; Copyright 2019, Ron Rahaman, Dillon Shaver.
+    Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+</div>
+</body>
+</html>
