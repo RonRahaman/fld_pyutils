@@ -241,6 +241,28 @@ class FldData:
             f.write(self._p.tobytes())
             f.write(self._t.tobytes())
             f.write(self._s.tobytes())
+            self._write_metadata(f)
+
+    def _write_metadata(self, file):
+
+        def vec_field_metadata(v):
+            # For coords and u
+            cols = []
+            for i in range(self.ndims):
+                cols.append(np.min(v[:,i,:], axis=1))
+                cols.append(np.max(v[:,i,:], axis=1))
+            return np.column_stack(cols)
+
+        def scal_field_metadata(v):
+            # For p, t, and each field in s
+            return np.column_stack([np.min(v, axis=-1), np.max(v, axis=-1)])
+
+        file.write(vec_field_metadata(self._coords).tobytes())
+        file.write(vec_field_metadata(self._u).tobytes())
+        file.write(scal_field_metadata(self._p).tobytes())
+        file.write(scal_field_metadata(self._t).tobytes())
+        for i in range(self._s.shape[0]):
+            file.write(scal_field_metadata(self._s[i,:,:]).tobytes())
 
     def __repr__(self):
         return repr(self.__dict__)
