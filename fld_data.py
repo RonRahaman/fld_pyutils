@@ -200,9 +200,9 @@ class FldData:
         glel
             Array of global element indices; shape must be ``(nelt,)``
         coords
-            Array of element coordinates; shape must be ``(ndims, nelt, nx1 * ny1 * nz1)``
+            Array of element coordinates; shape must be ``(nelt, ndims, nx1 * ny1 * nz1)``
         u
-            Array representing velocity field; shape must be ``(ndims, nelt, nx1 * ny1 * nz1)``
+            Array representing velocity field; shape must be ``(nelt, ndims, nx1 * ny1 * nz1)``
         p
             Array representing pressure field; shape must be ``(nelt, nx1 * ny1 * nz1,)``
         t
