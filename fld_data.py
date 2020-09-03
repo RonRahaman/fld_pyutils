@@ -110,25 +110,25 @@ class FldData:
                 if code == 'X':
                     notify("Located coordinates X")
                     size = h.ndims * h.nelt * nxyz * h.float_type.itemsize
-                    coords = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.nelt,h.ndims,nxyz)
+                    coords = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.nelt, h.ndims, nxyz)
 
                 # Velocity field
                 elif code == 'U':
                     notify("Located velocity field U")
                     size = h.ndims * h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
-                    u = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.nelt,h.ndims,nxyz)
+                    u = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.nelt, h.ndims, nxyz)
 
                 # Pressure field
                 elif code == 'P':
                     notify("Located pressure field P")
                     size = h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
-                    p = np.frombuffer(f.read(size), dtype=h.float_type)
+                    p = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.nelt, nxyz)
 
                 # Temperature field
                 elif code == 'T':
                     notify("Located temperature field T")
                     size = h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
-                    t = np.frombuffer(f.read(size), dtype=h.float_type)
+                    t = np.frombuffer(f.read(size), dtype=h.float_type).reshape(h.nelt, nxyz)
 
                 # Passive scalars
                 elif code.startswith('S'):
@@ -139,7 +139,7 @@ class FldData:
                     else:
                         notify("Located {} passive scalar fields".format(nscalars))
                         size = nscalars * h.nelt * h.nx1 * h.ny1 * h.nz1 * h.float_type.itemsize
-                        s = np.frombuffer(f.read(size), dtype=h.float_type).reshape(nscalars, -1)
+                        s = np.frombuffer(f.read(size), dtype=h.float_type).reshape(nscalars, h.nelt, nxyz)
 
                 else:
                     error("Warning: Unsupported rdcode '{}'".format(code))
@@ -200,15 +200,15 @@ class FldData:
         glel
             Array of global element indices; shape must be ``(nelt,)``
         coords
-            Array of element coordinates; shape must be ``(ndims, nelt * nx1 * ny1 * nz1)``
+            Array of element coordinates; shape must be ``(nelt, ndims, nx1 * ny1 * nz1)``
         u
-            Array representing velocity field; shape must be ``(ndims, nelt * nx1 * ny1 * nz1)``
+            Array representing velocity field; shape must be ``(nelt, ndims, nx1 * ny1 * nz1)``
         p
-            Array representing pressure field; shape must be ``(nelt * nx1 * ny1 * nz1,)``
+            Array representing pressure field; shape must be ``(nelt, nx1 * ny1 * nz1,)``
         t
-            Array representing temperature field; shape must be ``(nelt * nx1 * ny1 * nz1,)``
+            Array representing temperature field; shape must be ``(nelt, nx1 * ny1 * nz1,)``
         s
-            Array representing all passive scalar field; shape must be ``(nscalars, nelt * nx1 * ny1 * nz1)``
+            Array representing all passive scalar field; shape must be ``(nscalars, nelt, nx1 * ny1 * nz1)``
 
         Returns
         -------
@@ -241,6 +241,28 @@ class FldData:
             f.write(self._p.tobytes())
             f.write(self._t.tobytes())
             f.write(self._s.tobytes())
+            self._write_metadata(f)
+
+    def _write_metadata(self, file):
+
+        def vec_field_metadata(v):
+            # For coords and u
+            cols = []
+            for i in range(self.ndims):
+                cols.append(np.min(v[:,i,:], axis=1))
+                cols.append(np.max(v[:,i,:], axis=1))
+            return np.column_stack(cols)
+
+        def scal_field_metadata(v):
+            # For p, t, and each field in s
+            return np.column_stack([np.min(v, axis=-1), np.max(v, axis=-1)])
+
+        file.write(vec_field_metadata(self._coords).tobytes())
+        file.write(vec_field_metadata(self._u).tobytes())
+        file.write(scal_field_metadata(self._p).tobytes())
+        file.write(scal_field_metadata(self._t).tobytes())
+        for i in range(self._s.shape[0]):
+            file.write(scal_field_metadata(self._s[i,:,:]).tobytes())
 
     def __repr__(self):
         return repr(self.__dict__)
@@ -387,7 +409,7 @@ class FldData:
 
     @p.setter
     def p(self, other: np.ndarray):
-        if other.size != 0 and other.shape != (self.nelt * self.nx1 * self.ny1 * self.nz1,):
+        if other.size != 0 and other.shape != (self.nelt, self.nx1 * self.ny1 * self.nz1,):
             raise ValueError("Incorrect shape for p: p.shape must equal (nelt * nx1 * ny1 * nz1,)")
         self._p = other.astype(self.float_type)
         self._set_rdcode()
@@ -399,7 +421,7 @@ class FldData:
 
     @t.setter
     def t(self, other: np.ndarray):
-        if other.size != 0 and other.shape != (self.nelt * self.nx1 * self.ny1 * self.nz1,):
+        if other.size != 0 and other.shape != (self.nelt, self.nx1 * self.ny1 * self.nz1,):
             raise ValueError("Incorrect shape for t: t.shape must equal ``(nelt * nx1 * ny1 * nz1,)``")
         self._t = other.astype(self.float_type)
         self._set_rdcode()
@@ -411,10 +433,9 @@ class FldData:
 
     @s.setter
     def s(self, other: np.ndarray):
-        if other.size != 0 and (len(other.shape) != 2 or other.shape[
-            1] != self.nelt * self.nx1 * self.ny1 * self.nz1):
+        if other.size != 0 and (len(other.shape) != 3 or other.shape[1:] != (self.nelt, self.nx1 * self.ny1 * self.nz1)):
             raise ValueError(
-                "Incorrect shape for s: s.shape must equal (x, nelt * nx1 * ny1 * nz1) for arbitrary number of scalars x")
+                "Incorrect shape for s: s.shape must equal (x, nelt, nx1 * ny1 * nz1) for arbitrary number of scalars x")
         self._s = other.astype(self.float_type)
         self._set_rdcode()
 
@@ -423,7 +444,7 @@ if __name__ == '__main__':
     # Test 1:  Parses a file, writes it to a second file, then parses the second file
     # ===============================================================================
 
-    fld = FldData.fromfile('data/test0.f00001')
+    fld = FldData.fromfile('demos/data/test0.f00001')
     print(fld)
 
     print('***************')
