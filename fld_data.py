@@ -1,9 +1,11 @@
 import numpy as np
 import re
 from fld_header import FldHeader
+from fld_data_base import FldDataBase
+import typing
 
 
-class FldData:
+class FldData(FldDataBase):
     """ Contains the header and field data of a binary Nek5000 field file.
 
     The constructor is typically not used directly.  Most users will prefer to use :py:meth:`FldData.fromfile` or
@@ -45,7 +47,7 @@ class FldData:
                  t: np.ndarray = None,
                  s: np.ndarray = None):
 
-        self._header = header
+        super().__init__(header)
 
         self._coords = np.array([], self.float_type)
         self._u = np.array([], self.float_type)
@@ -66,20 +68,8 @@ class FldData:
 
     @classmethod
     def fromfile(cls, filename: str):
-        """ Creates an :py:class:`FldData` object from the contents of a given field file
 
-        Parameters
-        ----------
-        filename
-            Path to a binary Nek5000 field file
-
-        Returns
-        -------
-        FldData
-            A new instance of  :py:class:`FldData`
-
-        """
-
+        # Convenience functions
         def notify(msg: str):
             print("[{}] : {}".format(filename, msg))
 
@@ -243,14 +233,19 @@ class FldData:
             f.write(self._s.tobytes())
             self._write_metadata(f)
 
-    def _write_metadata(self, file):
+    def _write_metadata(self, file: typing.BinaryIO):
+        """
+        Writes metadata necessary for an open file object.  Uses current file offset.
+
+        :param file: An open file object.  Must be in binary mode.
+        """
 
         def vec_field_metadata(v):
             # For coords and u
             cols = []
             for i in range(self.ndims):
-                cols.append(np.min(v[:,i,:], axis=1))
-                cols.append(np.max(v[:,i,:], axis=1))
+                cols.append(np.min(v[:, i, :], axis=1))
+                cols.append(np.max(v[:, i, :], axis=1))
             return np.column_stack(cols)
 
         def scal_field_metadata(v):
@@ -262,230 +257,41 @@ class FldData:
         file.write(scal_field_metadata(self._p).tobytes())
         file.write(scal_field_metadata(self._t).tobytes())
         for i in range(self._s.shape[0]):
-            file.write(scal_field_metadata(self._s[i,:,:]).tobytes())
+            file.write(scal_field_metadata(self._s[i, :, :]).tobytes())
 
-    def __repr__(self):
-        return repr(self.__dict__)
-
-    def __str__(self):
-        attr = dict(coords=self.coords, u=self.u, p=self.p, t=self.t, s=self.s)
-        result = str(self._header)
-        for k, v in attr.items():
-            result += '{key} =\n{value}\n'.format(key=k, value=v)
-        return result
-
-    def _set_rdcode(self):
-        rdcode = ""
-        if self.coords.size != 0:
-            rdcode += "X"
-        if self.u.size != 0:
-            rdcode += "U"
-        if self.p.size != 0:
-            rdcode += "P"
-        if self.t.size != 0:
-            rdcode += "T"
-        if self.s.size != 0:
-            rdcode += "S{:02}".format(self.s.shape[0])
-        self._header.rdcode = rdcode
-
-    @property
-    def nx1(self) -> int:
-        """ Number of GLL gridpoints along x-axis """
-        return self._header.nx1
-
-    @property
-    def ny1(self) -> int:
-        """ Number of GLL gridpoints along y-axis """
-        return self._header.ny1
-
-    @property
-    def nz1(self) -> int:
-        """ Number of gridpoints along z-axis """
-        return self._header.nz1
-
-    @property
-    def nelt(self) -> int:
-        """ Number of elements in this file """
-        return self._header.nelt
-
-    @property
-    def nelgt(self) -> int:
-        """ Number of global elements"""
-        return self._header.nelgt
-
-    @property
-    def time(self) -> float:
-        """ Absolute simulation time of this file's state """
-        return self._header.time
-
-    @property
-    def iostep(self) -> int:
-        """ I/O timestep of this file's state """
-        return self._header.iostep
-
-    @property
-    def fid0(self) -> int:
-        """ Index of this file, with respect to all files produced at this I/O step """
-        return self._header.fid0
-
-    @property
-    def nfileoo(self) -> int:
-        """ Number of files produced at this I/O step """
-        return self._header.nfileoo
-
-    @property
-    def rdcode(self) -> str:
-        """ String representing the fields contained in this file """
-        return self._header.rdcode
-
-    @property
-    def p0th(self) -> float:
-        """ __ """
-        return self._header.p0th
-
-    @property
-    def if_press_mesh(self) -> bool:
-        """ States whether pressure mesh is being used """
-        return self._header.if_press_mesh
-
-    @property
-    def float_type(self) -> np.dtype:
-        """ Data type used for floating point numbers in this file """
-        return self._header.float_type
-
-    @property
-    def int_type(self) -> np.dtype:
-        """ Data type used for integers in this file """
-        return self._header.int_type
-
-    @property
-    def glel(self) -> np.ndarray:
-        """ Array of global element indices; shape is ``(nelt,)`` """
-        return self._header.glel
-
-    @glel.setter
-    def glel(self, other: np.ndarray):
-        # glel is a managed attribute of FldHeader, so no need to validate it here in FldData
-        self._header.glel = other
-
-    @property
-    def ndims(self) -> int:
-        """ Number of physical dimensions in this simulation """
-        return self._header.ndims
-
-    @property
-    def nscalars(self) -> int:
-        """ Number of passive scalars """
-        return self._header.nscalars
-
-    @property
-    def coords(self) -> np.ndarray:
-        """ Array of element coordinates; shape is ``(nelt, ndims, nx1 * ny1 * nz1)`` """
-        return self._coords
-
-    @coords.setter
+    @FldDataBase.coords.setter
     def coords(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt, self.ndims, self.nx1 * self.ny1 * self.nz1):
             raise ValueError("Incorrect shape for coords: coords.shape must equal (nelt, ndims,  nx1 * ny1 * nz1)")
         self._coords = other.astype(self.float_type)
         self._set_rdcode()
 
-    @property
-    def u(self) -> np.ndarray:
-        """ Array representing velocity field; shape is ``(nelt, ndims, nx1 * ny1 * nz1)``"""
-        return self._u
-
-    @u.setter
+    @FldDataBase.u.setter
     def u(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt, self.ndims, self.nx1 * self.ny1 * self.nz1):
             raise ValueError("Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)")
         self._u = other.astype(self.float_type)
         self._set_rdcode()
 
-    @property
-    def p(self) -> np.ndarray:
-        """ Array representing pressure field; shape is ``(nelt * nx1 * ny1 * nz1,)``"""
-        return self._p
-
-    @p.setter
+    @FldDataBase.p.setter
     def p(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt, self.nx1 * self.ny1 * self.nz1,):
             raise ValueError("Incorrect shape for p: p.shape must equal (nelt * nx1 * ny1 * nz1,)")
         self._p = other.astype(self.float_type)
         self._set_rdcode()
 
-    @property
-    def t(self) -> np.ndarray:
-        """ Array representing temperature field; shape is ``(nelt * nx1 * ny1 * nz1,)``"""
-        return self._t
-
-    @t.setter
+    @FldDataBase.t.setter
     def t(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt, self.nx1 * self.ny1 * self.nz1,):
             raise ValueError("Incorrect shape for t: t.shape must equal ``(nelt * nx1 * ny1 * nz1,)``")
         self._t = other.astype(self.float_type)
         self._set_rdcode()
 
-    @property
-    def s(self) -> np.ndarray:
-        """ Array representing all passive scalar field; shape is ``(nscalars, nelt * nx1 * ny1 * nz1)``"""
-        return self._s
-
-    @s.setter
+    @FldDataBase.s.setter
     def s(self, other: np.ndarray):
-        if other.size != 0 and (len(other.shape) != 3 or other.shape[1:] != (self.nelt, self.nx1 * self.ny1 * self.nz1)):
+        if other.size != 0 and (
+                len(other.shape) != 3 or other.shape[1:] != (self.nelt, self.nx1 * self.ny1 * self.nz1)):
             raise ValueError(
                 "Incorrect shape for s: s.shape must equal (x, nelt, nx1 * ny1 * nz1) for arbitrary number of scalars x")
         self._s = other.astype(self.float_type)
         self._set_rdcode()
-
-
-if __name__ == '__main__':
-    # Test 1:  Parses a file, writes it to a second file, then parses the second file
-    # ===============================================================================
-
-    fld = FldData.fromfile('demos/data/test0.f00001')
-    print(fld)
-
-    print('***************')
-
-    test_outfile = 'fld_header_test.bin'
-    fld.tofile(test_outfile)
-    fld2 = FldData.fromfile(test_outfile)
-    print(fld2)
-
-    # Test 2: Creates a file from values, writes it to a file, then parses it again
-    # ===============================================================================
-
-    # # Required
-    # ndims = 3
-    # nx1 = 7
-    # ny1 = nx1
-    # nz1 = nx1
-    # nelgt = 512
-    # nelt = nelgt
-    # float_type = np.dtype(np.float32)
-    # int_type = np.dtype(np.int32)
-
-    # # Optional
-    # glel = np.arange(1, nelt + 1)
-    # coords = np.vstack((np.full(nelt * nx1 ** 3, fill_value=2),
-    #                     np.full(nelt * nx1 ** 3, fill_value=3),
-    #                     np.full(nelt * nx1 ** 3, fill_value=4)))
-    # u = np.vstack((np.full(nelt * nx1 ** 3, fill_value=5),
-    #                np.full(nelt * nx1 ** 3, fill_value=6),
-    #                np.full(nelt * nx1 ** 3, fill_value=7)))
-    # p = np.full(nelt * nx1 ** 3, fill_value=8)
-    # t = np.full(nelt * nx1 ** 3, fill_value=9)
-
-    # fld = FldData.fromvalues(nx1=nx1, ny1=ny1, nz1=nz1, nelgt=nelgt, nelt=nelt,
-    #                          glel=glel, coords=coords, u=u, p=p, t=t)
-    # print(fld)
-
-    # # print('***************')
-
-    # test_outfile = 'fld_header_test.bin'
-    # fld.tofile(test_outfile)
-
-    # fld2 = FldData.fromfile(test_outfile)
-    # print(fld2)
