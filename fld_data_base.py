@@ -1,6 +1,7 @@
 import numpy as np
 from fld_header import FldHeader
 from abc import ABC, abstractmethod
+import typing
 
 
 class FldDataBase(ABC):
@@ -26,7 +27,6 @@ class FldDataBase(ABC):
         """
         pass
 
-    @abstractmethod
     def tofile(self, filename: str):
         """ Writes the data of this object to a binary Nek5000 field file.
 
@@ -38,7 +38,40 @@ class FldDataBase(ABC):
             The name of the desired field file
 
         """
-        pass
+        self._header.tofile(filename)
+        with open(filename, 'ab') as f:
+            f.write(self._coords.tobytes())
+            f.write(self._u.tobytes())
+            f.write(self._p.tobytes())
+            f.write(self._t.tobytes())
+            f.write(self._s.tobytes())
+            self._write_metadata(f)
+
+    def _write_metadata(self, file: typing.BinaryIO):
+        """
+        Writes metadata necessary for an open file object.  Uses current file offset.
+
+        :param file: An open file object.  Must be in binary mode.
+        """
+
+        def vec_field_metadata(v):
+            # For coords and u
+            cols = []
+            for i in range(self.ndims):
+                cols.append(np.min(v[:, i, :], axis=1))
+                cols.append(np.max(v[:, i, :], axis=1))
+            return np.column_stack(cols)
+
+        def scal_field_metadata(v):
+            # For p, t, and each field in s
+            return np.column_stack([np.min(v, axis=-1), np.max(v, axis=-1)])
+
+        file.write(vec_field_metadata(self._coords).tobytes())
+        file.write(vec_field_metadata(self._u).tobytes())
+        file.write(scal_field_metadata(self._p).tobytes())
+        file.write(scal_field_metadata(self._t).tobytes())
+        for i in range(self._s.shape[0]):
+            file.write(scal_field_metadata(self._s[i, :, :]).tobytes())
 
     def __repr__(self):
         return repr(self.__dict__)
