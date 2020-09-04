@@ -41,7 +41,7 @@ class FldDataMemmap(FldDataBase):
         self._set_rdcode()
 
     @classmethod
-    def fromfile(cls, filename: str, mode: str = "r+"):
+    def fromfile(cls, filename: str, mode: str = "r"):
 
         # Validate mode
         if mode not in ('r', 'r+', 'w+', 'c'):
