@@ -2,6 +2,7 @@ from fld_data_base import FldDataBase
 from fld_header import FldHeader
 import numpy as np
 import re
+import vtk
 
 
 # TODO: This uses tofile from the base class, which probably creates some intermediate byte arrays
@@ -150,3 +151,77 @@ class FldDataMemmap(FldDataBase):
                 "Incorrect shape for s: s.shape must equal (x, nelt, nx1 * ny1 * nz1) for arbitrary number of scalars x")
         self._s = other.astype(self.float_type)
         self._set_rdcode()
+
+    def make_hex(self, elem_id):
+        n_gll = self.nx1 * self.ny1 * self.nz1
+
+        hex = vtk.vtkLagrangeHexahedron()
+        hex.GetPointIds().SetNumberOfIds(n_gll)
+        hex.GetPoints().SetNumberOfPoints(n_gll)
+        hex.Initialize()
+
+        for i in range(n_gll):
+            idx = elem_id * n_gll + i
+            hex.GetPointIds().SetId(i, idx)
+
+        return hex
+
+    def plot(self):
+        n_gll = self.nx1 * self.ny1 * self.nz1
+
+        # Setup the points
+
+        points = vtk.vtkPoints()
+        points.Allocate(self.nelt * n_gll)
+
+        for i in range(self.nelt):
+            for j in range(n_gll):
+                points.InsertPoint(i * n_gll + j, list(self.coords[i, :, j]))
+
+        # Setup the grid and cells
+
+        hex_grid = vtk.vtkUnstructuredGrid()
+        hex_grid.Allocate(self.nelt)
+
+        for i in range(self.nelt):
+            hex = self.make_hex(i)
+            hex_grid.InsertNextCell(hex.GetCellType(), hex.GetPointIds())
+            print("\rProcessed {} / {} elements ...".format(i, self.nelt), end='')
+        print(" done!")
+        hex_grid.SetPoints(points)
+
+        # Plot it!
+
+        colors = vtk.vtkNamedColors()
+
+        mapper = vtk.vtkDataSetMapper()
+        mapper.SetInputData(hex_grid)
+
+        actor = vtk.vtkActor()
+        actor.SetMapper(mapper)
+        # actor.GetProperty().SetRepresentationToWireframe()
+        actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
+        actor.GetProperty().EdgeVisibilityOn()
+
+        ren = vtk.vtkRenderer()
+        ren.AddActor(actor)
+        ren.SetBackground(colors.GetColor3d("Beige"))
+
+        ren_win = vtk.vtkRenderWindow()
+        ren_win.AddRenderer(ren)
+        ren_win.SetSize(1600, 800)
+
+        iren = vtk.vtkRenderWindowInteractor()
+        iren.SetRenderWindow(ren_win)
+
+        ren.ResetCamera()
+        ren.GetActiveCamera().Azimuth(30)
+        ren.GetActiveCamera().Elevation(20)
+        ren.GetActiveCamera().Dolly(2.8)
+        ren.GetActiveCamera().Zoom(5)
+        ren.ResetCameraClippingRange()
+
+        ren_win.Render()
+
+        iren.Initialize()
+        iren.Start()
