@@ -152,18 +152,112 @@ class FldDataMemmap(FldDataBase):
         self._s = other.astype(self.float_type)
         self._set_rdcode()
 
-    def make_hex(self, elem_id):
-        n_gll = self.nx1 * self.ny1 * self.nz1
+    def make_hex(self, e):
+        nx = self.nx1   # Assume nx1 == ny1 == nz1
+        gpt = lambda x, y, z: (e * nx**3) + (x * nx**2) + (y * nx) + z  # Get the gridpoint corresponding to an (x, y, z) coordinate
+
+        # Start with vertices
+        idx = [
+            gpt(0, 0, 0),  # Vertex 0
+            gpt(nx-1, 0, 0),  # Vertex 1
+            gpt(nx-1, nx-1, 0),  # Vertex 2
+            gpt(0, nx-1, 0), # Vertex 3
+            gpt(0, 0, nx-1), # Vertex 4
+            gpt(nx-1, 0, nx-1), # Vertex 5
+            gpt(nx-1, nx-1, nx-1), # Vertex 6
+            gpt(0, nx-1, nx-1), # Vertex 8
+        ]
+
+        # Edges 8, 9
+        s = 0; t = 0
+        for r in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 10, 11
+        r = nx-1; t = 0
+        for s in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 12, 13
+        s = nx-1; t = 0
+        for r in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 14, 15
+        r = 0; t = 0
+        for s in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 16, 17
+        s = 0; t = nx-1
+        for r in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 18, 19
+        r = nx-1; t = nx-1
+        for s in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 20, 21
+        s = nx-1; t = nx-1
+        for r in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 22, 23
+        r = 0; t = nx-1
+        for s in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 24, 25
+        r = 0; s = 0
+        for t in range(1, nx -1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 26, 27
+        r = nx-1; s = 0
+        for t in range(1, nx -1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 28, 29
+        r = nx-1; s = nx-1
+        for t in range(1, nx -1):
+            idx.append(gpt(r, s, t))
+
+        # Edges 30, 31
+        r = 0; s = nx-1
+        for t in range(1, nx-1):
+            idx.append(gpt(r, s, t))
+
+        # Faces 32 and 36
+        for s in [0, nx - 1]:
+            for t in range(1, nx-1):
+                for r in range(1, nx - 1):
+                        idx.append(gpt(r, s, t))
+
+        # Faces  40 and 44
+        for r in [0, nx-1]:
+            for t in range(1, nx-1):
+                for s in range(1, nx - 1):
+                    idx.append(gpt(r, s, t))
+
+        # Faces 48 and 52
+        for t in [0, nx - 1]:
+            for s in range(1, nx-1):
+                for r in range(1, nx - 1):
+                    idx.append(gpt(r, s, t))
+
+        # Interior
+        for t in range(1, nx - 1):
+            for s in range(1, nx-1):
+                for r in range(1, nx - 1):
+                    idx.append(gpt(r, s, t))
 
         hex = vtk.vtkLagrangeHexahedron()
-        hex.GetPointIds().SetNumberOfIds(n_gll)
-        hex.GetPoints().SetNumberOfPoints(n_gll)
+        hex.GetPointIds().SetNumberOfIds(nx**3)
+        hex.GetPoints().SetNumberOfPoints(nx**3)
         hex.Initialize()
-
-        for i in range(n_gll):
-            idx = elem_id * n_gll + i
-            hex.GetPointIds().SetId(i, idx)
-
+        for i, x in enumerate(idx):
+            hex.GetPointIds().SetId(i, x)
         return hex
 
     def plot(self):
@@ -213,13 +307,6 @@ class FldDataMemmap(FldDataBase):
 
         iren = vtk.vtkRenderWindowInteractor()
         iren.SetRenderWindow(ren_win)
-
-        ren.ResetCamera()
-        ren.GetActiveCamera().Azimuth(30)
-        ren.GetActiveCamera().Elevation(20)
-        ren.GetActiveCamera().Dolly(2.8)
-        ren.GetActiveCamera().Zoom(5)
-        ren.ResetCameraClippingRange()
 
         ren_win.Render()
 
