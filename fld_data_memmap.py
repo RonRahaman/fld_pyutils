@@ -153,6 +153,7 @@ class FldDataMemmap(FldDataBase):
         self._set_rdcode()
 
     def make_hex(self, e):
+        # For debugging
         nx = self.nx1   # Assume nx1 == ny1 == nz1
         gpt = lambda x, y, z: (e * nx**3) + (x * nx**2) + (y * nx) + z  # Get the gridpoint corresponding to an (x, y, z) coordinate
 
@@ -168,83 +169,116 @@ class FldDataMemmap(FldDataBase):
             gpt(0, nx-1, nx-1), # Vertex 8
         ]
 
-        # Edges 8, 9
-        s = 0; t = 0
-        for r in range(1, nx-1):
-            idx.append(gpt(r, s, t))
+        # Edge 8
+        idx.append(gpt(nx//2, 0, 0))
+        # Edge 9
+        idx.append(gpt(nx-1, nx//2, 0))
+        # Edge 10
+        idx.append(gpt(nx//2, nx-1, 0))
+        # Edge 11
+        idx.append(gpt(0, nx//2, 0))
+        # Edge 12
+        idx.append(gpt(nx//2, 0, nx-1))
+        # Edge 13
+        idx.append(gpt(nx-1, nx//2, nx-1))
+        # Edge 14
+        idx.append(gpt(nx//2, nx-1, nx-1))
+        # Edge 15
+        idx.append(gpt(0, nx//2, nx-1))
+        # Edge 16
+        idx.append(gpt(0, 0, nx//2))
+        # Edge 17
+        idx.append(gpt(nx-1, 0, nx//2))
+        # Edge 18
+        idx.append(gpt(nx-1, nx-1, nx//2))
+        # Edge 19
+        idx.append(gpt(0, nx-1, nx//2))
 
-        # Edges 10, 11
-        r = nx-1; t = 0
-        for s in range(1, nx-1):
-            idx.append(gpt(r, s, t))
+        hex = vtk.vtkQuadraticHexahedron()
+        hex.GetPointIds().SetNumberOfIds(25)
+        hex.GetPoints().SetNumberOfPoints(25)
+        hex.Initialize()
+        for i, x in enumerate(idx):
+            hex.GetPointIds().SetId(i, x)
+        return hex
 
-        # Edges 12, 13
-        s = nx-1; t = 0
-        for r in range(1, nx-1):
-            idx.append(gpt(r, s, t))
+    def make_lagrange_hex(self, e):
+        nx = self.nx1   # Assume nx1 == ny1 == nz1
+        gpt = lambda x, y, z: (e * nx**3) + (x * nx**2) + (y * nx) + z  # Get the gridpoint corresponding to an (x, y, z) coordinate
 
-        # Edges 14, 15
-        r = 0; t = 0
-        for s in range(1, nx-1):
-            idx.append(gpt(r, s, t))
+        # Start with vertices
+        idx = [
+            gpt(0, 0, 0),  # Vertex 0
+            gpt(nx-1, 0, 0),  # Vertex 1
+            gpt(nx-1, nx-1, 0),  # Vertex 2
+            gpt(0, nx-1, 0), # Vertex 3
+            gpt(0, 0, nx-1), # Vertex 4
+            gpt(nx-1, 0, nx-1), # Vertex 5
+            gpt(nx-1, nx-1, nx-1), # Vertex 6
+            gpt(0, nx-1, nx-1), # Vertex 8
+        ]
 
-        # Edges 16, 17
-        s = 0; t = nx-1
-        for r in range(1, nx-1):
-            idx.append(gpt(r, s, t))
+        # Edge 8,9
+        for i in range(1, nx-1):
+            idx.append(gpt(i, 0, 0))
+        # Edge 10,11
+        for i in range(1, nx-1):
+            idx.append(gpt(nx-1, i, 0))
+        # Edge 12,13
+        for i in range(1, nx-1):
+            idx.append(gpt(i, nx-1, 0))
+        # Edge 14, 15
+        for i in range(1, nx-1):
+            idx.append(gpt(0, i, 0))
+        # Edge 16, 17
+        for i in range(1, nx-1):
+            idx.append(gpt(i, 0, nx-1))
+        # Edge 18, 19
+        for i in range(1, nx-1):
+            idx.append(gpt(nx-1, i, nx-1))
+        # Edge 20, 21
+        for i in range(1, nx-1):
+            idx.append(gpt(i, nx-1, nx-1))
+        # Edge 22, 23
+        for i in range(1, nx-1):
+            idx.append(gpt(0, i, nx-1))
+        # Edge 24, 26
+        for i in range(1, nx-1):
+            idx.append(gpt(0, 0, i))
+        # Edge 26, 27
+        for i in range(1, nx-1):
+            idx.append(gpt(nx-1, 0, i))
+        # Edge 28, 29
+        for i in range(1, nx-1):
+            idx.append(gpt(nx-1, nx-1, i))
+        # Edge 30, 31
+        for i in range(1, nx-1):
+            idx.append(gpt(0, nx-1, i))
 
-        # Edges 18, 19
-        r = nx-1; t = nx-1
-        for s in range(1, nx-1):
-            idx.append(gpt(r, s, t))
-
-        # Edges 20, 21
-        s = nx-1; t = nx-1
-        for r in range(1, nx-1):
-            idx.append(gpt(r, s, t))
-
-        # Edges 22, 23
-        r = 0; t = nx-1
-        for s in range(1, nx-1):
-            idx.append(gpt(r, s, t))
-
-        # Edges 24, 25
-        r = 0; s = 0
-        for t in range(1, nx -1):
-            idx.append(gpt(r, s, t))
-
-        # Edges 26, 27
-        r = nx-1; s = 0
-        for t in range(1, nx -1):
-            idx.append(gpt(r, s, t))
-
-        # Edges 28, 29
-        r = nx-1; s = nx-1
-        for t in range(1, nx -1):
-            idx.append(gpt(r, s, t))
-
-        # Edges 30, 31
-        r = 0; s = nx-1
+        # Face 32
         for t in range(1, nx-1):
-            idx.append(gpt(r, s, t))
-
-        # Faces 32 and 36
-        for s in [0, nx - 1]:
-            for t in range(1, nx-1):
-                for r in range(1, nx - 1):
-                        idx.append(gpt(r, s, t))
-
-        # Faces  40 and 44
-        for r in [0, nx-1]:
-            for t in range(1, nx-1):
-                for s in range(1, nx - 1):
-                    idx.append(gpt(r, s, t))
-
-        # Faces 48 and 52
-        for t in [0, nx - 1]:
+            for r in range(1, nx - 1):
+                idx.append(gpt(r, 0, t))
+        # Face 36
+        for t in range(1, nx-1):
+            for r in range(1, nx - 1):
+                idx.append(gpt(r, nx-1, t))
+        # Face 40
+        for t in range(1, nx-1):
             for s in range(1, nx-1):
-                for r in range(1, nx - 1):
-                    idx.append(gpt(r, s, t))
+                idx.append(gpt(0, s, t))
+        # Face 44
+        for t in range(1, nx-1):
+            for s in range(1, nx-1):
+                idx.append(gpt(nx-1, s, t))
+        # Face 48
+        for s in range(1, nx-1):
+            for r in range(1, nx-1):
+                idx.append(gpt(r, s, 0))
+        # Face 52
+        for s in range(1, nx-1):
+            for r in range(1, nx-1):
+                idx.append(gpt(r, s, nx-1))
 
         # Interior
         for t in range(1, nx - 1):
@@ -261,26 +295,32 @@ class FldDataMemmap(FldDataBase):
         return hex
 
     def plot(self):
+        N = 1
         n_gll = self.nx1 * self.ny1 * self.nz1
 
         # Setup the points
 
         points = vtk.vtkPoints()
-        points.Allocate(self.nelt * n_gll)
+        points.Allocate(N * n_gll)
 
-        for i in range(self.nelt):
-            for j in range(n_gll):
-                points.InsertPoint(i * n_gll + j, list(self.coords[i, :, j]))
+        c = self.coords.reshape([self.nelt, self.ndims, self.nx1, self.ny1, self.nz1])
+
+        for e in range(N):
+            for r in range(self.nx1):
+                for s in range(self.ny1):
+                    for t in range(self.nz1):
+                        pt = [c[e,0,r,s,t], c[e,1,r,s,t], c[e,2,r,s,t]]
+                        points.InsertNextPoint(pt)
 
         # Setup the grid and cells
 
         hex_grid = vtk.vtkUnstructuredGrid()
-        hex_grid.Allocate(self.nelt)
+        hex_grid.Allocate(N)
 
-        for i in range(self.nelt):
-            hex = self.make_hex(i)
+        for i in range(N):
+            hex = self.make_lagrange_hex(i)
             hex_grid.InsertNextCell(hex.GetCellType(), hex.GetPointIds())
-            print("\rProcessed {} / {} elements ...".format(i, self.nelt), end='')
+            print("\rProcessed {} / {} elements ...".format(i, N), end='')
         print(" done!")
         hex_grid.SetPoints(points)
 
