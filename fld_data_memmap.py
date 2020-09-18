@@ -206,6 +206,9 @@ class FldDataMemmap(FldDataBase):
         nx = self.nx1   # Assume nx1 == ny1 == nz1
         gpt = lambda r, s, t: (e * nx**3) + r * nx**2 + s * nx + t  # Get the gridpoint corresponding to an (x, y, z) coordinate
 
+        # From https://blog.kitware.com/wp-content/uploads/2018/09/Source_Issue_43.pdf
+        # with some corrections due to inconsistencies in diagram (see notes below)
+
         # Start with vertices
         idx = [
             gpt(0, 0, 0),  # Vertex 0
@@ -248,21 +251,17 @@ class FldDataMemmap(FldDataBase):
         # Edge 26, 27
         for i in range(1, nx-1):
             idx.append(gpt(nx-1, 0, i))
-        # Edge 28, 29
-        for i in range(1, nx-1):
-            idx.append(gpt(nx-1, nx-1, i))
+
+        # /****** Swapped these two edges vs blog ******
         # Edge 30, 31
         for i in range(1, nx-1):
             idx.append(gpt(0, nx-1, i))
+        # Edge 28, 29
+        for i in range(1, nx-1):
+            idx.append(gpt(nx-1, nx-1, i))
+        # **********************************************/
 
-        # Face 32
-        for t in range(1, nx-1):
-            for r in range(1, nx - 1):
-                idx.append(gpt(r, 0, t))
-        # Face 36
-        for t in range(1, nx-1):
-            for r in range(1, nx - 1):
-                idx.append(gpt(r, nx-1, t))
+        # /****** Swapped these faces vs blog ***********
         # Face 40
         for t in range(1, nx-1):
             for s in range(1, nx-1):
@@ -271,6 +270,16 @@ class FldDataMemmap(FldDataBase):
         for t in range(1, nx-1):
             for s in range(1, nx-1):
                 idx.append(gpt(nx-1, s, t))
+        # Face 32
+        for t in range(1, nx-1):
+            for r in range(1, nx - 1):
+                idx.append(gpt(r, 0, t))
+        # Face 36
+        for t in range(1, nx-1):
+            for r in range(1, nx - 1):
+                idx.append(gpt(r, nx-1, t))
+        # **********************************************/
+
         # Face 48
         for s in range(1, nx-1):
             for r in range(1, nx-1):
@@ -295,7 +304,7 @@ class FldDataMemmap(FldDataBase):
         return hex
 
     def plot(self):
-        N = 1
+        N = self.nelt
         n_gll = self.nx1 * self.ny1 * self.nz1
 
         # Setup the points

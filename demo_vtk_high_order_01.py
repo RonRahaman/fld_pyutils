@@ -69,21 +69,15 @@ for i in range(1, nx - 1):
 # Edge 26, 27
 for i in range(1, nx - 1):
     idx.append(gpt(nx - 1, 0, i))
-# Edge 28, 29
-for i in range(1, nx - 1):
-    idx.append(gpt(nx - 1, nx - 1, i))
 # Edge 30, 31
 for i in range(1, nx - 1):
     idx.append(gpt(0, nx - 1, i))
+# Edge 28, 29
+for i in range(1, nx - 1):
+    idx.append(gpt(nx - 1, nx - 1, i))
 
-# Face 32
-for t in range(1, nx - 1):
-    for r in range(1, nx - 1):
-        idx.append(gpt(r, 0, t))
-# Face 36
-for t in range(1, nx - 1):
-    for r in range(1, nx - 1):
-        idx.append(gpt(r, nx - 1, t))
+# Swap edge (nx-1,nx-1,:) with (0,nx-1,:)
+
 # Face 40
 for t in range(1, nx - 1):
     for s in range(1, nx - 1):
@@ -92,6 +86,15 @@ for t in range(1, nx - 1):
 for t in range(1, nx - 1):
     for s in range(1, nx - 1):
         idx.append(gpt(nx - 1, s, t))
+# Face 32
+for t in range(1, nx - 1):
+    for r in range(1, nx - 1):
+        idx.append(gpt(r, 0, t))
+# Face 36
+for t in range(1, nx - 1):
+    for r in range(1, nx - 1):
+        idx.append(gpt(r, nx - 1, t))
+
 # Face 48
 for s in range(1, nx - 1):
     for r in range(1, nx - 1):
@@ -118,7 +121,7 @@ labels = vtk.vtkStringArray()
 labels.SetName("globs")
 for loc, glob in enumerate(idx):
     hex.GetPointIds().SetId(loc, glob)
-    labels.InsertValue(glob, f"{loc}")
+    labels.InsertValue(glob, str(loc))
 
 # ==================================================================
 # The unstructured grid contain:
@@ -127,7 +130,7 @@ for loc, glob in enumerate(idx):
 # ==================================================================
 
 hex_grid = vtk.vtkUnstructuredGrid()
-hex_grid.Allocate(1)
+hex_grid.Allocate()
 hex_grid.InsertNextCell(hex.GetCellType(), hex.GetPointIds())
 hex_grid.SetPoints(pts)
 
@@ -174,7 +177,8 @@ mapper.SetInputData(hex_grid)
 actor = vtk.vtkActor()
 actor.SetMapper(mapper)
 actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
-actor.GetProperty().EdgeVisibilityOn()
+#actor.GetProperty().EdgeVisibilityOn()
+actor.GetProperty().SetRepresentationToWireframe()
 
 # The Axes
 axes = vtk.vtkAxesActor()
