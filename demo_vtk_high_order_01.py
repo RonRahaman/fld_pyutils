@@ -1,6 +1,6 @@
 import vtk
 
-nx = 3    # Number of gridpoints in each dim
+nx = 4    # Number of gridpoints in each dim
 dx = 1  # Spacing between gridpoints
 
 # ==================================================================
@@ -113,8 +113,12 @@ hex = vtk.vtkLagrangeHexahedron()
 hex.GetPointIds().SetNumberOfIds(nx**3)
 hex.GetPoints().SetNumberOfPoints(nx**3)
 hex.Initialize()
-for i, x in enumerate(idx):
-    hex.GetPointIds().SetId(i, x)
+
+labels = vtk.vtkStringArray()
+labels.SetName("globs")
+for loc, glob in enumerate(idx):
+    hex.GetPointIds().SetId(loc, glob)
+    labels.InsertValue(glob, f"{loc}")
 
 # ==================================================================
 # The unstructured grid contain:
@@ -126,6 +130,29 @@ hex_grid = vtk.vtkUnstructuredGrid()
 hex_grid.Allocate(1)
 hex_grid.InsertNextCell(hex.GetCellType(), hex.GetPointIds())
 hex_grid.SetPoints(pts)
+
+# Labeling
+# ---------
+# From https://www.programmersought.com/article/2153142323/
+hex_grid.GetPointData().AddArray(labels)
+
+text_prop = vtk.vtkTextProperty()
+text_prop.SetFontSize(35)
+#textProp.SetColor(whatever)
+#text_prop.SetFontFamilyToArial()
+
+hie = vtk.vtkPointSetToLabelHierarchy()
+hie.SetInputData(hex_grid)
+hie.SetMaximumDepth(1)
+hie.SetLabelArrayName("globs")
+#hie.SetTargetLabelCount(100)
+hie.SetTextProperty(text_prop)
+
+label_mapper = vtk.vtkLabelPlacementMapper()
+label_mapper.SetInputConnection(hie.GetOutputPort())
+
+label_actor = vtk.vtkActor2D()
+label_actor.SetMapper(label_mapper)
 
 # ==================================================================
 # Color pts by point ID (in cell)
@@ -146,6 +173,8 @@ mapper = vtk.vtkDataSetMapper()
 mapper.SetInputData(hex_grid)
 actor = vtk.vtkActor()
 actor.SetMapper(mapper)
+actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
+actor.GetProperty().EdgeVisibilityOn()
 
 # The Axes
 axes = vtk.vtkAxesActor()
@@ -159,6 +188,7 @@ axes.GetZAxisCaptionActor2D().GetTextActor().GetTextProperty().SetFontSize(s)
 ren = vtk.vtkRenderer()
 ren.AddActor(actor)
 ren.AddActor(axes)
+ren.AddActor(label_actor)
 
 ren_win = vtk.vtkRenderWindow()
 ren_win.AddRenderer(ren)
@@ -169,28 +199,6 @@ iren.SetRenderWindow(ren_win)
 ren.SetBackground(colors.GetColor3d("Black"))
 ren_win.SetSize(1600, 800)
 
-# ------------------------------------
-# Plotting option 1:  Just show faces
-# ------------------------------------
-#actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
-#actor.GetProperty().EdgeVisibilityOn()
-
-# ------------------------------------
-# Plotting option 2:  Label IDs
-# ------------------------------------
-
-# From:  https://cmake.org/Wiki/VTK/Examples/Cxx/Visualization/LabelMesh
-ids = vtk.vtkIdFilter()
-ids.SetInputData(hex_grid)
-ids.PointIdsOn()
-id_mapper = vtk.vtkLabeledDataMapper()
-id_mapper.SetInputConnection(ids.GetOutputPort())
-id_mapper.GetLabelTextProperty().SetFontSize(30)
-id_actor = vtk.vtkActor2D()
-id_actor.SetMapper(id_mapper)
-ren.AddActor(id_actor)
-
-actor.GetProperty().SetRepresentationToWireframe()
 
 # --------------------------------------
 ren_win.Render()

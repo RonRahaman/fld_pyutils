@@ -112,6 +112,7 @@ hex_grid.SetPoints(pts)
 
 # Labeling
 # ---------
+# From https://www.programmersought.com/article/2153142323/
 hex_grid.GetPointData().AddArray(labels)
 
 text_prop = vtk.vtkTextProperty()
