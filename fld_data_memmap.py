@@ -4,6 +4,7 @@ import numpy as np
 import re
 import vtk
 
+colors = vtk.vtkNamedColors()
 
 # TODO: This uses tofile from the base class, which probably creates some intermediate byte arrays
 # Might want to see if this is significant memory disadvantage...
@@ -312,10 +313,14 @@ class FldDataMemmap(FldDataBase):
         points = vtk.vtkPoints()
         points.Allocate(N * n_gll)
 
+        scalars = vtk.vtkDoubleArray()
+        scalars.Allocate(N * n_gll)
+
         for e in range(N):
             for i in range(n_gll):
                 pt = [self.coords[e,0,i], self.coords[e,1,i], self.coords[e,2,i]]
                 points.InsertNextPoint(pt)
+                scalars.InsertNextTuple1(self.t[e,i])
 
         # Setup the grid and cells
 
@@ -328,19 +333,36 @@ class FldDataMemmap(FldDataBase):
             print("\rProcessed {} / {} elements ...".format(i, N), end='')
         print(" done!")
         hex_grid.SetPoints(points)
+        hex_grid.GetPointData().SetScalars(scalars)
 
-        # Plot it!
+        # Clipping:  https://lorensen.github.io/VTKExamples/site/Python/UnstructuredGrid/ClipUnstructuredGridWithPlane2/
 
-        colors = vtk.vtkNamedColors()
+        #clip_plane = vtk.vtkPlane()
+        #clip_plane.SetOrigin(hex_grid.GetCenter())
+        #clip_plane.SetNormal([-1.0, -1.0, 1.0])
+
+        #clipper = vtk.vtkClipDataSet()
+        #clipper.SetClipFunction(clip_plane)
+        #clipper.SetInputData(hex_grid)
+        #clipper.SetValue(0.0)
+        #clipper.GenerateClippedOutputOn()
+        #clipper.Update()
+
+        #mapper = vtk.vtkDataSetMapper()
+        #mapper.SetInputData(clipper.GetClippedOutput())
+        #mapper.SetScalarRange(hex_grid.GetScalarRange())
 
         mapper = vtk.vtkDataSetMapper()
         mapper.SetInputData(hex_grid)
+        mapper.SetScalarRange(hex_grid.GetScalarRange())
+
+        # Plot it!
 
         actor = vtk.vtkActor()
         actor.SetMapper(mapper)
         # actor.GetProperty().SetRepresentationToWireframe()
-        actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
-        actor.GetProperty().EdgeVisibilityOn()
+        #actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
+        actor.GetProperty().EdgeVisibilityOff()
 
         ren = vtk.vtkRenderer()
         ren.AddActor(actor)
