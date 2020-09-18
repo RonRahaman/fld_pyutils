@@ -337,24 +337,24 @@ class FldDataMemmap(FldDataBase):
 
         # Clipping:  https://lorensen.github.io/VTKExamples/site/Python/UnstructuredGrid/ClipUnstructuredGridWithPlane2/
 
-        #clip_plane = vtk.vtkPlane()
-        #clip_plane.SetOrigin(hex_grid.GetCenter())
-        #clip_plane.SetNormal([-1.0, -1.0, 1.0])
+        clip_plane = vtk.vtkPlane()
+        clip_plane.SetOrigin(hex_grid.GetCenter())
+        clip_plane.SetNormal([1.0, 0.0, 0.0])
 
-        #clipper = vtk.vtkClipDataSet()
-        #clipper.SetClipFunction(clip_plane)
-        #clipper.SetInputData(hex_grid)
-        #clipper.SetValue(0.0)
-        #clipper.GenerateClippedOutputOn()
-        #clipper.Update()
-
-        #mapper = vtk.vtkDataSetMapper()
-        #mapper.SetInputData(clipper.GetClippedOutput())
-        #mapper.SetScalarRange(hex_grid.GetScalarRange())
+        clipper = vtk.vtkClipDataSet()
+        clipper.SetClipFunction(clip_plane)
+        clipper.SetInputData(hex_grid)
+        clipper.SetValue(0.0)
+        clipper.GenerateClippedOutputOn()
+        clipper.Update()
 
         mapper = vtk.vtkDataSetMapper()
-        mapper.SetInputData(hex_grid)
+        mapper.SetInputData(clipper.GetOutput())
         mapper.SetScalarRange(hex_grid.GetScalarRange())
+
+        #mapper = vtk.vtkDataSetMapper()
+        #mapper.SetInputData(hex_grid)
+        #mapper.SetScalarRange(hex_grid.GetScalarRange())
 
         # Plot it!
 
@@ -362,7 +362,10 @@ class FldDataMemmap(FldDataBase):
         actor.SetMapper(mapper)
         # actor.GetProperty().SetRepresentationToWireframe()
         #actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
-        actor.GetProperty().EdgeVisibilityOff()
+        actor.GetProperty().EdgeVisibilityOn()
+        actor.GetProperty().SetLineWidth(0.25)
+        actor.GetProperty().SetAmbient(50)
+
 
         ren = vtk.vtkRenderer()
         ren.AddActor(actor)
