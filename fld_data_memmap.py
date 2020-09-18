@@ -155,7 +155,7 @@ class FldDataMemmap(FldDataBase):
     def make_hex(self, e):
         # For debugging
         nx = self.nx1   # Assume nx1 == ny1 == nz1
-        gpt = lambda x, y, z: (e * nx**3) + (x * nx**2) + (y * nx) + z  # Get the gridpoint corresponding to an (x, y, z) coordinate
+        gpt = lambda x, y, z: (e * nx**3) + (z * nx**2) + (y * nx) + x  # Get the gridpoint corresponding to an (x, y, z) coordinate
 
         # Start with vertices
         idx = [
@@ -204,7 +204,7 @@ class FldDataMemmap(FldDataBase):
 
     def make_lagrange_hex(self, e):
         nx = self.nx1   # Assume nx1 == ny1 == nz1
-        gpt = lambda x, y, z: (e * nx**3) + (x * nx**2) + (y * nx) + z  # Get the gridpoint corresponding to an (x, y, z) coordinate
+        gpt = lambda r, s, t: (e * nx**3) + r * nx**2 + s * nx + t  # Get the gridpoint corresponding to an (x, y, z) coordinate
 
         # Start with vertices
         idx = [
@@ -303,14 +303,10 @@ class FldDataMemmap(FldDataBase):
         points = vtk.vtkPoints()
         points.Allocate(N * n_gll)
 
-        c = self.coords.reshape([self.nelt, self.ndims, self.nx1, self.ny1, self.nz1])
-
         for e in range(N):
-            for r in range(self.nx1):
-                for s in range(self.ny1):
-                    for t in range(self.nz1):
-                        pt = [c[e,0,r,s,t], c[e,1,r,s,t], c[e,2,r,s,t]]
-                        points.InsertNextPoint(pt)
+            for i in range(n_gll):
+                pt = [self.coords[e,0,i], self.coords[e,1,i], self.coords[e,2,i]]
+                points.InsertNextPoint(pt)
 
         # Setup the grid and cells
 
