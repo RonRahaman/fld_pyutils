@@ -418,3 +418,56 @@ class FldDataBase(ABC):
         grid.SetPoints(points)
         grid.GetPointData().SetScalars(scalars)
         return grid
+
+    def get_hex_grid(self):
+        nx = self.nx1  # Assume nx1 == ny1 == nz1
+
+        points = vtk.vtkPoints()
+        points.Allocate(self.nelt * nx**3)
+
+        # This is hardcoded to be temperature.  TODO: Function argument for specifying scalar
+        scalars = vtk.vtkDoubleArray()
+        scalars.Allocate(self.nelt * nx**3)
+
+        crd = self.coords.reshape((self.nelt, self.ndims, nx, nx, nx))
+        scl = self.t.reshape((self.nelt, nx, nx, nx))
+
+        for e in range(self.nelt):
+            for r in range(nx):
+                for s in range(nx):
+                    for t in range(nx):
+                        pt = [crd[e,0,r,s,t], crd[e,1,r,s,t], crd[e,2,r,s,t]]
+                        points.InsertNextPoint(pt)
+                        scalars.InsertNextTuple1(scl[e,r,s,t])
+
+        grid = vtk.vtkUnstructuredGrid()
+        grid.Allocate(self.nelt * nx**3)
+
+        gpt = lambda r, s, t: (e * nx**3) + r * nx**2 + s * nx + t  # Get the gridpoint corresponding to an (x, y, z) coordinate
+        for e in range(self.nelt):
+            for r in range(nx-1):
+                for s in range(nx-1):
+                    for t in range(nx-1):
+                        hex = vtk.vtkHexahedron()
+                        hex.GetPointIds().SetNumberOfIds(8)
+                        #hex.GetPointIds().SetNumberOfPoints(8)
+                        # Maps local verts -> global pts
+                        verts = [
+                            gpt(r, s, t),   #0
+                            gpt(r+1, s, t),  #1
+                            gpt(r+1, s+1, t),  #2
+                            gpt(r, s+1, t),  #3
+                            gpt(r, s, t+1),  # 4
+                            gpt(r + 1, s, t+1),  # 5
+                            gpt(r + 1, s + 1, t+1),  # 6
+                            gpt(r, s + 1, t+1)  # 7
+                        ]
+                        for i, x in enumerate(verts):
+                            hex.GetPointIds().SetId(i, x)
+                        grid.InsertNextCell(hex.GetCellType(), hex.GetPointIds())
+                        print("\rProcessed {} / {} hexes ...".format(e*nx**3 + r*nx**2 + s*nx + t + 1, self.nelt * nx**3), end='')
+        print(" done!")
+
+        grid.SetPoints(points)
+        grid.GetPointData().SetScalars(scalars)
+        return grid

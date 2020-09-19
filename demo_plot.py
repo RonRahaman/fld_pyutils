@@ -4,7 +4,8 @@ from fld_data import FldData
 
 #d1 = FldDataMemmap.fromfile('demos/data/test0.f00001')
 d1 = FldData.fromfile('testA/rod_short0.f00001')
-hex_grid = d1.get_lagrange_hex_grid()
+hex_grid = d1.get_hex_grid()
+#hex_grid = d1.get_lagrange_hex_grid()
 
 # Clipping:  https://lorensen.github.io/VTKExamples/site/Python/UnstructuredGrid/ClipUnstructuredGridWithPlane2/
 colors = vtk.vtkNamedColors()
@@ -56,4 +57,3 @@ iren.Start()
 
 #d1 = FldDataMemmap.fromfile('demos/data/test0.f00001')
 d1 = FldData.fromfile('testA/rod_short0.f00001')
-d1.plot()
