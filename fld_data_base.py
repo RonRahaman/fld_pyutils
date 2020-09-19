@@ -289,7 +289,7 @@ class FldDataBase(ABC):
             hex.GetPointIds().SetId(i, x)
         return hex
 
-    def make_lagrange_hex(self, e):
+    def get_lagrange_hex(self, e):
         nx = self.nx1   # Assume nx1 == ny1 == nz1
         gpt = lambda r, s, t: (e * nx**3) + r * nx**2 + s * nx + t  # Get the gridpoint corresponding to an (x, y, z) coordinate
 
@@ -390,83 +390,31 @@ class FldDataBase(ABC):
             hex.GetPointIds().SetId(i, x)
         return hex
 
-    def plot(self):
-        colors = vtk.vtkNamedColors()
+    def get_lagrange_hex_grid(self):
 
-        N = self.nelt
         n_gll = self.nx1 * self.ny1 * self.nz1
 
-        # Setup the points
-
         points = vtk.vtkPoints()
-        points.Allocate(N * n_gll)
+        points.Allocate(self.nelt * n_gll)
 
+        # This is hardcoded to be temperature.  TODO: Function argument for specifying scalar
         scalars = vtk.vtkDoubleArray()
-        scalars.Allocate(N * n_gll)
+        scalars.Allocate(self.nelt * n_gll)
 
-        for e in range(N):
+        for e in range(self.nelt):
             for i in range(n_gll):
                 pt = [self.coords[e,0,i], self.coords[e,1,i], self.coords[e,2,i]]
                 points.InsertNextPoint(pt)
                 scalars.InsertNextTuple1(self.t[e,i])
 
-        # Setup the grid and cells
+        grid = vtk.vtkUnstructuredGrid()
+        grid.Allocate(self.nelt)
 
-        hex_grid = vtk.vtkUnstructuredGrid()
-        hex_grid.Allocate(N)
-
-        for i in range(N):
-            hex = self.make_lagrange_hex(i)
-            hex_grid.InsertNextCell(hex.GetCellType(), hex.GetPointIds())
-            print("\rProcessed {} / {} elements ...".format(i, N), end='')
+        for i in range(self.nelt):
+            hex = self.get_lagrange_hex(i)
+            grid.InsertNextCell(hex.GetCellType(), hex.GetPointIds())
+            print("\rProcessed {} / {} elements ...".format(i+1, self.nelt), end='')
         print(" done!")
-        hex_grid.SetPoints(points)
-        hex_grid.GetPointData().SetScalars(scalars)
-
-        # Clipping:  https://lorensen.github.io/VTKExamples/site/Python/UnstructuredGrid/ClipUnstructuredGridWithPlane2/
-
-        clip_plane = vtk.vtkPlane()
-        clip_plane.SetOrigin(hex_grid.GetCenter())
-        clip_plane.SetNormal([1.0, 0.0, 0.0])
-
-        clipper = vtk.vtkClipDataSet()
-        clipper.SetClipFunction(clip_plane)
-        clipper.SetInputData(hex_grid)
-        clipper.SetValue(0.0)
-        clipper.GenerateClippedOutputOn()
-        clipper.Update()
-
-        mapper = vtk.vtkDataSetMapper()
-        mapper.SetInputData(clipper.GetOutput())
-        mapper.SetScalarRange(hex_grid.GetScalarRange())
-
-        #mapper = vtk.vtkDataSetMapper()
-        #mapper.SetInputData(hex_grid)
-        #mapper.SetScalarRange(hex_grid.GetScalarRange())
-
-        # Plot it!
-
-        actor = vtk.vtkActor()
-        actor.SetMapper(mapper)
-        # actor.GetProperty().SetRepresentationToWireframe()
-        #actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
-        actor.GetProperty().EdgeVisibilityOn()
-        actor.GetProperty().SetLineWidth(0.25)
-        actor.GetProperty().SetAmbient(50)
-
-
-        ren = vtk.vtkRenderer()
-        ren.AddActor(actor)
-        ren.SetBackground(colors.GetColor3d("Beige"))
-
-        ren_win = vtk.vtkRenderWindow()
-        ren_win.AddRenderer(ren)
-        ren_win.SetSize(1600, 800)
-
-        iren = vtk.vtkRenderWindowInteractor()
-        iren.SetRenderWindow(ren_win)
-
-        ren_win.Render()
-
-        iren.Initialize()
-        iren.Start()
+        grid.SetPoints(points)
+        grid.GetPointData().SetScalars(scalars)
+        return grid
