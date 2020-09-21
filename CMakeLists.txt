@@ -12,6 +12,7 @@ vtk_module_config(VTK
         vtkInteractionWidgets
         vtkRenderingOpenGL2
         vtkRenderingLOD
+        vtkRenderingLabel
         vtkIOParallel
         )
 include(${VTK_USE_FILE})
@@ -30,3 +31,7 @@ target_include_directories(plot_hex_grid PUBLIC cxx/include)
 add_executable(lagrange_tet_demo cxx/demos/lagrange_tet_demo.cpp)
 target_link_libraries(lagrange_tet_demo PUBLIC ${VTK_LIBRARIES})
 target_include_directories(lagrange_tet_demo PUBLIC cxx/include)
+
+add_executable(lagrange_hex_demo cxx/demos/lagrange_hex_demo.cpp)
+target_link_libraries(lagrange_hex_demo PUBLIC ${VTK_LIBRARIES})
+target_include_directories(lagrange_hex_demo PUBLIC cxx/include)
