@@ -20,82 +20,83 @@
 #include <vector>
 
 int nx = 4;
+int nelt = 10;
 int dx = 1;
 
-int gpt(int r, int s, int t)
+int gpt(int e, int r, int s, int t)
 {
-  return (r * nx * nx) + (s * nx) + t;
+  return (e * nx * nx * nx) + (r * nx * nx) + (s * nx) + t;
 }
 
-vtkSmartPointer<vtkLagrangeHexahedron> makeHex()
+vtkSmartPointer<vtkLagrangeHexahedron> makeHex(int e)
 {
   // Very recent versions allow vtkNew as return type:
   // https://discourse.vtk.org/t/vtknew-and-vtksmartpointer/469/10 For now, use vtkSmartPointer:
   // https://vtk.org/Wiki/VTK/Tutorials/SmartPointers
 
-  std::vector<int> glid{ gpt(0, 0, 0), gpt(nx - 1, 0, 0), gpt(nx - 1, nx - 1, 0), gpt(0, nx - 1, 0),
-    gpt(0, 0, nx - 1), gpt(nx - 1, 0, nx - 1), gpt(nx - 1, nx - 1, nx - 1),
-    gpt(0, nx - 1, nx - 1) };
+  std::vector<int> glid{ gpt(e, 0, 0, 0), gpt(e, nx - 1, 0, 0), gpt(e, nx - 1, nx - 1, 0),
+    gpt(e, 0, nx - 1, 0), gpt(e, 0, 0, nx - 1), gpt(e, nx - 1, 0, nx - 1),
+    gpt(e, nx - 1, nx - 1, nx - 1), gpt(e, 0, nx - 1, nx - 1) };
 
   // Edge 8, 9
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(i, 0, 0));
+    glid.push_back(gpt(e, i, 0, 0));
   }
   // Edge 10, 11
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(nx - 1, i, 0));
+    glid.push_back(gpt(e, nx - 1, i, 0));
   }
   // Edge 12, 13
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(i, nx - 1, 0));
+    glid.push_back(gpt(e, i, nx - 1, 0));
   }
   // Edge 14, 15
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(0, i, 0));
+    glid.push_back(gpt(e, 0, i, 0));
   }
   // Edge 16, 17
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(i, 0, nx - 1));
+    glid.push_back(gpt(e, i, 0, nx - 1));
   }
   // Edge 18, 19
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(nx - 1, i, nx - 1));
+    glid.push_back(gpt(e, nx - 1, i, nx - 1));
   }
   // Edge 20, 21
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(i, nx - 1, nx - 1));
+    glid.push_back(gpt(e, i, nx - 1, nx - 1));
   }
   // Edge 22, 23
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(0, i, nx - 1));
+    glid.push_back(gpt(e, 0, i, nx - 1));
   }
   // Edge 24, 25
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(0, 0, i));
+    glid.push_back(gpt(e, 0, 0, i));
   }
   // Edge 26, 27
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(nx - 1, 0, i));
+    glid.push_back(gpt(e, nx - 1, 0, i));
   }
   // Edge 30, 31
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(0, nx - 1, i));
+    glid.push_back(gpt(e, 0, nx - 1, i));
   }
   // Edge 28, 29
   for (int i = 1; i < nx - 1; ++i)
   {
-    glid.push_back(gpt(nx - 1, nx - 1, i));
+    glid.push_back(gpt(e, nx - 1, nx - 1, i));
   }
 
   // Face 40
@@ -103,7 +104,7 @@ vtkSmartPointer<vtkLagrangeHexahedron> makeHex()
   {
     for (int s = 1; s < nx - 1; ++s)
     {
-      glid.push_back(gpt(0, s, t));
+      glid.push_back(gpt(e, 0, s, t));
     }
   }
   // Face 44
@@ -111,7 +112,7 @@ vtkSmartPointer<vtkLagrangeHexahedron> makeHex()
   {
     for (int s = 1; s < nx - 1; ++s)
     {
-      glid.push_back(gpt(nx - 1, s, t));
+      glid.push_back(gpt(e, nx - 1, s, t));
     }
   }
   // Face 32
@@ -119,7 +120,7 @@ vtkSmartPointer<vtkLagrangeHexahedron> makeHex()
   {
     for (int r = 1; r < nx - 1; ++r)
     {
-      glid.push_back(gpt(r, 0, t));
+      glid.push_back(gpt(e, r, 0, t));
     }
   }
   // Face 36
@@ -127,7 +128,7 @@ vtkSmartPointer<vtkLagrangeHexahedron> makeHex()
   {
     for (int r = 1; r < nx - 1; ++r)
     {
-      glid.push_back(gpt(r, nx - 1, t));
+      glid.push_back(gpt(e, r, nx - 1, t));
     }
   }
   // Face 48
@@ -135,7 +136,7 @@ vtkSmartPointer<vtkLagrangeHexahedron> makeHex()
   {
     for (int r = 1; r < nx - 1; ++r)
     {
-      glid.push_back(gpt(r, s, 0));
+      glid.push_back(gpt(e, r, s, 0));
     }
   }
   // Face 52
@@ -143,7 +144,7 @@ vtkSmartPointer<vtkLagrangeHexahedron> makeHex()
   {
     for (int r = 1; r < nx - 1; ++r)
     {
-      glid.push_back(gpt(r, s, nx - 1));
+      glid.push_back(gpt(e, r, s, nx - 1));
     }
   }
 
@@ -154,7 +155,7 @@ vtkSmartPointer<vtkLagrangeHexahedron> makeHex()
     {
       for (int r = 1; r < nx - 1; ++r)
       {
-        glid.push_back(gpt(r, s, t));
+        glid.push_back(gpt(e, r, s, t));
       }
     }
   }
@@ -177,22 +178,30 @@ int main()
   vtkNew<vtkPoints> pts;
   pts->Allocate(nx * nx * nx);
 
-  for (int r = 0; r < nx; ++r)
+  for (int e = 0; e < nelt; ++e)
   {
-    for (int s = 0; s < nx; ++s)
+    for (int r = 0; r < nx; ++r)
     {
-      for (int t = 0; t < nx; ++t)
+      for (int s = 0; s < nx; ++s)
       {
-        pts->InsertNextPoint(r * dx, s * dx, t * dx);
+        for (int t = 0; t < nx; ++t)
+        {
+          pts->InsertNextPoint(e * ((nx - 1) * dx + 0.2) + r * dx, s * dx, t * dx);
+        }
       }
     }
   }
 
-  auto hex = makeHex();
-
   vtkNew<vtkUnstructuredGrid> hexGrid;
-  hexGrid->Allocate();
-  hexGrid->InsertNextCell(hex->GetCellType(), hex->GetPointIds());
+  hexGrid->Allocate(nelt);
+
+  // Works!
+  for (int e = 0; e < nelt; ++e)
+  {
+    auto hex = makeHex(e);
+    hexGrid->InsertNextCell(hex->GetCellType(), hex->GetPointIds());
+  }
+
   hexGrid->SetPoints(pts);
 
   //================================================================
