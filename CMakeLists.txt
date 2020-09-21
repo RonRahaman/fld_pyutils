@@ -26,3 +26,7 @@ target_include_directories(main PUBLIC cxx/include)
 add_executable(plot_hex_grid cxx/src/plot_hex_grid.cpp)
 target_link_libraries(plot_hex_grid PUBLIC ${VTK_LIBRARIES})
 target_include_directories(plot_hex_grid PUBLIC cxx/include)
+
+add_executable(lagrange_tet_demo cxx/demos/lagrange_tet_demo.cpp)
+target_link_libraries(lagrange_tet_demo PUBLIC ${VTK_LIBRARIES})
+target_include_directories(lagrange_tet_demo PUBLIC cxx/include)
