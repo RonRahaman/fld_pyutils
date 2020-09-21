@@ -465,7 +465,7 @@ class FldDataBase(ABC):
                         for i, x in enumerate(verts):
                             hex.GetPointIds().SetId(i, x)
                         grid.InsertNextCell(hex.GetCellType(), hex.GetPointIds())
-                        print("\rProcessed {} / {} hexes ...".format(e*nx**3 + r*nx**2 + s*nx + t + 1, self.nelt * nx**3), end='')
+            print("\rProcessed {} / {} elements ...".format(e+1, self.nelt), end='')
         print(" done!")
 
         grid.SetPoints(points)

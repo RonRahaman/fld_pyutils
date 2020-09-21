@@ -2,8 +2,13 @@ from fld_data_memmap import FldDataMemmap
 import vtk
 from fld_data import FldData
 
-#d1 = FldDataMemmap.fromfile('../data/test0.f00001')
-d1 = FldData.fromfile('../data/rod_short0.f00001')
+
+filename = '../data/rod_short0.f00001'
+clip_origin = [0.0, 0.0, 2.5]
+clip_normal = [1.0, 0.0, 0.0]
+
+
+d1 = FldData.fromfile(filename)
 #hex_grid = d1.get_hex_grid()
 hex_grid = d1.get_lagrange_hex_grid()
 
@@ -11,8 +16,10 @@ hex_grid = d1.get_lagrange_hex_grid()
 colors = vtk.vtkNamedColors()
 
 clip_plane = vtk.vtkPlane()
-clip_plane.SetOrigin(hex_grid.GetCenter())
-clip_plane.SetNormal([1.0, 0.0, 0.0])
+#clip_plane.SetOrigin(hex_grid.GetCenter())
+#clip_plane.SetNormal([1.0, 0.0, 0.0])
+clip_plane.SetOrigin(clip_origin)
+clip_plane.SetNormal(clip_normal)
 
 clipper = vtk.vtkClipDataSet()
 clipper.SetClipFunction(clip_plane)
@@ -31,16 +38,22 @@ mapper.SetScalarRange(hex_grid.GetScalarRange())
 
 # Plot it!
 
-actor = vtk.vtkActor()
+actor = vtk.vtkLODActor()
 actor.SetMapper(mapper)
 # actor.GetProperty().SetRepresentationToWireframe()
 # actor.GetProperty().SetColor(colors.GetColor3d("Peacock"))
-actor.GetProperty().EdgeVisibilityOn()
+actor.GetProperty().EdgeVisibilityOff()
 actor.GetProperty().SetLineWidth(0.25)
 actor.GetProperty().SetAmbient(50)
 
+camera = vtk.vtkCamera()
+camera.SetPosition([-20, 0, 20])
+camera.SetFocalPoint([0, 0, 5])
+camera.Zoom(2)
+
 ren = vtk.vtkRenderer()
 ren.AddActor(actor)
+ren.SetActiveCamera(camera)
 ren.SetBackground(colors.GetColor3d("Beige"))
 
 ren_win = vtk.vtkRenderWindow()
