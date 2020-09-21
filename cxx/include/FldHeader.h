@@ -116,7 +116,7 @@ FldHeader<floatTypeT, intTypeT>::FldHeader(const std::string& filename)
   }
 
   // Finally, set beginning of field data
-  FieldsBegin = GlelBegin + Nelgt * sizeof(IntType);
+  FieldsBegin = GlelBegin + static_cast<std::streampos>(Nelgt * sizeof(IntType));
 }
 
 template <typename floatTypeT, typename intTypeT>
