@@ -3,12 +3,12 @@ import vtk
 from fld_data import FldData
 
 
-filename = '../data/rod_short0.f00001'
-clip_origin = [0.0, 0.0, 2.5]
+filename = '/Users/ronald/output/assembly20.f00007'
+clip_origin = [0.0, 0.0, 0.0]
 clip_normal = [1.0, 0.0, 0.0]
 
 
-d1 = FldData.fromfile(filename)
+d1 = FldDataMemmap.fromfile(filename)
 #hex_grid = d1.get_hex_grid()
 hex_grid = d1.get_lagrange_hex_grid()
 
