@@ -114,21 +114,22 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
   // Initialize points and scalars (for temperature)
   // ========================================================================
 
-  auto points = vtkSmartPointer<vtkPoints>::New();
-  points->Allocate(H->Nelt * nx3);
+  vtkNew<vtkPoints> points;
+  points->Allocate(H->Nelt * nx3Ndims);
 
-  auto scalars = vtkSmartPointer<vtkFloatArray>::New();
+  vtkNew<vtkFloatArray> scalars;
+  scalars->Allocate(H->Nelt * nx3);
 
   for (std::size_t e = 0; e < H->Nelt; ++e)
   {
-      for (std::size_t r = 0; r < nx; ++r)
+    for (std::size_t r = 0; r < nx; ++r)
+    {
+      for (std::size_t s = 0; s < nx; ++s)
       {
-        for (std::size_t s = 0; s < nx; ++s)
+        for (std::size_t t = 0; t < nx; ++t)
         {
-          for (std::size_t t = 0; t < nx; ++t)
-          {
-            points->InsertNextPoint(Coords[(e * nx3Ndims) + (0 * nx3) + (r * nx2) + (s * nx) + t],
-              Coords[(e * nx3Ndims) + (1 * nx3) + (r * nx2) + (s * nx) + t],
+          points->InsertNextPoint(Coords[(e * nx3Ndims) + (0 * nx3) + (r * nx2) + (s * nx) + t],
+            Coords[(e * nx3Ndims) + (1 * nx3) + (r * nx2) + (s * nx) + t],
               Coords[(e * nx3Ndims) + (2 * nx3) + (r * nx2) + (s * nx) + t]);
             scalars->InsertNextTuple1(T[(e * nx3) + (r * nx2) + (s * nx) + t]);
           }
@@ -140,6 +141,7 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
   // Initialize unstructured grid of hexes
   // ========================================================================
 
+  // Return type. In very recent versions of VTK, this can be vtkNew
   auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
   grid->Allocate(H->Nelt * nx3);
 
@@ -190,10 +192,11 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetLagrangeHexGrid()
   // Initialize points and scalars (for temperature)
   // ========================================================================
 
-  auto points = vtkSmartPointer<vtkPoints>::New();
-  points->Allocate(H->Nelt * nx3);
+  vtkNew<vtkPoints> points;
+  points->Allocate(H->Nelt * nx3Ndims);
 
-  auto scalars = vtkSmartPointer<vtkFloatArray>::New();
+  vtkNew<vtkFloatArray> scalars;
+  scalars->Allocate(H->Nelt * nx3);
 
   for (vtkIdType e = 0; e < H->Nelt; ++e)
   {
@@ -212,6 +215,7 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetLagrangeHexGrid()
     }
   }
 
+  // Return type. In very recent versions of VTK, this can be vtkNew
   auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
   grid->Allocate(H->Nelt);
 
