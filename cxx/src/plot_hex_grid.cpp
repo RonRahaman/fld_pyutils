@@ -12,6 +12,21 @@
 #include "vtkWindowToImageFilter.h"
 
 #include <cassert>
+#include <ctime>
+
+typedef struct timespec timespec_t;
+
+timespec_t tick()
+{
+  timespec_t res;
+  clock_gettime(CLOCK_MONOTONIC, &res);
+  return res;
+}
+
+long tick_diff(timespec_t start, timespec_t end)
+{
+  return 1000000000L * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
+}
 
 int main(int argc, char* argv[])
 {
@@ -20,9 +35,14 @@ int main(int argc, char* argv[])
   // std::string filename{argv[1]};
   std::string filename{ "/Users/ronald/repos/fld_pyutils/data/rod_short0.f00001" };
 
+  auto totStart = tick();
   fld::FldData<float, int> data(filename);
-  // auto hexGrid = data.GetHexGrid();
-  auto hexGrid = data.GetLagrangeHexGrid();
+
+  auto gridStart = tick();
+  auto hexGrid = data.GetHexGrid();
+  // auto hexGrid = data.GetLagrangeHexGrid();
+  auto gridEnd = tick();
+  std::cout << "Grid setup time: " << tick_diff(gridStart, gridEnd) / 1e9 << " s" << std::endl;
 
   vtkNew<vtkPlane> clipPlane;
   clipPlane->SetOrigin(hexGrid->GetCenter());
@@ -62,7 +82,11 @@ int main(int argc, char* argv[])
   vtkNew<vtkRenderWindowInteractor> iren;
   iren->SetRenderWindow(renWin);
 
+  auto renderStart = tick();
   renWin->Render();
+  auto renderEnd = tick();
+  std::cout << "Rendering time: " << tick_diff(renderStart, renderEnd) / 1e9 << " s" << std::endl;
+  std::cout << "Total time: " << tick_diff(totStart, renderEnd) / 1e9 << " s" << std::endl;
 
   vtkNew<vtkPNGWriter> writer;
   vtkNew<vtkWindowToImageFilter> winToImg;
