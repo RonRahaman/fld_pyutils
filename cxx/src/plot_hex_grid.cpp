@@ -65,15 +65,16 @@ int main(int argc, char* argv[])
   actor->GetProperty()->SetLineWidth(0.25);
   actor->GetProperty()->SetAmbient(50);
 
-  vtkNew<vtkCamera> camera;
-  camera->SetPosition(-5, 0, 20);
-  camera->SetFocalPoint(5, 0, 0);
-  camera->Zoom(4);
-
   vtkNew<vtkRenderer> ren;
   ren->AddActor(actor);
   ren->SetBackground(245, 245, 220); // beige
-  ren->SetActiveCamera(camera);
+
+  // For nicer image
+  // vtkNew<vtkCamera> camera;
+  // camera->SetPosition(-5, 0, 20);
+  // camera->SetFocalPoint(5, 0, 0);
+  // camera->Zoom(4);
+  // ren->SetActiveCamera(camera);
 
   vtkNew<vtkRenderWindow> renWin;
   renWin->AddRenderer(ren);
