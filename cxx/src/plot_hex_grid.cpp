@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
   fld::FldData<float, int> data(filename);
 
   auto gridStart = tick();
-  auto hexGrid = data.GetHexGrid();
-  // auto hexGrid = data.GetLagrangeHexGrid();
+  // auto hexGrid = data.GetHexGrid();
+  auto hexGrid = data.GetLagrangeHexGrid();
   auto gridEnd = tick();
   std::cout << "Grid setup time: " << tick_diff(gridStart, gridEnd) / 1e9 << " s" << std::endl;
 

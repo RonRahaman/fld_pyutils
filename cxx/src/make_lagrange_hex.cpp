@@ -1,4 +1,5 @@
 #include "make_lagrange_hex.h"
+#include "vtkIdList.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 
@@ -153,4 +154,153 @@ vtkSmartPointer<vtkLagrangeHexahedron> fld::MakeLagrangeHex(std::size_t e, std::
   }
 
   return hex;
+}
+
+void fld::MakeLagrandIDs(vtkIdType* pts, vtkIdType e, vtkIdType nx)
+{
+  {
+
+    // Very recent versions allow vtkNew as return type:
+    // https://discourse.vtk.org/t/vtknew-and-vtksmartpointer/469/10 For now, use vtkSmartPointer:
+    // https://vtk.org/Wiki/VTK/Tutorials/SmartPointers
+
+    const vtkIdType nx2 = nx * nx;
+    const vtkIdType nx3 = nx * nx * nx;
+
+    auto gpt = [nx3, nx2, nx](vtkIdType e, vtkIdType r, vtkIdType s, vtkIdType t) {
+      return e * nx3 + r * nx2 + s * nx + t;
+    };
+
+    int i = 0;
+    pts[i++] = gpt(e, 0, 0, 0);
+    pts[i++] = gpt(e, nx - 1, 0, 0);
+    pts[i++] = gpt(e, nx - 1, nx - 1, 0);
+    pts[i++] = gpt(e, 0, nx - 1, 0);
+    pts[i++] = gpt(e, 0, 0, nx - 1);
+    pts[i++] = gpt(e, nx - 1, 0, nx - 1);
+    pts[i++] = gpt(e, nx - 1, nx - 1, nx - 1);
+    pts[i++] = gpt(e, 0, nx - 1, nx - 1);
+
+    // Edge 8, 9
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, j, 0, 0);
+    }
+    // Edge 10, 11
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, nx - 1, j, 0);
+    }
+    // Edge 12, 13
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, j, nx - 1, 0);
+    }
+    // Edge 14, 15
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, 0, j, 0);
+    }
+    // Edge 16, 17
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, j, 0, nx - 1);
+    }
+    // Edge 18, 19
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, nx - 1, j, nx - 1);
+    }
+    // Edge 20, 21
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, j, nx - 1, nx - 1);
+    }
+    // Edge 22, 23
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, 0, j, nx - 1);
+    }
+    // Edge 24, 25
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, 0, 0, j);
+    }
+    // Edge 26, 27
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, nx - 1, 0, j);
+    }
+    // Edge 30, 31
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, 0, nx - 1, j);
+    }
+    // Edge 28, 29
+    for (int j = 1; j < nx - 1; ++j)
+    {
+      pts[i++] = gpt(e, nx - 1, nx - 1, j);
+    }
+
+    // Face 40
+    for (int t = 1; t < nx - 1; ++t)
+    {
+      for (int s = 1; s < nx - 1; ++s)
+      {
+        pts[i++] = gpt(e, 0, s, t);
+      }
+    }
+    // Face 44
+    for (int t = 1; t < nx - 1; ++t)
+    {
+      for (int s = 1; s < nx - 1; ++s)
+      {
+        pts[i++] = gpt(e, nx - 1, s, t);
+      }
+    }
+    // Face 32
+    for (int t = 1; t < nx - 1; ++t)
+    {
+      for (int r = 1; r < nx - 1; ++r)
+      {
+        pts[i++] = gpt(e, r, 0, t);
+      }
+    }
+    // Face 36
+    for (int t = 1; t < nx - 1; ++t)
+    {
+      for (int r = 1; r < nx - 1; ++r)
+      {
+        pts[i++] = gpt(e, r, nx - 1, t);
+      }
+    }
+    // Face 48
+    for (int s = 1; s < nx - 1; ++s)
+    {
+      for (int r = 1; r < nx - 1; ++r)
+      {
+        pts[i++] = gpt(e, r, s, 0);
+      }
+    }
+    // Face 52
+    for (int s = 1; s < nx - 1; ++s)
+    {
+      for (int r = 1; r < nx - 1; ++r)
+      {
+        pts[i++] = gpt(e, r, s, nx - 1);
+      }
+    }
+
+    // Interior
+    for (int t = 1; t < nx - 1; ++t)
+    {
+      for (int s = 1; s < nx - 1; ++s)
+      {
+        for (int r = 1; r < nx - 1; ++r)
+        {
+          pts[i++] = gpt(e, r, s, t);
+        }
+      }
+    }
+  }
 }
