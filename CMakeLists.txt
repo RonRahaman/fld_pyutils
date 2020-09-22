@@ -39,3 +39,7 @@ target_include_directories(lagrange_hex_demo PUBLIC cxx/include)
 add_executable(lagrange_hex_many_demo cxx/demos/lagrange_hex_many_demo.cpp)
 target_link_libraries(lagrange_hex_many_demo PUBLIC ${VTK_LIBRARIES})
 target_include_directories(lagrange_hex_many_demo PUBLIC cxx/include)
+
+add_executable(ugrid cxx/demos/ugrid.cpp)
+target_link_libraries(ugrid PUBLIC ${VTK_LIBRARIES})
+target_include_directories(ugrid PUBLIC cxx/include)
