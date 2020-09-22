@@ -23,7 +23,6 @@ public:
   explicit FldData(const std::string& filename);
   const std::unique_ptr<FldHeader<FloatT, IntT>> H;
   vtkSmartPointer<vtkUnstructuredGrid> GetHexGrid();
-  inline std::size_t gpt(std::size_t e, std::size_t r, std::size_t s, std::size_t t) const;
 
   std::vector<FloatT> Coords;
   std::vector<FloatT> U;
@@ -101,23 +100,19 @@ FldData<FloatT, IntT>::FldData(const std::string& filename)
 }
 
 template <typename FloatT, typename IntT>
-std::size_t FldData<FloatT, IntT>::gpt(
-  std::size_t e, std::size_t r, std::size_t s, std::size_t t) const
-{
-  return (e * H->Nx1 * H->Nx1 * H->Nx1) + (r * H->Nx1 * H->Nx1) + (s * H->Nx1) + t;
-}
-
-template <typename FloatT, typename IntT>
 vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
 {
-  auto nx = H->Nx1; // Assume Nx1 == Ny1 == Nz1
+  const auto nx = H->Nx1; // Assume Nx1 == Ny1 == Nz1
+  const auto nx2 = nx * nx;
+  const auto nx3 = nx * nx * nx;
+  const auto nx3Ndims = nx * nx * nx * H->Ndims;
 
   // ========================================================================
   // Initialize points and scalars (for temperature)
   // ========================================================================
 
   auto points = vtkSmartPointer<vtkPoints>::New();
-  points->Allocate(H->Nelt * nx * nx * nx);
+  points->Allocate(H->Nelt * nx3);
 
   auto scalars = vtkSmartPointer<vtkFloatArray>::New();
 
@@ -129,36 +124,34 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
         {
           for (std::size_t t = 0; t < nx; ++t)
           {
-            points->InsertNextPoint(
-              Coords[(e * nx * nx * nx * H->Ndims) + (0 * nx * nx * nx) + (r * nx * nx) + (s * nx) + t],
-              Coords[(e * nx * nx * nx * H->Ndims) + (1 * nx * nx * nx) + (r * nx * nx) + (s * nx) + t],
-              Coords[(e * nx * nx * nx * H->Ndims) + (2 * nx * nx * nx) + (r * nx * nx) + (s * nx) + t]);
-            scalars->InsertNextTuple1(
-              T[(e * nx * nx * nx) + (r * nx * nx) + (s * nx) + t]);
+            points->InsertNextPoint(Coords[(e * nx3Ndims) + (0 * nx3) + (r * nx2) + (s * nx) + t],
+              Coords[(e * nx3Ndims) + (1 * nx3) + (r * nx2) + (s * nx) + t],
+              Coords[(e * nx3Ndims) + (2 * nx3) + (r * nx2) + (s * nx) + t]);
+            scalars->InsertNextTuple1(T[(e * nx3) + (r * nx2) + (s * nx) + t]);
           }
         }
-     }
+      }
   }
-
 
   // ========================================================================
   // Initialize unstructured grid of hexes
   // ========================================================================
 
   auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-  grid->Allocate(H->Nelt * nx * nx * nx);
-  //grid->Allocate(1 * nx * nx * nx);
+  grid->Allocate(H->Nelt * nx3);
+
+  auto gpt = [nx3, nx2, nx](std::size_t e, std::size_t r, std::size_t s, std::size_t t) {
+    return e * nx3 + r * nx2 + s * nx + t;
+  };
 
   for (std::size_t e = 0; e < H->Nelt; ++e)
-  //for (std::size_t e = 0; e < 1; ++e)
   {
-    for (std::size_t r = 0; r < nx-1; ++r)
+    for (std::size_t r = 0; r < nx - 1; ++r)
     {
-      for (std::size_t s = 0; s < nx-1; ++s)
+      for (std::size_t s = 0; s < nx - 1; ++s)
       {
-        for (std::size_t t = 0; t < nx-1; ++t)
+        for (std::size_t t = 0; t < nx - 1; ++t)
         {
-          //auto hex = vtkSmartPointer<vtkHexahedron>::New();
           vtkNew<vtkHexahedron> hex;
           hex->GetPointIds()->SetNumberOfIds(8);
           hex->Initialize();
