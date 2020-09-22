@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
 
   fld::FldData<float, int> data(filename);
   auto hexGrid = data.GetHexGrid();
+  // auto hexGrid = data.GetLagrangeHexGrid();
 
   auto clipPlane = vtkSmartPointer<vtkPlane>::New();
   clipPlane->SetOrigin(hexGrid->GetCenter());
@@ -42,7 +43,7 @@ int main(int argc, char* argv[]) {
 
   auto ren = vtkSmartPointer<vtkRenderer>::New();
   ren->AddActor(actor);
-  ren->SetBackground(245, 245, 220);  // beige
+  ren->SetBackground(245, 245, 220); // beige
 
   auto renWin = vtkSmartPointer<vtkRenderWindow>::New();
   renWin->AddRenderer(ren);
@@ -52,6 +53,6 @@ int main(int argc, char* argv[]) {
   iren->SetRenderWindow(renWin);
 
   renWin->Render();
-  iren->Initialize();
-  iren->Start();
+  // iren->Initialize();
+  // iren->Start();
 }

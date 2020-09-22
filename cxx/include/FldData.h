@@ -2,6 +2,8 @@
 #define FLD_PYUTILS_CXX_SRC_FLDDATA_H
 
 #include "FldHeader.h"
+#include "make_lagrange_hex.h"
+
 #include "vtkFloatArray.h"
 #include "vtkHexahedron.h"
 #include "vtkPointData.h"
@@ -23,6 +25,7 @@ public:
   explicit FldData(const std::string& filename);
   const std::unique_ptr<FldHeader<FloatT, IntT>> H;
   vtkSmartPointer<vtkUnstructuredGrid> GetHexGrid();
+  vtkSmartPointer<vtkUnstructuredGrid> GetLagrangeHexGrid();
 
   std::vector<FloatT> Coords;
   std::vector<FloatT> U;
@@ -173,7 +176,57 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
         }
       }
     }
-    std::cout << "Finished " << e+1 << " / " << H->Nelt << " elements." << std::endl;
+    // std::cout << "Finished " << e+1 << " / " << H->Nelt << " elements." << std::endl;
+  }
+
+  grid->SetPoints(points);
+  grid->GetPointData()->SetScalars(scalars);
+
+  return grid;
+}
+
+template <typename FloatT, typename IntT>
+vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetLagrangeHexGrid()
+{
+  const auto nx = H->Nx1; // Assume Nx1 == Ny1 == Nz1
+  const auto nx2 = nx * nx;
+  const auto nx3 = nx * nx * nx;
+  const auto nx3Ndims = nx * nx * nx * H->Ndims;
+
+  // ========================================================================
+  // Initialize points and scalars (for temperature)
+  // ========================================================================
+
+  auto points = vtkSmartPointer<vtkPoints>::New();
+  points->Allocate(H->Nelt * nx3);
+
+  auto scalars = vtkSmartPointer<vtkFloatArray>::New();
+
+  for (std::size_t e = 0; e < H->Nelt; ++e)
+  {
+    for (std::size_t r = 0; r < nx; ++r)
+    {
+      for (std::size_t s = 0; s < nx; ++s)
+      {
+        for (std::size_t t = 0; t < nx; ++t)
+        {
+          points->InsertNextPoint(Coords[(e * nx3Ndims) + (0 * nx3) + (r * nx2) + (s * nx) + t],
+            Coords[(e * nx3Ndims) + (1 * nx3) + (r * nx2) + (s * nx) + t],
+            Coords[(e * nx3Ndims) + (2 * nx3) + (r * nx2) + (s * nx) + t]);
+          scalars->InsertNextTuple1(T[(e * nx3) + (r * nx2) + (s * nx) + t]);
+        }
+      }
+    }
+  }
+
+  auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+  grid->Allocate(H->Nelt);
+
+  for (std::size_t e = 0; e < H->Nelt; ++e)
+  {
+    auto hex = MakeLagrangeHex(e, nx);
+    grid->InsertNextCell(hex->GetCellType(), hex->GetPointIds());
+    // std::cout << "Finished " << e+1 << " / " << H->Nelt << " elements." << std::endl;
   }
 
   grid->SetPoints(points);
