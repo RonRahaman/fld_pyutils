@@ -105,10 +105,10 @@ FldData<FloatT, IntT>::FldData(const std::string& filename)
 template <typename FloatT, typename IntT>
 vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
 {
-  const auto nx = H->Nx1; // Assume Nx1 == Ny1 == Nz1
-  const auto nx2 = nx * nx;
-  const auto nx3 = nx * nx * nx;
-  const auto nx3Ndims = nx * nx * nx * H->Ndims;
+  const vtkIdType nx = H->Nx1; // Assume Nx1 == Ny1 == Nz1
+  const vtkIdType nx2 = nx * nx;
+  const vtkIdType nx3 = nx * nx * nx;
+  const vtkIdType nx3Ndims = nx * nx * nx * H->Ndims;
 
   // ========================================================================
   // Initialize points and scalars (for temperature)
@@ -143,22 +143,19 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
   auto grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
   grid->Allocate(H->Nelt * nx3);
 
-  auto gpt = [nx3, nx2, nx](std::size_t e, std::size_t r, std::size_t s, std::size_t t) {
+  auto gpt = [nx3, nx2, nx](vtkIdType e, vtkIdType r, vtkIdType s, vtkIdType t) {
     return e * nx3 + r * nx2 + s * nx + t;
   };
 
-  for (std::size_t e = 0; e < H->Nelt; ++e)
+  for (vtkIdType e = 0; e < H->Nelt; ++e)
   {
-    for (std::size_t r = 0; r < nx - 1; ++r)
+    for (vtkIdType r = 0; r < nx - 1; ++r)
     {
-      for (std::size_t s = 0; s < nx - 1; ++s)
+      for (vtkIdType s = 0; s < nx - 1; ++s)
       {
-        for (std::size_t t = 0; t < nx - 1; ++t)
+        for (vtkIdType t = 0; t < nx - 1; ++t)
         {
-          vtkNew<vtkHexahedron> hex;
-          hex->GetPointIds()->SetNumberOfIds(8);
-          hex->Initialize();
-          std::size_t verts[8] = {
+          vtkIdType verts[8] = {
             gpt(e, r, s, t),             // 0
             gpt(e, r + 1, s, t),         // 1
             gpt(e, r + 1, s + 1, t),     // 2
@@ -168,11 +165,7 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
             gpt(e, r + 1, s + 1, t + 1), // 6
             gpt(e, r, s + 1, t + 1)      // 7
           };
-          for (int i = 0; i < 8; ++i)
-          {
-            hex->GetPointIds()->SetId(i, verts[i]);
-          }
-          grid->InsertNextCell(hex->GetCellType(), hex->GetPointIds());
+          grid->InsertNextCell(VTK_HEXAHEDRON, 8, verts);
         }
       }
     }
