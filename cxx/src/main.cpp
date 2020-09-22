@@ -20,6 +20,8 @@ int main()
 
   // Data test
   fld::FldData<float, int> bar(filename);
+  std::cout << "Coords min/max: " << *std::min_element(bar.Coords.cbegin(), bar.Coords.cend())
+            << ", " << *std::max_element(bar.Coords.cbegin(), bar.Coords.cend()) << std::endl;
   std::cout << "Velocity min/max: " << *std::min_element(bar.U.cbegin(), bar.U.cend()) << ", "
             << *std::max_element(bar.U.cbegin(), bar.U.cend()) << std::endl;
   std::cout << "Pressure min/max: " << *std::min_element(bar.P.cbegin(), bar.P.cend()) << ", "

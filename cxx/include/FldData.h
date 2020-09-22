@@ -16,30 +16,27 @@
 namespace fld
 {
 
-template <typename floatTypeT, typename intTypeT>
+template <typename FloatT, typename IntT>
 class FldData
 {
 public:
-  using floatType = floatTypeT;
-  using intType = intTypeT;
-
   explicit FldData(const std::string& filename);
-  const std::unique_ptr<FldHeader<floatType, intType>> H;
+  const std::unique_ptr<FldHeader<FloatT, IntT>> H;
   vtkSmartPointer<vtkUnstructuredGrid> GetHexGrid();
   inline std::size_t gpt(std::size_t e, std::size_t r, std::size_t s, std::size_t t) const;
 
-  std::vector<intType> Coords;
-  std::vector<floatType> U;
-  std::vector<floatType> P;
-  std::vector<floatType> T;
-  std::vector<floatType> S;
+  std::vector<FloatT> Coords;
+  std::vector<FloatT> U;
+  std::vector<FloatT> P;
+  std::vector<FloatT> T;
+  std::vector<FloatT> S;
 
   int Nscalars;
 };
 
-template <typename floatTypeT, typename intTypeT>
-FldData<floatTypeT, intTypeT>::FldData(const std::string& filename)
-  : H(std::make_unique<FldHeader<floatTypeT, intTypeT>>(filename))
+template <typename FloatT, typename IntT>
+FldData<FloatT, IntT>::FldData(const std::string& filename)
+  : H(std::make_unique<FldHeader<FloatT, IntT>>(filename))
 {
   auto tokens = H->RdcodeTokens();
   try
@@ -54,7 +51,7 @@ FldData<floatTypeT, intTypeT>::FldData(const std::string& filename)
         std::cout << "Located coordinates X" << std::endl;
         auto sz = H->Nelt * H->Ndims * H->Nx1 * H->Ny1 * H->Nz1;
         Coords.resize(sz);
-        infile.read(reinterpret_cast<char*>(Coords.data()), sz * sizeof(intType));
+        infile.read(reinterpret_cast<char*>(Coords.data()), sz * sizeof(FloatT));
       }
 
       // Velocity field
@@ -63,7 +60,7 @@ FldData<floatTypeT, intTypeT>::FldData(const std::string& filename)
         std::cout << "Located velocity field U" << std::endl;
         auto sz = H->Nelt * H->Ndims * H->Nx1 * H->Ny1 * H->Nz1;
         U.resize(sz);
-        infile.read(reinterpret_cast<char*>(U.data()), sz * sizeof(floatType));
+        infile.read(reinterpret_cast<char*>(U.data()), sz * sizeof(FloatT));
       }
 
       // Pressure Field
@@ -72,7 +69,7 @@ FldData<floatTypeT, intTypeT>::FldData(const std::string& filename)
         std::cout << "Located pressure field P" << std::endl;
         auto sz = H->Nelt * H->Nx1 * H->Ny1 * H->Nz1;
         P.resize(sz);
-        infile.read(reinterpret_cast<char*>(P.data()), sz * sizeof(floatType));
+        infile.read(reinterpret_cast<char*>(P.data()), sz * sizeof(FloatT));
       }
 
       // Temperature field
@@ -81,7 +78,7 @@ FldData<floatTypeT, intTypeT>::FldData(const std::string& filename)
         std::cout << "Located temperature field T" << std::endl;
         auto sz = H->Nelt * H->Nx1 * H->Ny1 * H->Nz1;
         T.resize(sz);
-        infile.read(reinterpret_cast<char*>(T.data()), sz * sizeof(floatType));
+        infile.read(reinterpret_cast<char*>(T.data()), sz * sizeof(FloatT));
       }
 
       // Passive scalars
@@ -91,7 +88,7 @@ FldData<floatTypeT, intTypeT>::FldData(const std::string& filename)
         std::cout << "Located " << Nscalars << " scalar fields S" << std::endl;
         auto sz = Nscalars * H->Nelt * H->Nx1 * H->Ny1 * H->Nz1;
         S.resize(sz);
-        infile.read(reinterpret_cast<char*>(S.data()), sz * sizeof(floatType));
+        infile.read(reinterpret_cast<char*>(S.data()), sz * sizeof(FloatT));
       }
     }
   }
@@ -103,15 +100,15 @@ FldData<floatTypeT, intTypeT>::FldData(const std::string& filename)
   }
 }
 
-template <typename floatTypeT, typename intTypeT>
-std::size_t FldData<floatTypeT, intTypeT>::gpt(
+template <typename FloatT, typename IntT>
+std::size_t FldData<FloatT, IntT>::gpt(
   std::size_t e, std::size_t r, std::size_t s, std::size_t t) const
 {
   return (e * H->Nx1 * H->Nx1 * H->Nx1) + (r * H->Nx1 * H->Nx1) + (s * H->Nx1) + t;
 }
 
-template <typename floatTypeT, typename intTypeT>
-vtkSmartPointer<vtkUnstructuredGrid> FldData<floatTypeT, intTypeT>::GetHexGrid()
+template <typename FloatT, typename IntT>
+vtkSmartPointer<vtkUnstructuredGrid> FldData<FloatT, IntT>::GetHexGrid()
 {
   auto nx = H->Nx1; // Assume Nx1 == Ny1 == Nz1
 
@@ -164,6 +161,7 @@ vtkSmartPointer<vtkUnstructuredGrid> FldData<floatTypeT, intTypeT>::GetHexGrid()
           //auto hex = vtkSmartPointer<vtkHexahedron>::New();
           vtkNew<vtkHexahedron> hex;
           hex->GetPointIds()->SetNumberOfIds(8);
+          hex->Initialize();
           std::size_t verts[8] = {
             gpt(e, r, s, t),             // 0
             gpt(e, r + 1, s, t),         // 1

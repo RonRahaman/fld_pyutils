@@ -10,13 +10,10 @@
 namespace fld
 {
 
-template <typename floatTypeT, typename intTypeT>
+template <typename FloatT, typename IntT>
 class FldHeader
 {
 public:
-  using FloatType = floatTypeT;
-  using IntType = intTypeT;
-
   explicit FldHeader(const std::string& filename);
 
   std::vector<std::string> RdcodeTokens() const;
@@ -42,11 +39,11 @@ public:
 
   const float EndianExpectVal = 6.54321f; // Expected value for endianness test
 
-  std::vector<IntType> Glel;
+  std::vector<IntT> Glel;
 };
 
-template <typename floatTypeT, typename intTypeT>
-FldHeader<floatTypeT, intTypeT>::FldHeader(const std::string& filename)
+template <typename FloatT, typename IntT>
+FldHeader<FloatT, IntT>::FldHeader(const std::string& filename)
   : Filename(filename)
 {
 
@@ -74,11 +71,11 @@ FldHeader<floatTypeT, intTypeT>::FldHeader(const std::string& filename)
 
   // See if fld file has double or single precision data.  Usually float
   // TODO: Handle different-sized floats.  Probably factory
-  if (floatSizeTest != sizeof(FloatType))
+  if (floatSizeTest != sizeof(FloatT))
   {
     throw std::runtime_error("Error: .fld file " + Filename + " has " +
       std::to_string(floatSizeTest) + "-byte floats, but the FldReader was instantiated to read " +
-      std::to_string(sizeof(FloatType)) + "byte floats");
+      std::to_string(sizeof(FloatT)) + "byte floats");
   }
 
   // See if there's a pressure mesh
@@ -106,7 +103,7 @@ FldHeader<floatTypeT, intTypeT>::FldHeader(const std::string& filename)
     // Read Glel
     Glel.resize(Nelgt);
     infile.seekg(GlelBegin, std::ifstream::beg);
-    infile.read(reinterpret_cast<char*>(Glel.data()), Nelgt * sizeof(IntType));
+    infile.read(reinterpret_cast<char*>(Glel.data()), Nelgt * sizeof(IntT));
   }
   catch (std::ifstream::failure& e)
   {
@@ -116,11 +113,11 @@ FldHeader<floatTypeT, intTypeT>::FldHeader(const std::string& filename)
   }
 
   // Finally, set beginning of field data
-  FieldsBegin = GlelBegin + static_cast<std::streampos>(Nelgt * sizeof(IntType));
+  FieldsBegin = GlelBegin + static_cast<std::streampos>(Nelgt * sizeof(IntT));
 }
 
-template <typename floatTypeT, typename intTypeT>
-std::vector<std::string> FldHeader<floatTypeT, intTypeT>::RdcodeTokens() const
+template <typename FloatT, typename IntT>
+std::vector<std::string> FldHeader<FloatT, IntT>::RdcodeTokens() const
 {
   std::vector<std::string> tokens;
   std::regex pattern("\\D\\d*");
