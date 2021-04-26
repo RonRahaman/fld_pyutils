@@ -230,14 +230,14 @@ class FldData(FldDataBase):
     @FldDataBase.p.setter
     def p(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt, self.nx1 * self.ny1 * self.nz1,):
-            raise ValueError("Incorrect shape for p: p.shape must equal (nelt * nx1 * ny1 * nz1,)")
+            raise ValueError("Incorrect shape for p: p.shape must equal (nelt, nx1 * ny1 * nz1)")
         self._p = other.astype(self.float_type)
         self._set_rdcode()
 
     @FldDataBase.t.setter
     def t(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt, self.nx1 * self.ny1 * self.nz1,):
-            raise ValueError("Incorrect shape for t: t.shape must equal ``(nelt * nx1 * ny1 * nz1,)``")
+            raise ValueError("Incorrect shape for t: t.shape must equal ``(nelt, nx1 * ny1 * nz1)``")
         self._t = other.astype(self.float_type)
         self._set_rdcode()
 
