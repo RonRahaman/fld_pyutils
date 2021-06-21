@@ -119,7 +119,7 @@ class FldHeader:
             # Set if_press_mesh               # default = F
             if header_list[13].casefold() == 'f':
                 if_press_mesh = False
-            elif header_list[13].casefold() == '_t':
+            elif header_list[13].casefold() == 't':
                 raise ValueError("{} specifies if_press_mesh='{}', but PnPn-2 is not supported for {}".format(
                     filename, header_list[13], cls.__name__))
             else:
