@@ -30,17 +30,18 @@ nxyz=nx1*ny1*nz1
 coords=np.empty((nelt,ndims,nxyz))
 for i in range(nelt):
   for j in range(nxyz):
-    k=i*nxyz+j
-    l=vid[k]
-    coords[i][0][j]=x[l]
-    coords[i][1][j]=y[l]
-    coords[i][2][j]=z[l]
+    k = i * nxyz + j
+    l = vid[k]
+    coords[i][0][j] = x[l]
+    coords[i][1][j] = y[l]
+    coords[i][2][j] = z[l]
     po.append(power[k])
     to.append(flux[k])
 
-p=np.array(po)
-t=np.array(to)
+p = np.array(po).reshape((nelt, nxyz))
+t = np.array(to).reshape((nelt, nxyz))
 
-data = FldData.fromvalues(nx1=nx1, ny1=ny1, nz1=nz1, nelgt=nelt, nelt=nelt, glel=glel, coords=coords, p=p,t=t)
+data = FldData.fromvalues(nx1=nx1, ny1=ny1, nz1=nz1, nelgt=nelt, nelt=nelt, glel=glel,
+                          coords=coords, p=p, t=t)
 
 data.tofile('proteus0.f00001')
