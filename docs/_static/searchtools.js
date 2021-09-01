@@ -162,24 +162,24 @@ var Search = {
     var tmp = splitQuery(query);
     var objectterms = [];
     for (i = 0; i < tmp.length; i++) {
-      if (tmp[i] !== "") {
-          objectterms.push(tmp[i].toLowerCase());
-      }
+        if (tmp[i] !== "") {
+            objectterms.push(tmp[i].toLowerCase());
+        }
 
         if ($u.indexOf(stopwords, tmp[i].toLowerCase()) != -1 || tmp[i] === "") {
             // skip this "word"
             continue;
         }
-      // stem the word
-      var word = stemmer.stemWord(tmp[i].toLowerCase());
-      // prevent stemmer from cutting word smaller than two chars
-      if(word.length < 3 && tmp[i].length >= 3) {
-        word = tmp[i];
-      }
-      var toAppend;
-      // select the correct list
-      if (word[0] == '-') {
-        toAppend = excluded;
+        // stem the word
+        var word = stemmer.stemWord(tmp[i].toLowerCase());
+        // prevent stemmer from cutting word smaller than two chars
+        if (word.length < 3 && tmp[i].length >= 3) {
+            word = tmp[i];
+        }
+        var toAppend;
+        // select the correct list
+        if (word[0] == '-') {
+            toAppend = excluded;
         word = word.substr(1);
       }
       else {
@@ -289,14 +289,15 @@ var Search = {
                       setTimeout(function () {
                           displayNextItem();
                       }, 5);
-                  }});
+                  }
+              });
         } else {
-          // no source available, just display title
+              // no source available, just display title
               Search.output.append(listItem);
               setTimeout(function () {
                   displayNextItem();
               }, 5);
-        }
+          }
       }
       // search finished, update title and status message
       else {
@@ -340,16 +341,16 @@ var Search = {
               } else if (parts[parts.length - 1].indexOf(object) > -1) {
                   score += Scorer.objPartialMatch;
               }
-          var match = objects[prefix][name];
-          var objname = objnames[match[1]][2];
-          var title = titles[match[0]];
-          // If more than one term searched for, we require other words to be
-          // found in the name/title/description
-          if (otherterms.length > 0) {
-            var haystack = (prefix + ' ' + name + ' ' +
-                            objname + ' ' + title).toLowerCase();
-            var allfound = true;
-            for (i = 0; i < otherterms.length; i++) {
+              var match = objects[prefix][name];
+              var objname = objnames[match[1]][2];
+              var title = titles[match[0]];
+              // If more than one term searched for, we require other words to be
+              // found in the name/title/description
+              if (otherterms.length > 0) {
+                  var haystack = (prefix + ' ' + name + ' ' +
+                      objname + ' ' + title).toLowerCase();
+                  var allfound = true;
+                  for (i = 0; i < otherterms.length; i++) {
               if (haystack.indexOf(otherterms[i]) == -1) {
                 allfound = false;
                 break;
@@ -362,16 +363,16 @@ var Search = {
           var descr = objname + _(', in ') + title;
 
           var anchor = match[3];
-          if (anchor === '')
-            anchor = fullname;
-          else if (anchor == '-')
-            anchor = objnames[match[1]][1] + '-' + fullname;
-          // add custom score for some objects according to scorer
-          if (Scorer.objPrio.hasOwnProperty(match[2])) {
-            score += Scorer.objPrio[match[2]];
-          } else {
-              score += Scorer.objPrioDefault;
-          }
+              if (anchor === '')
+                  anchor = fullname;
+              else if (anchor == '-')
+                  anchor = objnames[match[1]][1] + '-' + fullname;
+              // add custom score for some objects according to scorer
+              if (Scorer.objPrio.hasOwnProperty(match[2])) {
+                  score += Scorer.objPrio[match[2]];
+              } else {
+                  score += Scorer.objPrioDefault;
+              }
               results.push([docnames[match[0]], fullname, '#' + anchor, descr, score, filenames[match[0]]]);
           }
       }
@@ -396,14 +397,14 @@ var Search = {
         var titles = this._index.titles;
 
         var i, j, file;
-    var fileMap = {};
-    var scoreMap = {};
-    var results = [];
+        var fileMap = {};
+        var scoreMap = {};
+        var results = [];
 
-    // perform the search on the required terms
-    for (i = 0; i < searchterms.length; i++) {
-      var word = searchterms[i];
-      var files = [];
+        // perform the search on the required terms
+        for (i = 0; i < searchterms.length; i++) {
+            var word = searchterms[i];
+            var files = [];
       var _o = [
         {files: terms[word], score: Scorer.term},
         {files: titleterms[word], score: Scorer.title}
@@ -448,7 +449,7 @@ var Search = {
 
       // create the mapping
       for (j = 0; j < files.length; j++) {
-        file = files[j];
+          file = files[j];
           if (file in fileMap && fileMap[file].indexOf(word) === -1)
               fileMap[file].push(word);
           else
@@ -498,23 +499,23 @@ var Search = {
    * latter for highlighting it.
    */
   makeSearchSummary : function(htmlText, keywords, hlwords) {
-    var text = Search.htmlToText(htmlText);
-    var textLower = text.toLowerCase();
-    var start = 0;
-    $.each(keywords, function() {
-      var i = textLower.indexOf(this.toLowerCase());
-      if (i > -1)
-        start = i;
-    });
-    start = Math.max(start - 120, 0);
+      var text = Search.htmlToText(htmlText);
+      var textLower = text.toLowerCase();
+      var start = 0;
+      $.each(keywords, function () {
+          var i = textLower.indexOf(this.toLowerCase());
+          if (i > -1)
+              start = i;
+      });
+      start = Math.max(start - 120, 0);
       var excerpt = ((start > 0) ? '...' : '') +
           $.trim(text.substr(start, 240)) +
           ((start + 240 - text.length) ? '...' : '');
       var rv = $('<p class="context"></p>').text(excerpt);
-    $.each(hlwords, function() {
-      rv = rv.highlightText(this, 'highlighted');
-    });
-    return rv;
+      $.each(hlwords, function () {
+          rv = rv.highlightText(this, 'highlighted');
+      });
+      return rv;
   }
 };
 

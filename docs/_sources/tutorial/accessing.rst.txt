@@ -82,6 +82,8 @@ fields and changing the number of passive scalars, see below).  :py:class:`fld_d
 
 To delete a field, assign it to an empty array:
 
+.. code-block:: pycon
+
     >>> f.u = np.array([])
 
 You may freely change the number of passive scalars, so long as each scalar

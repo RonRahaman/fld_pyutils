@@ -1045,10 +1045,10 @@ domReady(function enableCssMediaQueries() {
                         test();
                     } else {
                         cssHelper.broadcast('cssMediaQueriesTested');
-					}
-				}, 500);
-			}
-		};
+                    }
+                }, 500);
+            }
+        };
 
 		window.onresize = function () {
 			var x = window.onresize || function () {}; // save original

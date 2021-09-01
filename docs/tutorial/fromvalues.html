@@ -56,6 +56,335 @@
                 <section id="creating-from-values">
                     <h1>Creating From Values<a class="headerlink" href="#creating-from-values"
                                                title="Permalink to this headline">¶</a></h1>
+                    <p>A new <a class="reference internal"
+                                href="../api/fld_data.html#fld_data.FldData"
+                                title="fld_data.FldData"><code
+                            class="xref py py-class docutils literal notranslate"><span class="pre">fld_data.FldData</span></code></a>
+                        instance can be created directly from NumPy arrays using
+                        <a class="reference internal"
+                           href="../api/fld_data.html#fld_data.FldData.fromvalues"
+                           title="fld_data.FldData.fromvalues"><code
+                                class="xref py py-meth docutils literal notranslate"><span
+                                class="pre">fld_data.FldData.fromvalues()</span></code></a> method.
+                        This is demonstrated in
+                        <code class="docutils literal notranslate"><span class="pre">examples/demo_fromvalues_tofile.py</span></code>,
+                        found in the repo and described below.</p>
+                    <p>First, we set the size of the problem, including the dimensions, number of
+                        GLL points,
+                        and number of elements:</p>
+                    <div class="highlight-python notranslate">
+                        <div class="highlight"><pre><span></span><span class="n">ndims</span> <span
+                                class="o">=</span> <span class="mi">3</span>
+<span class="n">nx1</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">ny1</span> <span class="o">=</span> <span class="n">nx1</span>
+<span class="n">nz1</span> <span class="o">=</span> <span class="n">nx1</span>
+<span class="n">nelgt</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">nelt</span> <span class="o">=</span> <span class="n">nelgt</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>We can optionally specify the datatypes of integers and floats in the file.
+                        By default,
+                        <a class="reference internal"
+                           href="../api/fld_data.html#fld_data.FldData.fromvalues"
+                           title="fld_data.FldData.fromvalues"><code
+                                class="xref py py-meth docutils literal notranslate"><span
+                                class="pre">fld_data.FldData.fromvalues()</span></code></a> uses
+                        32-bit ints and floats.</p>
+                    <div class="highlight-python notranslate">
+                        <div class="highlight"><pre><span></span><span
+                                class="n">float_type</span> <span class="o">=</span> <span
+                                class="n">np</span><span class="o">.</span><span
+                                class="n">dtype</span><span class="p">(</span><span
+                                class="n">np</span><span class="o">.</span><span
+                                class="n">float32</span><span class="p">)</span>
+<span class="n">int_type</span> <span class="o">=</span> <span class="n">np</span><span
+                                    class="o">.</span><span class="n">dtype</span><span
+                                    class="p">(</span><span class="n">np</span><span
+                                    class="o">.</span><span class="n">int32</span><span
+                                    class="p">)</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>We must explicitly set global element IDs. In many downstream use cases, this
+                        is arbitrary.</p>
+                    <div class="highlight-python notranslate">
+                        <div class="highlight"><pre><span></span><span class="n">glel</span> <span
+                                class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+                                class="n">arange</span><span class="p">(</span><span
+                                class="mi">1</span><span class="p">,</span> <span
+                                class="n">nelt</span> <span class="o">+</span> <span
+                                class="mi">1</span><span class="p">)</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>To create the gridpoints, you can use a variety of NumPy trickery. For
+                        demonstration purposes,
+                        we will start with simple array of shape <code
+                                class="docutils literal notranslate"><span class="pre">(nelt,</span>
+                            <span class="pre">ndim)</span></code> and use it to construct an NumPy
+                        array of
+                        shape <code class="docutils literal notranslate"><span
+                                class="pre">(nelt,</span> <span class="pre">ndim,</span> <span
+                                class="pre">nx1</span> <span class="pre">*</span> <span class="pre">ny1</span>
+                            <span class="pre">*</span> <span class="pre">nz1)</span></code>. The
+                        latter is the expected shape for
+                        <code class="docutils literal notranslate"><span
+                                class="pre">FldData.coords</span></code>.</p>
+                    <p>We start with these points:</p>
+                    <div class="highlight-python notranslate">
+                        <div class="highlight"><pre><span></span><span class="n">pt</span> <span
+                                class="o">=</span><span class="p">[[</span><span
+                                class="mf">0.0</span><span class="p">,</span> <span
+                                class="mf">0.0</span><span class="p">,</span> <span
+                                class="mf">0.0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">],</span>
+     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">,</span> <span class="mf">1.0</span><span
+                                    class="p">]]</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>And create a coordinate array of the proper shape:</p>
+                    <div class="highlight-python notranslate">
+                        <div class="highlight"><pre><span></span><span class="n">nxyz</span> <span
+                                class="o">=</span> <span class="n">nx1</span> <span
+                                class="o">*</span> <span class="n">ny1</span> <span
+                                class="o">*</span> <span class="n">nz1</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span
+                                    class="o">.</span><span class="n">empty</span><span
+                                    class="p">((</span><span class="n">nelt</span><span
+                                    class="p">,</span> <span class="n">ndims</span><span
+                                    class="p">,</span> <span class="n">nxyz</span><span
+                                    class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span
+                                    class="n">float_type</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span
+                                    class="p">(</span><span class="n">nelt</span><span
+                                    class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+                                    class="p">(</span><span class="n">nxyz</span><span
+                                    class="p">):</span>
+        <span class="n">coords</span><span class="p">[</span><span class="n">j</span><span
+                                    class="p">][</span><span class="mi">0</span><span
+                                    class="p">][</span><span class="n">i</span><span
+                                    class="p">]</span> <span class="o">=</span> <span
+                                    class="n">pt</span><span class="p">[</span><span
+                                    class="n">i</span><span class="p">][</span><span
+                                    class="mi">0</span><span class="p">]</span>
+        <span class="n">coords</span><span class="p">[</span><span class="n">j</span><span
+                                    class="p">][</span><span class="mi">1</span><span
+                                    class="p">][</span><span class="n">i</span><span
+                                    class="p">]</span> <span class="o">=</span> <span
+                                    class="n">pt</span><span class="p">[</span><span
+                                    class="n">i</span><span class="p">][</span><span
+                                    class="mi">1</span><span class="p">]</span>
+        <span class="n">coords</span><span class="p">[</span><span class="n">j</span><span
+                                    class="p">][</span><span class="mi">2</span><span
+                                    class="p">][</span><span class="n">i</span><span
+                                    class="p">]</span> <span class="o">=</span> <span
+                                    class="n">pt</span><span class="p">[</span><span
+                                    class="n">i</span><span class="p">][</span><span
+                                    class="mi">2</span><span class="p">]</span> <span
+                                    class="o">+</span> <span class="n">j</span>  <span class="c1">#offset in the z-direction by the element number</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>Next, we create a velocity field with some dummy values. Like coordinates,
+                        <code class="docutils literal notranslate"><span
+                                class="pre">FldData.u</span></code> must have shape <code
+                                class="docutils literal notranslate"><span class="pre">(nelt,</span>
+                            <span class="pre">ndim,</span> <span class="pre">nx1</span> <span
+                                    class="pre">*</span> <span class="pre">ny1</span> <span
+                                    class="pre">*</span> <span class="pre">nz1)</span></code>:</p>
+                    <div class="highlight-python notranslate">
+                        <div class="highlight"><pre><span></span><span class="n">u</span> <span
+                                class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+                                class="n">empty</span><span class="p">((</span><span
+                                class="n">nelt</span><span class="p">,</span> <span
+                                class="n">ndims</span><span class="p">,</span> <span
+                                class="n">nxyz</span><span class="p">),</span> <span
+                                class="n">dtype</span><span class="o">=</span><span class="n">float_type</span><span
+                                class="p">)</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span
+                                    class="p">(</span><span class="n">nelt</span><span
+                                    class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+                                    class="p">(</span><span class="n">nxyz</span><span
+                                    class="p">):</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">j</span><span
+                                    class="p">][</span><span class="mi">0</span><span
+                                    class="p">][</span><span class="n">i</span><span
+                                    class="p">]</span> <span class="o">=</span> <span
+                                    class="n">j</span> <span class="o">+</span> <span
+                                    class="mf">1.0</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">j</span><span
+                                    class="p">][</span><span class="mi">1</span><span
+                                    class="p">][</span><span class="n">i</span><span
+                                    class="p">]</span> <span class="o">=</span> <span
+                                    class="p">(</span><span class="n">j</span> <span
+                                    class="o">+</span> <span class="mf">1.0</span><span
+                                    class="p">)</span> <span class="o">*</span> <span
+                                    class="mf">2.0</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">j</span><span
+                                    class="p">][</span><span class="mi">2</span><span
+                                    class="p">][</span><span class="n">i</span><span
+                                    class="p">]</span> <span class="o">=</span> <span
+                                    class="p">(</span><span class="n">j</span> <span
+                                    class="o">+</span> <span class="mf">1.0</span><span
+                                    class="p">)</span> <span class="o">*</span> <span
+                                    class="mf">3.0</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>Next, we create pressure and velocity fields with dummy values. The expected
+                        shape of
+                        scalar fields is <code class="docutils literal notranslate"><span
+                                class="pre">(nelt,</span> <span class="pre">nx1</span> <span
+                                class="pre">*</span> <span class="pre">ny1</span> <span class="pre">*</span>
+                            <span class="pre">nz1)</span></code>.</p>
+                    <div class="highlight-python notranslate">
+                        <div class="highlight"><pre><span></span><span class="n">i</span> <span
+                                class="o">=</span> <span class="mf">1.0</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span
+                                    class="o">.</span><span class="n">arange</span><span
+                                    class="p">(</span><span class="n">i</span><span
+                                    class="p">,</span> <span class="n">i</span> <span
+                                    class="o">+</span> <span class="n">nelt</span> <span
+                                    class="o">*</span> <span class="n">nxyz</span><span
+                                    class="p">,</span> <span class="n">dtype</span><span
+                                    class="o">=</span><span class="nb">float</span><span
+                                    class="p">)</span><span class="o">.</span><span class="n">reshape</span><span
+                                    class="p">(</span><span class="n">nelt</span><span
+                                    class="p">,</span> <span class="n">nxyz</span><span
+                                    class="p">)</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span
+                                    class="n">nelt</span> <span class="o">*</span> <span class="n">nxyz</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span
+                                    class="o">.</span><span class="n">arange</span><span
+                                    class="p">(</span><span class="n">i</span><span
+                                    class="p">,</span> <span class="n">i</span> <span
+                                    class="o">+</span> <span class="n">nelt</span> <span
+                                    class="o">*</span> <span class="n">nxyz</span><span
+                                    class="p">,</span> <span class="n">dtype</span><span
+                                    class="o">=</span><span class="nb">float</span><span
+                                    class="p">)</span><span class="o">.</span><span class="n">reshape</span><span
+                                    class="p">(</span><span class="n">nelt</span><span
+                                    class="p">,</span> <span class="n">nxyz</span><span
+                                    class="p">)</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>Finally, we instantiate an <a class="reference internal"
+                                                     href="../api/fld_data.html#fld_data.FldData"
+                                                     title="fld_data.FldData"><code
+                            class="xref py py-class docutils literal notranslate"><span class="pre">fld_data.FldData</span></code></a>
+                        and write it to file:</p>
+                    <div class="highlight-python notranslate">
+                        <div class="highlight"><pre><span></span><span class="n">data</span> <span
+                                class="o">=</span> <span class="n">FldData</span><span
+                                class="o">.</span><span class="n">fromvalues</span><span
+                                class="p">(</span><span class="n">nx1</span><span class="o">=</span><span
+                                class="n">nx1</span><span class="p">,</span> <span
+                                class="n">ny1</span><span class="o">=</span><span
+                                class="n">ny1</span><span class="p">,</span> <span
+                                class="n">nz1</span><span class="o">=</span><span
+                                class="n">nz1</span><span class="p">,</span> <span
+                                class="n">nelgt</span><span class="o">=</span><span
+                                class="n">nelgt</span><span class="p">,</span> <span
+                                class="n">nelt</span><span class="o">=</span><span
+                                class="n">nelt</span><span class="p">,</span>
+                         <span class="n">glel</span><span class="o">=</span><span
+                                    class="n">glel</span><span class="p">,</span> <span class="n">coords</span><span
+                                    class="o">=</span><span class="n">coords</span><span
+                                    class="p">,</span> <span class="n">p</span><span
+                                    class="o">=</span><span class="n">p</span><span
+                                    class="p">,</span> <span class="n">u</span><span
+                                    class="o">=</span><span class="n">u</span><span
+                                    class="p">,</span> <span class="n">t</span><span
+                                    class="o">=</span><span class="n">t</span><span
+                                    class="p">)</span>
+
+<span class="n">data</span><span class="o">.</span><span class="n">tofile</span><span
+                                    class="p">(</span><span class="s1">&#39;fdtf0.f00001&#39;</span><span
+                                    class="p">)</span>
+</pre>
+                        </div>
+                    </div>
                 </section>
 
 
