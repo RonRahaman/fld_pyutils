@@ -9,7 +9,7 @@ Welcome to Fld Utils's documentation!
     api/index
 
 
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`

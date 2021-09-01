@@ -1031,7 +1031,7 @@ domReady(function enableCssMediaQueries() {
 		}
 
 		var timer;
-		var resizeHandler = function () {
+        var resizeHandler = function () {
             var vpw = cssHelper.getViewportWidth();
             var vph = cssHelper.getViewportHeight();
             // check whether vp size has really changed, because IE also triggers resize event when body size changes

@@ -34,15 +34,15 @@ var Stemmer = function () {
         ization: 'ize',
         ation: 'ate',
         ator: 'ate',
-    alism: 'al',
-    iveness: 'ive',
-    fulness: 'ful',
-    ousness: 'ous',
-    aliti: 'al',
-    iviti: 'ive',
-    biliti: 'ble',
-    logi: 'log'
-  };
+        alism: 'al',
+        iveness: 'ive',
+        fulness: 'ful',
+        ousness: 'ous',
+        aliti: 'al',
+        iviti: 'ive',
+        biliti: 'ble',
+        logi: 'log'
+    };
 
   var step3list = {
     icate: 'ic',

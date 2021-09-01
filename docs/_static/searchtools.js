@@ -180,15 +180,14 @@ var Search = {
         // select the correct list
         if (word[0] == '-') {
             toAppend = excluded;
-        word = word.substr(1);
-      }
-      else {
-        toAppend = searchterms;
-        hlterms.push(tmp[i].toLowerCase());
-      }
-      // only add if not already in the list
-      if (!$u.contains(toAppend, word))
-        toAppend.push(word);
+            word = word.substr(1);
+        } else {
+            toAppend = searchterms;
+            hlterms.push(tmp[i].toLowerCase());
+        }
+        // only add if not already in the list
+        if (!$u.contains(toAppend, word))
+            toAppend.push(word);
     }
     var highlightstring = '?highlight=' + $.urlencode(hlterms.join(" "));
 
@@ -351,18 +350,18 @@ var Search = {
                       objname + ' ' + title).toLowerCase();
                   var allfound = true;
                   for (i = 0; i < otherterms.length; i++) {
-              if (haystack.indexOf(otherterms[i]) == -1) {
-                allfound = false;
-                break;
+                      if (haystack.indexOf(otherterms[i]) == -1) {
+                          allfound = false;
+                          break;
+                      }
+                  }
+                  if (!allfound) {
+                      continue;
+                  }
               }
-            }
-            if (!allfound) {
-              continue;
-            }
-          }
-          var descr = objname + _(', in ') + title;
+              var descr = objname + _(', in ') + title;
 
-          var anchor = match[3];
+              var anchor = match[3];
               if (anchor === '')
                   anchor = fullname;
               else if (anchor == '-')
@@ -405,18 +404,18 @@ var Search = {
         for (i = 0; i < searchterms.length; i++) {
             var word = searchterms[i];
             var files = [];
-      var _o = [
-        {files: terms[word], score: Scorer.term},
-        {files: titleterms[word], score: Scorer.title}
-      ];
-      // add support for partial matches
-      if (word.length > 2) {
-          var word_regex = this.escapeRegExp(word);
-        for (var w in terms) {
-            if (w.match(word_regex) && !terms[word]) {
-                _o.push({files: terms[w], score: Scorer.partialTerm})
-            }
-        }
+            var _o = [
+                {files: terms[word], score: Scorer.term},
+                {files: titleterms[word], score: Scorer.title}
+            ];
+            // add support for partial matches
+            if (word.length > 2) {
+                var word_regex = this.escapeRegExp(word);
+                for (var w in terms) {
+                    if (w.match(word_regex) && !terms[word]) {
+                        _o.push({files: terms[w], score: Scorer.partialTerm})
+                    }
+                }
         for (var w in titleterms) {
             if (w.match(word_regex) && !titleterms[word]) {
                 _o.push({files: titleterms[w], score: Scorer.partialTitle})
