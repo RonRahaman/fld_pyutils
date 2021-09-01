@@ -1032,20 +1032,19 @@ domReady(function enableCssMediaQueries() {
 
 		var timer;
 		var resizeHandler = function () {
-			var vpw = cssHelper.getViewportWidth();
-			var vph = cssHelper.getViewportHeight();
-			// check whether vp size has really changed, because IE also triggers resize event when body size changes
-			// 20px allowance to accomodate short appearance of scrollbars in IE in some cases
-			if (Math.abs(vpw - cvpw) > scrollbarWidth || Math.abs(vph - cvph) > scrollbarWidth) {
-				cvpw = vpw;
-				cvph = vph;
-				clearTimeout(timer);
-				timer = setTimeout(function () {
-					if (!nativeSupport()) {
-						test();
-					}
-					else {
-						cssHelper.broadcast('cssMediaQueriesTested');
+            var vpw = cssHelper.getViewportWidth();
+            var vph = cssHelper.getViewportHeight();
+            // check whether vp size has really changed, because IE also triggers resize event when body size changes
+            // 20px allowance to accommodate short appearance of scrollbars in IE in some cases
+            if (Math.abs(vpw - cvpw) > scrollbarWidth || Math.abs(vph - cvph) > scrollbarWidth) {
+                cvpw = vpw;
+                cvph = vph;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    if (!nativeSupport()) {
+                        test();
+                    } else {
+                        cssHelper.broadcast('cssMediaQueriesTested');
 					}
 				}, 500);
 			}
