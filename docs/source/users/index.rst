@@ -6,8 +6,3 @@ Users' Guide
 
     about
     data
-    fromfile
-    accessing
-    editing
-    tofile
-    fromvalues

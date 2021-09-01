@@ -56,6 +56,65 @@
                 <section id="writing-data-to-file">
                     <h1>Writing Data To File<a class="headerlink" href="#writing-data-to-file"
                                                title="Permalink to this headline">¶</a></h1>
+                    <p>A <a class="reference internal" href="../api/fld_data.html#fld_data.FldData"
+                            title="fld_data.FldData"><code
+                            class="xref py py-class docutils literal notranslate"><span class="pre">fld_data.FldData</span></code></a>
+                        instance can be written to a new field file by the
+                        <code class="xref py py-meth docutils literal notranslate"><span
+                                class="pre">fld_data.FldData.tofile()</span></code> method. This
+                        produces a valid field file that can be used
+                        for restarting a Nek simulation and plotting in ParaView or VisIt.</p>
+                    <p>In this demo, we:</p>
+                    <blockquote>
+                        <div>
+                            <ol class="arabic simple">
+                                <li><p>Read a field file</p></li>
+                                <li><p>Convert the temperature field from Kelvin to Celsius</p></li>
+                                <li><p>Re-write the data to a new field file</p></li>
+                            </ol>
+                        </div>
+                    </blockquote>
+                    <p>First, we read the file:</p>
+                    <div class="highlight-pycon notranslate">
+                        <div class="highlight"><pre><span></span><span
+                                class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                class="nn">fld_data</span> <span class="kn">import</span> <span
+                                class="n">FldData</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span
+                                    class="n">FldData</span><span class="o">.</span><span class="n">fromfile</span><span
+                                    class="p">(</span><span class="s1">&#39;demos/data/test0.f00001&#39;</span><span
+                                    class="p">)</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>Then, we convert to Celsius</p>
+                    <div class="highlight-pycon notranslate">
+                        <div class="highlight"><pre><span></span><span
+                                class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                class="o">.</span><span class="n">t</span> <span class="o">+=</span> <span
+                                class="mf">273.15</span>
+</pre>
+                        </div>
+                    </div>
+                    <p>Finally, we write to new file:</p>
+                    <div class="highlight-pycon notranslate">
+                        <div class="highlight"><pre><span></span><span
+                                class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span
+                                class="o">.</span><span class="n">tofile</span><span
+                                class="p">(</span><span
+                                class="s1">&#39;celsius0.f00001&#39;</span><span class="p">)</span>
+</pre>
+                        </div>
+                    </div>
+                    <div class="admonition warning">
+                        <p class="admonition-title">Warning</p>
+                        <p><code class="xref py py-meth docutils literal notranslate"><span
+                                class="pre">fld_data.FldData.tofile()</span></code> can use an
+                            arbitrary filename, but downstream applications
+                            (such a Nek restarts, ParaView, and VisIt) expect specifically-formatted
+                            filenames. See the
+                            Nek documentation for a description of the filename format.</p>
+                    </div>
                 </section>
 
 
