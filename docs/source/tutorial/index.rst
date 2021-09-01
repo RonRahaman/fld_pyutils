@@ -6,5 +6,3 @@ Tutorial
 
     fromfile
     accessing
-    tofile
-    fromvalues

@@ -55,11 +55,11 @@ for j in range(nelt):
 
 #p = np.full(nelt * nx1 ** 3, fill_value=8)
 
-i=1.0
-p=np.arange(i,i+nelt*nxyz,dtype=float)
+i = 1.0
+p = np.arange(i, i + nelt * nxyz, dtype=float).reshape(nelt, nxyz)
 
-i=i+nelt*nxyz
-t = np.arange(i,i+nelt*nxyz,dtype=float)
+i = i + nelt * nxyz
+t = np.arange(i, i + nelt * nxyz, dtype=float).reshape(nelt, nxyz)
 
 data = FldData.fromvalues(nx1=nx1, ny1=ny1, nz1=nz1, nelgt=nelgt, nelt=nelt,
                          glel=glel, coords=coords, p=p, u=u, t=t)

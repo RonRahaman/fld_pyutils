@@ -66,10 +66,14 @@ class FldDataBase(ABC):
             # For p, t, and each field in s
             return np.column_stack([np.min(v, axis=-1), np.max(v, axis=-1)])
 
-        file.write(vec_field_metadata(self._coords).tobytes())
-        file.write(vec_field_metadata(self._u).tobytes())
-        file.write(scal_field_metadata(self._p).tobytes())
-        file.write(scal_field_metadata(self._t).tobytes())
+        if len(self._coords):
+            file.write(vec_field_metadata(self._coords).tobytes())
+        if len(self._u):
+            file.write(vec_field_metadata(self._u).tobytes())
+        if len(self._p):
+            file.write(scal_field_metadata(self._p).tobytes())
+        if len(self._t):
+            file.write(scal_field_metadata(self._t).tobytes())
         for i in range(self._s.shape[0]):
             file.write(scal_field_metadata(self._s[i, :, :]).tobytes())
 

@@ -22,15 +22,15 @@ class FldData(FldDataBase):
         An instantiated :py:class:`fld_header.FldHeader` object.
     coords
         Array of global element coordinates.
-        Must have shape = ``(header.nelt, header.nx1 * header.ny1 * header.nz1, header.ndims)``.  Default is ``None``.
+        Must have shape = ``(header.nelt, header.ndims, header.nx1 * header.ny1 * header.nz1)``.  Default is ``None``.
     u
-        Array of velocities.  Must have shape = ``(header.nelt, header.nx1 * header.ny1 * header.nz1, header.ndims)``. Default is ``None``.
+        Array of velocities.  Must have shape = ``(header.nelt, header.ndims, header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.
     p
-        Array of pressures.  Must have shape = ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``. Default is ``None``.
+        Array of pressures.  Must have shape = ``(header.nelt, header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.
     t
-        Array of temperatures.  Must have shape = ``(header.nelt * header.nx1 * header.ny1 * header.nz1,)``. Default is ``None``.
+        Array of temperatures.  Must have shape = ``(header.nelt, header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.
     s
-        Array of passive scalars.  Must have shape = ``(header.nscalars, header.nelt * header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.
+        Array of passive scalars.  Must have shape = ``(header.nscalars, header.nelt, header.nx1 * header.ny1 * header.nz1)``. Default is ``None``.
 
     Raises
     ------
@@ -194,9 +194,9 @@ class FldData(FldDataBase):
         u
             Array representing velocity field; shape must be ``(nelt, ndims, nx1 * ny1 * nz1)``
         p
-            Array representing pressure field; shape must be ``(nelt, nx1 * ny1 * nz1,)``
+            Array representing pressure field; shape must be ``(nelt, nx1 * ny1 * nz1)``
         t
-            Array representing temperature field; shape must be ``(nelt, nx1 * ny1 * nz1,)``
+            Array representing temperature field; shape must be ``(nelt, nx1 * ny1 * nz1)``
         s
             Array representing all passive scalar field; shape must be ``(nscalars, nelt, nx1 * ny1 * nz1)``
 
@@ -230,14 +230,15 @@ class FldData(FldDataBase):
     @FldDataBase.p.setter
     def p(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt, self.nx1 * self.ny1 * self.nz1,):
-            raise ValueError("Incorrect shape for p: p.shape must equal (nelt * nx1 * ny1 * nz1,)")
+            raise ValueError("Incorrect shape for p: p.shape must equal (nelt, nx1 * ny1 * nz1)")
         self._p = other.astype(self.float_type)
         self._set_rdcode()
 
     @FldDataBase.t.setter
     def t(self, other: np.ndarray):
         if other.size != 0 and other.shape != (self.nelt, self.nx1 * self.ny1 * self.nz1,):
-            raise ValueError("Incorrect shape for t: t.shape must equal ``(nelt * nx1 * ny1 * nz1,)``")
+            raise ValueError(
+                "Incorrect shape for t: t.shape must equal ``(nelt, nx1 * ny1 * nz1)``")
         self._t = other.astype(self.float_type)
         self._set_rdcode()
 
@@ -246,6 +247,6 @@ class FldData(FldDataBase):
         if other.size != 0 and (
                 len(other.shape) != 3 or other.shape[1:] != (self.nelt, self.nx1 * self.ny1 * self.nz1)):
             raise ValueError(
-                "Incorrect shape for s: s.shape must equal (x, nelt, nx1 * ny1 * nz1) for arbitrary number of scalars x")
+                "Incorrect shape for s: s.shape must equal (n, nelt, nx1 * ny1 * nz1) for arbitrary number of scalars n")
         self._s = other.astype(self.float_type)
         self._set_rdcode()

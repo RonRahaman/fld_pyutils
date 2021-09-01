@@ -41,7 +41,6 @@ Reading the data is straightforward.  It can be used like like any NumPy array.
 .. code-block:: pycon
 
     >>> from fld_data import FldData
-    >>> import numpy as np
     >>> f = FldData.fromfile('demos/data/test0.f00001')
     [scratch.f00001] : Attempting to fields from rdcode XUPTS02
     [scratch.f00001] : Located coordinates X
@@ -52,7 +51,7 @@ Reading the data is straightforward.  It can be used like like any NumPy array.
     >>> f.p                   # Pressure field
     array([-8.543964e-09, -7.483058e-09, -7.243701e-09, ..., -7.243678e-09,
            -7.483029e-09, -8.543934e-09], dtype=float32)
-    >>> np.max(f.p)           # Maximum pressure value
+    >>> f.p.max()             # Maximum pressure value
     2.293219e-08
     >>> f.u[f.glel == 2,:,:]  # Velocity components for global element ID 2
 
@@ -70,9 +69,16 @@ fields and changing the number of passive scalars, see below).  :py:class:`fld_d
 
 .. code-block:: pycon
 
-    >>> f.u = np.full_like(f.u, fill_value=1.0)                             # OK
-    >>> f.u = np.full(shape=(f.nelt * f.nx1**3 * f.ndims), fill_value=2.0)  # Oops!
+    >>> import numpy as np
+    >>> f.u = np.full_like(f.u, fill_value=1.0)                                 # OK
+    >>> f.u = np.full((f.nelt, f.ndims, f.nx1 * f.ny1 * f.nz1), fill_value=2.0) # Also OK
+    >>> f.u = np.full((f.ndims, f.nelt, f.nx1 * f.ny1 * f.nz1), fill_value=2.0) # Oops!
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "/Users/rahaman/repos/fld_pyutils/fld_data.py", line 226, in u
+        raise ValueError("Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)")
     ValueError: Incorrect shape for u: u.shape must equal (nelt, ndims, nx1 * ny1 * nz1)
+
 
 To delete a field, assign it to an empty array:
 
